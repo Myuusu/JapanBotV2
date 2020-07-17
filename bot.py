@@ -88,11 +88,11 @@ class Music(commands.Cog):
         # Region should be a discord.py guild.region e.g sydney or us_central (Though this is not technically required)
         node = await self.bot.wavelink.initiate_node(
             host='127.0.0.1',
-            port=2333,
-            rest_uri='http://127.0.0.1:2333',
+            port=80,
+            rest_uri='http://127.0.0.1:80',
             password='testing',
             identifier='TEST',
-            region='us_central')
+            region='europe')
 
         # Set our node hook callback
         node.set_hook(self.on_event_hook)
