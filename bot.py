@@ -1,6 +1,3 @@
-import discord
-import os
-import config
 import asyncio
 import datetime
 import discord
@@ -9,17 +6,21 @@ import itertools
 import re
 import sys
 import traceback
-import lavalink
 import wavelink
 from discord.ext import commands
+from config import bot_token
 from typing import Union
+import os
 
-RURL = re.compile('https?:\/\/(?:www\.)?.+')
+
+RURL = re.compile('http:\/\/.+')
 
 
 class Bot(commands.Bot):
+
     def __init__(self):
-        super().__init__(command_prefix = '!')
+        super(Bot, self).__init__(command_prefix="!")
+
         self.add_cog(Music(self))
 
         for filename in os.listdir('./commands'):
@@ -38,7 +39,7 @@ class Bot(commands.Bot):
 class MusicController:
 
     def __init__(self, bot, guild_id):
-        self.client = bot
+        self.bot = bot
         self.guild_id = guild_id
         self.channel = None
 
@@ -48,12 +49,12 @@ class MusicController:
         self.volume = 40
         self.now_playing = None
 
-        self.client.loop.create_task(self.controller_loop())
+        self.bot.loop.create_task(self.controller_loop())
 
     async def controller_loop(self):
-        await self.client.wait_until_ready()
+        await self.bot.wait_until_ready()
 
-        player = self.client.wavelink.get_player(self.guild_id)
+        player = self.bot.wavelink.get_player(self.guild_id)
         await player.set_volume(self.volume)
 
         while True:
@@ -85,12 +86,13 @@ class Music(commands.Cog):
 
         # Initiate our nodes. For this example we will use one server.
         # Region should be a discord.py guild.region e.g sydney or us_central (Though this is not technically required)
-        node = await self.bot.wavelink.initiate_node(host='127.0.0.1',
-                                                     port=80,
-                                                     rest_uri='http://127.0.0.1:80',
-                                                     password='testing',
-                                                     identifier='TEST',
-                                                     region='europe')
+        node = await self.bot.wavelink.initiate_node(
+            host='127.0.0.1',
+            port=2333,
+            rest_uri='http://127.0.0.1:2333',
+            password='testing',
+            identifier='TEST',
+            region='us_central')
 
         # Set our node hook callback
         node.set_hook(self.on_event_hook)
@@ -155,7 +157,6 @@ class Music(commands.Cog):
             query = f'ytsearch:{query}'
 
         tracks = await self.bot.wavelink.get_tracks(f'{query}')
-
         if not tracks:
             return await ctx.send('Could not find any songs with that query.')
 
@@ -168,6 +169,28 @@ class Music(commands.Cog):
         controller = self.get_controller(ctx)
         await controller.queue.put(track)
         await ctx.send(f'Added {str(track)} to the queue.', delete_after=15)
+
+    @commands.command()
+    async def radio(self, ctx, *, query: str):
+        """Search for and add a song to the Queue."""
+        #        if not RURL.match(query):
+        #            query = f'ytsearch:{query}'
+        #
+        #        tracks = await self.bot.wavelink.get_tracks(f'{query}')
+        tracks = await self.bot.wavelink.get_tracks('https://musicbird.leanstream.co/JCB061-MP3')
+        if not tracks:
+            return await ctx.send('Could not find any songs with that query.')
+
+        player = self.bot.wavelink.get_player(ctx.guild.id)
+        if not player.is_connected:
+            await ctx.invoke(self.connect_)
+
+        track = tracks[0]
+
+        controller = self.get_controller(ctx)
+        await controller.queue.put(track)
+        await ctx.send(f'Added {str(track)} to the queue.', delete_after=15)
+
 
     @commands.command()
     async def pause(self, ctx):
@@ -279,4 +302,4 @@ class Music(commands.Cog):
 
 
 bot = Bot()
-bot.run(config.bot_token)
+bot.run(bot_token)
