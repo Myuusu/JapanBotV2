@@ -14,8 +14,16 @@ class Bot(commands.Bot):
                 self.load_extension(f'commands.{filename[:-3]}')
 
     async def on_ready(self):
-        await self.change_presence(status=discord.Status.dnd, activity=discord.Game('coding'))
+        await self.change_presence(
+            status=discord.Status.online,
+            activity=discord.Game(
+                'streams of your favorite stations! [!s]'
+            )
+        )
         print(f'Logged in as {self.user.name} | {self.user.id}')
+
+    async def on_command_error(self, ctx, exception):
+        print(f'Context: {ctx} | Exception: {exception}')
 
 
 bot = Bot()
