@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 import os
 import random
@@ -40,6 +42,27 @@ class Utility(commands.Cog):
     @commands.command(name='ping', aliases=['ding'])
     async def ping(self, ctx):
         await ctx.send(f'Pong! {round(self.bot.latency * 1000)}ms')
+
+    @commands.command()
+    async def hack(self, ctx, user: discord.Member):
+        """Hack someone's account! Try it!"""
+        msg = await ctx.send(f"Hacking! Target: {user}")
+        await asyncio.sleep(2)
+        await msg.edit(content="Accessing Discord Files... [▓▓    ]")
+        await asyncio.sleep(2)
+        await msg.edit(content="Accessing Discord Files... [▓▓▓   ]")
+        await asyncio.sleep(2)
+        await msg.edit(content="Accessing Discord Files... [▓▓▓▓▓ ]")
+        await asyncio.sleep(2)
+        await msg.edit(content="Accessing Discord Files COMPLETE! [▓▓▓▓▓▓]")
+        await asyncio.sleep(2)
+        await msg.edit(content="Retrieving Login Info... [▓▓▓    ]")
+        await asyncio.sleep(3)
+        await msg.edit(content="Retrieving Login Info... [▓▓▓▓▓ ]")
+        await asyncio.sleep(3)
+        await msg.edit(content="Retrieving Login Info... [▓▓▓▓▓▓ ]")
+        await asyncio.sleep(4)
+        await msg.edit(content=f"An error has occurred hacking {user}'s account. Please try again later. ❌")
 
 
 def setup(bot):
