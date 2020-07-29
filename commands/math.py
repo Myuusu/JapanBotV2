@@ -6,11 +6,7 @@ class Math(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(
-        aliases=[
-            'round_up', 'ceiling'
-        ]
-    )
+    @commands.command(aliases=['round_up'])
     async def ceil(self, ctx, *, term):
         if term:
             await ctx.send(
@@ -21,11 +17,7 @@ class Math(commands.Cog):
                 'Please specify one term to round up!'
             )
 
-    @commands.command(
-        aliases=[
-            'round_down'
-        ]
-    )
+    @commands.command(aliases=['round_down'])
     async def floor(self, ctx, *, term):
         if term:
             await ctx.send(
@@ -36,11 +28,7 @@ class Math(commands.Cog):
                 'Please specify one term to round down!'
             )
 
-    @commands.command(
-        aliases=[
-            'fact'
-        ]
-    )
+    @commands.command(aliases=['fact'])
     async def factorial(self, ctx, *, term):
         if term:
             await ctx.send(
@@ -51,11 +39,7 @@ class Math(commands.Cog):
                 'Please specify one term to produce a factorial!'
             )
 
-    @commands.command(
-        aliases=[
-            'multiplication', 'multiply', 'times', 'prod'
-        ]
-    )
+    @commands.command(aliases=['multiplication', 'multiply', 'times', 'prod'])
     async def product(self, ctx, term1: int, term2: int):
         if term1 and term2:
             await ctx.send(
@@ -66,11 +50,7 @@ class Math(commands.Cog):
                 'Please specify two terms to produce a product!'
             )
 
-    @commands.command(
-        aliases=[
-            'divide', 'division', 'quot'
-        ]
-    )
+    @commands.command(aliases=['divide', 'division', 'quot'])
     async def quotient(self, ctx, term1: float, term2: float):
         if term1 and term2:
             await ctx.send(
@@ -81,11 +61,7 @@ class Math(commands.Cog):
                 'Please specify two terms to produce a quotient!'
             )
 
-    @commands.command(
-        aliases=[
-            'root', 'square_root'
-        ]
-    )
+    @commands.command(aliases=['root', 'square_root'])
     async def sqrt(self, ctx, term: float):
         if term:
             await ctx.send(
@@ -96,15 +72,11 @@ class Math(commands.Cog):
                 'Please specify one term to produce a square root!'
             )
 
-    @commands.command(
-        aliases=[
-            'power', 'raise', 'square'
-        ]
-    )
+    @commands.command(aliases=['power', 'raise', 'square'])
     async def pow(self, ctx, term1: float, term2: float = 2):
         if term1 and term2:
             await ctx.send(
-                f'{term1}^{term2} = {math.pow(term1,term2):,.0f}'
+                f'{term1}^{term2} = {math.pow(term1,term2):,.2f}'
             )
         else:
             await ctx.send(
@@ -141,6 +113,6 @@ class Math(commands.Cog):
                 'Please specify two terms to produce a quotient!'
             )
 
-
+            
 def setup(bot):
     bot.add_cog(Math(bot))
