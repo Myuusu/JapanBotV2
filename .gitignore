@@ -130,3 +130,7 @@ dmypy.json
 
 ./config.py
 config.py
+
+*/__pycache__/*
+.vs/*
+Lavalink/

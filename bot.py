@@ -1,13 +1,16 @@
 import discord
+import os
 from discord.ext import commands
 from config import bot_token
-import os
 
 
 class Bot(commands.Bot):
 
     def __init__(self):
-        super(Bot, self).__init__(command_prefix="!")
+        super(Bot, self).__init__(
+            command_prefix=["!", "'", "73"],
+            case_insensitive=True
+        )
 
         for filename in os.listdir('./commands'):
             if filename.endswith('.py'):

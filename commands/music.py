@@ -7,7 +7,9 @@ import sys
 import traceback
 import wavelink
 import humanize
+from config import node_settings
 from discord.ext import commands
+from storage.station_list import station_list
 from typing import Union
 
 
@@ -17,60 +19,51 @@ class MusicController:
         self.bot = bot
         self.guild_id = guild_id
         self.channel = None
-
         self.next = asyncio.Event()
         self.queue = asyncio.Queue()
-
         self.volume = 40
         self.now_playing = None
-
         self.bot.loop.create_task(self.controller_loop())
 
     async def controller_loop(self):
         await self.bot.wait_until_ready()
-
         player = self.bot.wavelink.get_player(self.guild_id)
         await player.set_volume(self.volume)
-
         while True:
             if self.now_playing:
                 await self.now_playing.delete()
-
             self.next.clear()
-
             song = await self.queue.get()
             await player.play(song)
-            self.now_playing = await self.channel.send(f'Now playing: `{song}`')
-
-            await self.next.wait()
+            try:
+                self.now_playing = await self.channel.send(f'Now playing: `{song}`')
+                await self.next.wait()
+            except AttributeError as error:
+                print(error)
 
 
 class Music(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
         self.controllers = {}
-
         if not hasattr(bot, 'wavelink'):
             self.bot.wavelink = wavelink.Client(bot=self.bot)
-
         self.bot.loop.create_task(self.start_nodes())
 
     async def start_nodes(self):
         await self.bot.wait_until_ready()
-
-        # Initiate our nodes. For this example we will use one server.
-        # Region should be a discord.py guild.region e.g sydney or us_central (Though this is not technically required)
-        node = await self.bot.wavelink.initiate_node(
-            host='127.0.0.1',
-            port=80,
-            rest_uri='http://127.0.0.1:80',
-            password='testing',
-            identifier='TEST',
-            region='europe')
-
-        # Set our node hook callback
-        node.set_hook(self.on_event_hook)
+        try:
+            node = await self.bot.wavelink.initiate_node(
+                host=node_settings['host'],
+                port=node_settings['port'],
+                rest_uri=node_settings['rest_uri'],
+                password=node_settings['password'],
+                identifier=node_settings['identifier'],
+                region=node_settings['region']
+            )
+            node.set_hook(self.on_event_hook)
+        except wavelink.errors.NodeOccupied:
+            pass
 
     async def on_event_hook(self, event):
         """Node hook callback."""
@@ -130,8 +123,8 @@ class Music(commands.Cog):
         await ctx.send(f'Added {str(track)} to the queue.', delete_after=15)
 
     @commands.command()
-    async def play_station(self, ctx, query: str):
-        station = await self.bot.wavelink.get_tracks(f'{query}')
+    async def play_station(self, ctx, url: str):
+        station = await self.bot.wavelink.get_tracks(url)
         player = self.bot.wavelink.get_player(ctx.guild.id)
         if not player.is_connected:
             await ctx.invoke(self.connect_)
@@ -141,7 +134,6 @@ class Music(commands.Cog):
 
     @commands.command()
     async def pause(self, ctx):
-        """Pause the player."""
         player = self.bot.wavelink.get_player(ctx.guild.id)
         if not player.is_playing:
             return await ctx.send('I am not currently playing anything!', delete_after=15)
@@ -151,7 +143,6 @@ class Music(commands.Cog):
 
     @commands.command()
     async def resume(self, ctx):
-        """Resume the player from a paused state."""
         player = self.bot.wavelink.get_player(ctx.guild.id)
         if not player.paused:
             return await ctx.send('I am not currently paused!', delete_after=15)
@@ -159,7 +150,9 @@ class Music(commands.Cog):
         await ctx.send('Resuming the player!', delete_after=15)
         await player.set_pause(False)
 
-    @commands.command()
+    @commands.command(
+        aliases=['next']
+    )
     async def skip(self, ctx):
         """Skip the currently playing song."""
         player = self.bot.wavelink.get_player(ctx.guild.id)
@@ -247,86 +240,64 @@ class Music(commands.Cog):
               f'Server Uptime: `{datetime.timedelta(milliseconds=node.stats.uptime)}`'
         await ctx.send(fmt)
 
-    @commands.command(aliases=['s', 'st'])
-    async def stations(self, ctx):
-        des = ["**1.**  Anime Radio", "**2.**  Jazz Sakura - Asia Dream Radio", "**3.**  Japan Hits - Asia Dream Radio",
-               "**4.**  J-Pop Powerplay", "**5.**  J-Club Powerplay Hip-Hop", "**6.**  J-Pop Sakura 懐かしい",
-               "**7.**  J-Pop Powerplay Kawaii", "**8.**  J-Rock Powerplay", "**9.**  Vocaloid Radio",
-               "**10.** Japanimradio", "**11.** FM 845", "**12.** Bitter Sweet Music JP", "**13.** Banana FM",
-               "**14.** Musashino FM", "**15.** Radio Kanazawa", "**16.** Smooth Jazz Florida",
-               "**Enter the number corresponding to the Radio you want to listen to:**"]
-        embedable = discord.Embed(
-            title="Station List",
-            description="\n".join(des),
-            color=0x00ff00)
-        await ctx.send(embed=embedable)
-
-        def pred(m):
-            return ctx.channel == m.channel and ctx.author == m.author
-
-        try:
-            response = await self.bot.wait_for(
-                'message',
-                check=pred,
-                timeout=10
+    @commands.command(
+        aliases=['s', 'st']
+    )
+    async def stations(self, ctx, *, station_id: int = 0):
+        if station_id == 0:
+            des = await self.get_station_descriptions()
+            des.append("*Please Respond With The Station Number!*")
+            embed_item = discord.Embed(
+                title="Station List",
+                description="\n".join(des),
+                color=0x00ff00
             )
-            if response.content == "1":
-                station_url = 'http://87.98.217.63:23612/:stream/1'
-                name = 'Anime Radio'
-            elif response.content == "2":
-                station_url = 'http://agnes.torontocast.com:8087/;.mp3'
-                name = 'Jazz Sakura - Asia DREAM Radio'
-            elif response.content == "3":
-                station_url = 'http://agnes.torontocast.com:8102/;'
-                name = 'Japan Hits - Asia DREAM Radio'
-            elif response.content == "4":
-                station_url = 'http://bluford.torontocast.com:8526/;'
-                name = 'J-Pop Powerplay'
-            elif response.content == "5":
-                station_url = 'http://agnes.torontocast.com:8051/;'
-                name = 'J-Club Powerplay Hip-Hop'
-            elif response.content == "6":
-                station_url = 'http://bluford.torontocast.com:8519/;'
-                name = 'J-Pop Sakura 懐かしい'
-            elif response.content == "7":
-                station_url = 'http://sky1.torontocast.com:9029/;'
-                name = 'J-Pop Powerplay Kawaii'
-            elif response.content == "8":
-                station_url = 'http://cristina.torontocast.com:8057/;.mp3'
-                name = 'J-Rock Powerplay'
-            elif response.content == "9":
-                station_url = 'http://curiosity.shoutca.st:8019/stream'
-                name = 'Vocaloid Radio'
-            elif response.content == "10":
-                station_url = 'http://vps-8ef514a5.vps.ovh.net:8000/stream'
-                name = 'Japanimradio'
-            elif response.content == "11":
-                station_url = 'https://musicbird.leanstream.co/JCB104-MP3'
-                name = 'FM 845'
-            elif response.content == "12":
-                station_url = 'http://5.196.244.141:8600/live.jp'
-                name = 'Bitter Sweet Music JP'
-            elif response.content == "13":
-                station_url = 'https://musicbird.leanstream.co/JCB075-MP3'
-                name = 'Banana FM'
-            elif response.content == "14":
-                station_url = 'https://musicbird.leanstream.co/JCB032-MP3'
-                name = 'Musashino FM'
-            elif response.content == "15":
-                station_url = 'https://musicbird.leanstream.co/JCB061-MP3'
-                name = 'Radio Kanazawa'
-            elif response.content == "16":
-                station_url = 'https://usa6.fastcast4u.com/proxy/wsjfhd?mp=/1'
-                name = 'Smooth Jazz Florida'
-            else:
-                return await ctx.send('Could not find any songs with that query.')
+            await ctx.send(embed=embed_item)
+
+            def pred(m):
+                return ctx.channel == m.channel and ctx.author == m.author
+
+            try:
+                response = await self.bot.wait_for(
+                    'message',
+                    check=pred,
+                    timeout=10
+                )
+                player = self.bot.wavelink.get_player(ctx.guild.id)
+                if player.is_connected:
+                    await player.stop()
+
+                current_station_url = await self.get_station_url(ctx, int(response.content))
+                if current_station_url:
+                    await self.play_station(ctx, current_station_url)
+            except asyncio.TimeoutError:
+                await ctx.send('Too Slow')
+        else:
+
             player = self.bot.wavelink.get_player(ctx.guild.id)
             if player.is_connected:
                 await player.stop()
-            await self.play_station(ctx, station_url)
-            await ctx.send(f'You are now listening to: {name}!')
-        except asyncio.TimeoutError:
-            await ctx.send('Too Slow')
+
+            current_station_url = await self.get_station_url(ctx, station_id)
+            if current_station_url:
+                await self.play_station(ctx, current_station_url)
+
+    @commands.command()
+    async def get_station_url(self, ctx, search_id: int = 0):
+        if 1 <= search_id <= len(station_list):
+            for current_station in station_list:
+                if search_id == current_station['id']:
+                    return current_station['url']
+        await ctx.send('For a full list, please issue the stations command with no parameters.')
+
+    @commands.command()
+    async def get_station_descriptions(self):
+        des = []
+        for current_station in station_list:
+            des.append(
+                f'**{current_station["id"]}.** {current_station["name"]}'
+            )
+        return des
 
     async def cog_check(self, ctx):
         """A local check which applies to all commands in this cog."""
@@ -335,7 +306,6 @@ class Music(commands.Cog):
         return True
 
     async def cog_command_error(self, ctx, error):
-        """A local error handler for all errors arising from commands in this cog."""
         if isinstance(error, commands.NoPrivateMessage):
             try:
                 return await ctx.send('This command can not be used in Private Messages.')

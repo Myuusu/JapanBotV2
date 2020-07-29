@@ -1,5 +1,5 @@
-from discord.ext import commands
 import math
+from discord.ext import commands
 
 
 class Math(commands.Cog):
@@ -83,6 +83,36 @@ class Math(commands.Cog):
                 'Please specify two term to produce a square root!'
             )
 
+    @commands.command(
+        aliases=[
+            'add', 'plus', '+'
+        ]
+    )
+    async def addition(self, ctx, term1: float, term2: float):
+        if term1 and term2:
+            await ctx.send(
+                f'{term1} + {term2} = {term1 + term2:,.0f}'
+            )
+        else:
+            await ctx.send(
+                'Please specify two terms to produce a quotient!'
+            )
 
+    @commands.command(
+        aliases=[
+            'subtract', 'minus', '-'
+        ]
+    )
+    async def subtraction(self, ctx, term1: float, term2: float):
+        if term1 and term2:
+            await ctx.send(
+                f'{term1} - {term2} = {term1 - term2:,.0f}'
+            )
+        else:
+            await ctx.send(
+                'Please specify two terms to produce a quotient!'
+            )
+
+            
 def setup(bot):
     bot.add_cog(Math(bot))
