@@ -85,10 +85,9 @@ class Music(commands.Cog):
 
         return controller
 
-    @commands.command(
-        name='connect'
-    )
+    @commands.command(name='connect')
     async def connect_(self, ctx, channel: discord.VoiceChannel = None):
+        """Connect to a valid voice channel."""
         if not channel:
             try:
                 channel = ctx.author.voice.channel
@@ -176,11 +175,11 @@ class Music(commands.Cog):
         await ctx.send(f'Setting the player volume to `{vol}`')
         await player.set_volume(vol)
 
-    @commands.command(
-        aliases=['np', 'current', 'nowplaying']
-    )
+    @commands.command(aliases=['np', 'current', 'nowplaying'])
     async def now_playing(self, ctx):
+        """Retrieve the currently playing song."""
         player = self.bot.wavelink.get_player(ctx.guild.id)
+
         if not player.current:
             return await ctx.send('I am not currently playing anything!')
 
@@ -189,9 +188,7 @@ class Music(commands.Cog):
 
         controller.now_playing = await ctx.send(f'Now playing: `{player.current}`')
 
-    @commands.command(
-        aliases=['q']
-    )
+    @commands.command(aliases=['q'])
     async def queue(self, ctx):
         """Retrieve information on the next 5 songs from the queue."""
         player = self.bot.wavelink.get_player(ctx.guild.id)
@@ -207,9 +204,7 @@ class Music(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(
-        aliases=['disconnect', 'dc']
-    )
+    @commands.command(aliases=['disconnect', 'dc'])
     async def stop(self, ctx):
         """Stop and disconnect the player and controller."""
         player = self.bot.wavelink.get_player(ctx.guild.id)
