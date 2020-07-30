@@ -66,23 +66,16 @@ class Utility(commands.Cog):
 
     @commands.command()
     async def reverse(self, ctx, *, text: str):
-        """ !poow ,ffuts esreveR
-        Everything you type after reverse will of course, be reversed
-        """
         t_rev = text[::-1].replace("@", "@\u200B").replace("&", "&\u200B")
         await ctx.send(f"🔁 {t_rev}")
 
     @commands.command()
-    async def password(self, ctx, nbytes: int = 18):
-        """ Generates a random password string for you
-        This returns a random URL-safe text string, containing nbytes random bytes.
-        The text is Base64 encoded, so on average each byte results in approximately 1.3 characters.
-        """
-        if nbytes not in range(3, 1401):
+    async def password(self, ctx, num_bytes: int = 18):
+        if num_bytes not in range(3, 1401):
             return await ctx.send("I only accept any numbers between 3-1400")
         if hasattr(ctx, 'guild') and ctx.guild is not None:
             await ctx.send(f"Sending you a private message with your random generated password **{ctx.author.name}**")
-        await ctx.author.send(f"🎁 **Here is your password:**\n{secrets.token_urlsafe(nbytes)}")
+        await ctx.author.send(f"🎁 **Here is your password:**\n{secrets.token_urlsafe(num_bytes)}")
 
     @commands.command(aliases=['slots', 'bet'])
     @commands.cooldown(rate=1, per=3.0, type=commands.BucketType.user)
@@ -93,14 +86,14 @@ class Utility(commands.Cog):
         b = random.choice(emojis)
         c = random.choice(emojis)
 
-        slotmachine = f"**[ {a} {b} {c} ]\n{ctx.author.name}**,"
+        slot_machine = f"**[ {a} {b} {c} ]\n{ctx.author.name}**,"
 
-        if (a == b == c):
-            await ctx.send(f"{slotmachine} All matching, you won! 🎉")
-        elif (a == b) or (a == c) or (b == c):
-            await ctx.send(f"{slotmachine} 2 in a row, you won! 🎉")
+        if a == b == c:
+            await ctx.send(f"{slot_machine} All matching, you won! 🎉")
+        elif a == b or a == c or b == c:
+            await ctx.send(f"{slot_machine} 2 in a row, you won! 🎉")
         else:
-            await ctx.send(f"{slotmachine} No match, you lost 😢")
+            await ctx.send(f"{slot_machine} No match, you lost 😢")
 
 
 def setup(bot):
