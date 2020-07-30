@@ -5,6 +5,7 @@ import os
 import random
 from discord.ext import commands
 from storage.eight_ball_responses import responses
+from storage.slot_machines import slot_machines
 
 
 class Utility(commands.Cog):
@@ -78,36 +79,34 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=['slots', 'bet'])
     @commands.cooldown(rate=1, per=3.0, type=commands.BucketType.user)
-    async def slot(self, ctx, machine: str = "osrs"):
-        """ Roll the slot machine """
-        if machine == "emojis":
-            emojis = "☺☻♥♦♣♠♂♀"
-        elif machine == "desserts":
-            emojis = "🍨🍦🍰🍧🎂🍩🍪🍫🍡"
-        elif machine == "fruits":
-            emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
-        elif machine == "animals":
-            emojis = "🐫🦚🦉🐧🐠🐍🐢🦝"
+    async def slot(self, ctx, input_string: str = "help"):
+        if input_string == "help":
+            des = ["Enter the slot command, followed by the name of the slot machine you'd like to play!"]
+            for current in slot_machines:
+                des.append(f'Name: {current["name"]}\n Emojis: {current["emojis"]}')
+            return await ctx.send("\n".join(des))
         else:
-            emojis = "🧙🦹🦸🧛🧜🧝🧟🧞‍"
+            for machine in slot_machines:
+                if machine["name"] == input_string:
+                    emojis = machine["emojis"]
 
-        a = random.choice(emojis)
-        b = random.choice(emojis)
-        c = random.choice(emojis)
+            a = random.choice(emojis)
+            b = random.choice(emojis)
+            c = random.choice(emojis)
 
-        msg = await ctx.send(f"**[ ? ? ? ] Spinning! Good luck!\n{ctx.author.name}**")
-        await asyncio.sleep(3)
-        await msg.edit(content=f"**[ {a} ? ? ]\n{ctx.author.name}**")
-        await asyncio.sleep(1)
-        await msg.edit(content=f"**[ {a} {b} ? ]\n{ctx.author.name}**")
-        await asyncio.sleep(2.5)
-        await msg.edit(content=f"**[ {a} {b} ? ]\n{ctx.author.name}**")
-        if a == b == c:
-            await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} All matching, you won! 🎉")
-        elif a == b or a == c or b == c:
-            await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} 2 in a row, you won! 🎉")
-        else:
-            await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} No match, you lost 😢")
+            msg = await ctx.send(f"**[ ? ? ? ] Spinning! Good luck!\n{ctx.author.name}**")
+            await asyncio.sleep(3)
+            await msg.edit(content=f"**[ {a} ? ? ]\n{ctx.author.name}**")
+            await asyncio.sleep(1)
+            await msg.edit(content=f"**[ {a} {b} ? ]\n{ctx.author.name}**")
+            await asyncio.sleep(2.5)
+            await msg.edit(content=f"**[ {a} {b} ? ]\n{ctx.author.name}**")
+            if a == b == c:
+                await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} All matching, you won! 🎉")
+            elif a == b or a == c or b == c:
+                await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} 2 in a row, you won! 🎉")
+            else:
+                await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} No match, you lost 😢")
 
 
 def setup(bot):
