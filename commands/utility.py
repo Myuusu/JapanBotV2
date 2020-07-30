@@ -1,6 +1,5 @@
 import asyncio
 import secrets
-
 import discord
 import os
 import random
@@ -64,12 +63,12 @@ class Utility(commands.Cog):
         await asyncio.sleep(4)
         await msg.edit(content=f"Completed hacking of {user}'s account. Please check log for Information. :pepohack:")
 
-    @commands.command()
+    @commands.command(name='reverse', aliases=['rev', 'backwards'])
     async def reverse(self, ctx, *, text: str):
         t_rev = text[::-1].replace("@", "@\u200B").replace("&", "&\u200B")
         await ctx.send(f"🔁 {t_rev}")
 
-    @commands.command()
+    @commands.command(name="password", aliases=['generate', 'new_password'])
     async def password(self, ctx, num_bytes: int = 18):
         if num_bytes not in range(3, 1401):
             return await ctx.send("I only accept any numbers between 3-1400")

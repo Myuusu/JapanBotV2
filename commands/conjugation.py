@@ -20,7 +20,9 @@ class Conjugation(commands.Cog):
 
     @commands.command(aliases=['con'])
     async def c(self, ctx, query: str = "string"):
-        with webdriver.Chrome(executable_path=chrome_driver_path) as driver:
+        options = webdriver.ChromeOptions()
+        options.add_argument("headless")
+        with webdriver.Chrome(executable_path=chrome_driver_path, options=options) as driver:
             wait = WebDriverWait(driver, 10)
             driver.get(f'https://tangorin.com/words?search={query}')
             link = wait.until(
