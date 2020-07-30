@@ -189,7 +189,7 @@ class Music(commands.Cog):
         embed = discord.Embed(title=f'Upcoming - Next {len(upcoming)}', description=fmt)
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=['disconnect', 'dc'])
+    @commands.command(aliases=['leave', 'disconnect', 'dc'])
     async def stop(self, ctx):
         player = self.bot.wavelink.get_player(ctx.guild.id)
         try:
@@ -227,29 +227,21 @@ class Music(commands.Cog):
         if station_id == 0:
             des = await self.get_station_descriptions()
             des.append("*Please Respond With The Station Number!*")
-            embed_item = discord.Embed(
-                title="Station List",
-                description="\n".join(des),
-                color=0x00ff00
-            )
-            await ctx.send(embed=embed_item)
+            await ctx.send(embed=discord.Embed(title="Station List", description="\n".join(des), color=0x00ff00))
 
-            def pred(m):
+            def test(m):
                 return ctx.channel == m.channel and ctx.author == m.author
-
             try:
-                response = await self.bot.wait_for('message', check=pred, timeout=10)
+                response = await self.bot.wait_for('message', check=test, timeout=10)
                 player = self.bot.wavelink.get_player(ctx.guild.id)
                 if player.is_connected:
                     await player.stop()
-
                 current_station_url = await self.get_station_url(ctx, int(response.content))
                 if current_station_url:
                     await self.play_station(ctx, current_station_url)
             except asyncio.TimeoutError:
                 await ctx.send('Too Slow')
         else:
-
             player = self.bot.wavelink.get_player(ctx.guild.id)
             if player.is_connected:
                 await player.stop()
