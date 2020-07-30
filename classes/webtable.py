@@ -32,7 +32,7 @@ class WebTable:
     def get_all_data(self):
         num_rows = len(self.table.find_elements_by_xpath("//tr")) - 1
         header = ["Form", "Plain", "Polite"]
-        all_data = [" | ".join(header)]
+        all_data = ["    |    ".join(header)]
         for i in range(2, num_rows):
             ro = [
                 "**(" + self.table.find_element_by_xpath("//tr[" + str(i) + "]/th").text + ")**"
