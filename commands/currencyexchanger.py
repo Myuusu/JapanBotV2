@@ -1,7 +1,6 @@
-import asyncio
+import aiohttp
 import discord
 from discord.ext import commands
-import aiohttp
 
 
 class CurrencyExchanger(commands.Cog):
@@ -9,7 +8,7 @@ class CurrencyExchanger(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='exc')
+    @commands.command(name='exc', aliases=['$'])
     async def exc(self, ctx, input_amount, base_currency='EUR'):
         base_currency = base_currency.upper()
         if base_currency == 'EUR':
@@ -37,15 +36,13 @@ class CurrencyExchanger(commands.Cog):
                 for rate in output["rates"]:
                     output_no_cleanup = float(input_amount) * float(output["rates"][rate])
                     if rate == 'JPY':
-                        description_line = str(round(output_no_cleanup))
+                        des.append(f'{str(round(output_no_cleanup))} {rate}')
                     else:
-                        description_line = "{:.2f}".format(round(output_no_cleanup, 2))
-                    des.append(description_line + " " + rate)
+                        des.append(f'{format(round(output_no_cleanup, 2)):,.2f} {rate}')
                 custom_embed = discord.Embed(
                     title="Currency Exchange Output",
                     description="\n".join(des),
                     url="https://exchangeratesapi.io/",
-                    color=0x00ff00
                 ).set_footer(
                     text="Click title for more rates and information!"
                 )

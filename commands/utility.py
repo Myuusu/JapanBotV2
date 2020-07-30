@@ -44,9 +44,8 @@ class Utility(commands.Cog):
     async def ping(self, ctx):
         await ctx.send(f'Pong! {round(self.bot.latency * 1000)}ms')
 
-    @commands.command()
+    @commands.command(name='hack', aliases=['code', 'initiate_hack'])
     async def hack(self, ctx, user: discord.Member):
-        """Hack someone's account! Try it!"""
         msg = await ctx.send(f"Hacking! Target: {user}")
         await asyncio.sleep(2)
         await msg.edit(content="Accessing Discord Files... [▓▓    ]")
@@ -63,7 +62,7 @@ class Utility(commands.Cog):
         await asyncio.sleep(3)
         await msg.edit(content="Retrieving Login Info... [▓▓▓▓▓▓ ]")
         await asyncio.sleep(4)
-        await msg.edit(content=f"An error has occurred hacking {user}'s account. Please try again later. ❌")
+        await msg.edit(content=f"Completed hacking of {user}'s account. Please check log for Information. :pepohack:")
 
     @commands.command()
     async def reverse(self, ctx, *, text: str):
