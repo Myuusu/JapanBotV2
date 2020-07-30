@@ -85,14 +85,19 @@ class Utility(commands.Cog):
         b = random.choice(emojis)
         c = random.choice(emojis)
 
-        slot_machine = f"**[ {a} {b} {c} ]\n{ctx.author.name}**,"
-
+        msg = await ctx.send(f"**[ ? ? ? ] Spinning! Good luck!\n{ctx.author.name}**")
+        await asyncio.sleep(3)
+        await msg.edit(content=f"**[ {a} ? ? ]\n{ctx.author.name}**")
+        await asyncio.sleep(1)
+        await msg.edit(content=f"**[ {a} {b} ? ]\n{ctx.author.name}**")
+        await asyncio.sleep(2.5)
+        await msg.edit(content=f"**[ {a} {b} ? ]\n{ctx.author.name}**")
         if a == b == c:
-            await ctx.send(f"{slot_machine} All matching, you won! 🎉")
+            await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} All matching, you won! 🎉")
         elif a == b or a == c or b == c:
-            await ctx.send(f"{slot_machine} 2 in a row, you won! 🎉")
+            await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name}** 2 in a row, you won! 🎉")
         else:
-            await ctx.send(f"{slot_machine} No match, you lost 😢")
+            await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name}** No match, you lost 😢")
 
 
 def setup(bot):

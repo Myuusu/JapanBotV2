@@ -55,6 +55,6 @@ class WebTable:
     def get_cell_data(self, row_number, column_number):
         if row_number == 0:
             raise Exception("Row number starts from 1")
-        row_number = row_number+1
+        row_number = row_number + 1
         cell_data = self.table.find_element_by_xpath("//tr["+str(row_number)+"]/td["+str(column_number)+"]").text
         return cell_data
