@@ -78,9 +78,19 @@ class Utility(commands.Cog):
 
     @commands.command(aliases=['slots', 'bet'])
     @commands.cooldown(rate=1, per=3.0, type=commands.BucketType.user)
-    async def slot(self, ctx):
+    async def slot(self, ctx, machine: str = "osrs"):
         """ Roll the slot machine """
-        emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
+        if machine == "emojis":
+            emojis = "☺☻♥♦♣♠♂♀"
+        elif machine == "desserts":
+            emojis = "🍨🍦🍰🍧🎂🍩🍪🍫🍡"
+        elif machine == "fruits":
+            emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
+        elif machine == "animals":
+            emojis = "🐫🦚🦉🐧🐠🐍🐢🦝"
+        else:
+            emojis = "🧙🦹🦸🧛🧜🧝🧟🧞‍"
+
         a = random.choice(emojis)
         b = random.choice(emojis)
         c = random.choice(emojis)
@@ -95,9 +105,9 @@ class Utility(commands.Cog):
         if a == b == c:
             await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} All matching, you won! 🎉")
         elif a == b or a == c or b == c:
-            await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name}** 2 in a row, you won! 🎉")
+            await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} 2 in a row, you won! 🎉")
         else:
-            await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name}** No match, you lost 😢")
+            await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} No match, you lost 😢")
 
 
 def setup(bot):
