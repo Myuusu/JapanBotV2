@@ -1,6 +1,3 @@
-import pprint
-
-
 class WebTable:
     def __init__(self, web_table):
         self.table = web_table
