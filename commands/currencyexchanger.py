@@ -8,7 +8,7 @@ class CurrencyExchanger(commands.Cog):
         self.bot = bot
 
     @commands.command(name='exc', aliases=['$'])
-    async def exc(self, ctx, input_amount, base_currency='EUR'):
+    async def exc(self, ctx, input_amount: float, base_currency: str = 'EUR'):
         base_currency = base_currency.upper()
         if base_currency == 'EUR':
             output_currency = ['JPY', 'GBP', 'USD']
@@ -20,16 +20,15 @@ class CurrencyExchanger(commands.Cog):
             output_currency = ['EUR', 'JPY', 'GBP']
         else:
             output_currency = ['EUR', 'JPY', 'GBP', 'USD']
-        output_currency_as_string = ",".join(output_currency)
         async with aiohttp.ClientSession() as session:
-            params = {'base': base_currency, 'symbols': output_currency_as_string}
+            params = {'base': base_currency, 'symbols': ",".join(output_currency)}
             async with session.get(
                     'https://api.exchangeratesapi.io/latest',
                     params=params
             ) as resp:
                 output = await resp.json()
                 await session.close()
-        des = [input_amount + " " + base_currency + " is:"]
+        des = [f'{input_amount} {base_currency} is:']
         for rate in output["rates"]:
             output_no_cleanup = float(input_amount) * float(output["rates"][rate])
             if rate == 'JPY':

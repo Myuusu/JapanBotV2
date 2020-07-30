@@ -66,7 +66,6 @@ class Music(commands.Cog):
             pass
 
     async def on_event_hook(self, event):
-        """Node hook callback."""
         if isinstance(event, (wavelink.TrackEnd, wavelink.TrackException)):
             controller = self.get_controller(event.player)
             controller.next.set()
@@ -87,7 +86,6 @@ class Music(commands.Cog):
 
     @commands.command(name='connect')
     async def connect_(self, ctx, channel: discord.VoiceChannel = None):
-        """Connect to a valid voice channel."""
         if not channel:
             try:
                 channel = ctx.author.voice.channel
@@ -104,7 +102,6 @@ class Music(commands.Cog):
 
     @commands.command()
     async def play(self, ctx, *, query: str):
-        """Search for and add a song to the Queue."""
         if not re.compile('https?://.+').match(query):
             query = f'ytsearch:{query}'
 
@@ -150,11 +147,8 @@ class Music(commands.Cog):
         await ctx.send('Resuming the player!', delete_after=15)
         await player.set_pause(False)
 
-    @commands.command(
-        aliases=['next']
-    )
+    @commands.command(aliases=['next'])
     async def skip(self, ctx):
-        """Skip the currently playing song."""
         player = self.bot.wavelink.get_player(ctx.guild.id)
 
         if not player.is_playing:
@@ -165,7 +159,6 @@ class Music(commands.Cog):
 
     @commands.command()
     async def volume(self, ctx, *, vol: int):
-        """Set the player volume."""
         player = self.bot.wavelink.get_player(ctx.guild.id)
         controller = self.get_controller(ctx)
 
@@ -177,38 +170,28 @@ class Music(commands.Cog):
 
     @commands.command(aliases=['np', 'current', 'nowplaying'])
     async def now_playing(self, ctx):
-        """Retrieve the currently playing song."""
-        player = self.bot.wavelink.get_player(ctx.guild.id)
-
+        player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, context=ctx)
+        if not player.is_connected:
+            return await ctx.send('Could not locate the player! Please restart Lavalink')
         if not player.current:
             return await ctx.send('I am not currently playing anything!')
-
         controller = self.get_controller(ctx)
-        await controller.now_playing.delete()
-
         controller.now_playing = await ctx.send(f'Now playing: `{player.current}`')
 
     @commands.command(aliases=['q'])
     async def queue(self, ctx):
-        """Retrieve information on the next 5 songs from the queue."""
         player = self.bot.wavelink.get_player(ctx.guild.id)
         controller = self.get_controller(ctx)
-
         if not player.current or not controller.queue._queue:
             return await ctx.send('There are no songs currently in the queue.', delete_after=20)
-
         upcoming = list(itertools.islice(controller.queue._queue, 0, 5))
-
         fmt = '\n'.join(f'**`{str(song)}`**' for song in upcoming)
         embed = discord.Embed(title=f'Upcoming - Next {len(upcoming)}', description=fmt)
-
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['disconnect', 'dc'])
     async def stop(self, ctx):
-        """Stop and disconnect the player and controller."""
         player = self.bot.wavelink.get_player(ctx.guild.id)
-
         try:
             del self.controllers[ctx.guild.id]
         except KeyError:
@@ -220,7 +203,6 @@ class Music(commands.Cog):
 
     @commands.command()
     async def info(self, ctx):
-        """Retrieve various Node/Server/Player information."""
         player = self.bot.wavelink.get_player(ctx.guild.id)
         node = player.node
 
@@ -240,9 +222,7 @@ class Music(commands.Cog):
               f'Server Uptime: `{datetime.timedelta(milliseconds=node.stats.uptime)}`'
         await ctx.send(fmt)
 
-    @commands.command(
-        aliases=['s', 'st']
-    )
+    @commands.command(aliases=['s', 'st'])
     async def stations(self, ctx, *, station_id: int = 0):
         if station_id == 0:
             des = await self.get_station_descriptions()
@@ -258,11 +238,7 @@ class Music(commands.Cog):
                 return ctx.channel == m.channel and ctx.author == m.author
 
             try:
-                response = await self.bot.wait_for(
-                    'message',
-                    check=pred,
-                    timeout=10
-                )
+                response = await self.bot.wait_for('message', check=pred, timeout=10)
                 player = self.bot.wavelink.get_player(ctx.guild.id)
                 if player.is_connected:
                     await player.stop()
@@ -300,7 +276,6 @@ class Music(commands.Cog):
         return des
 
     async def cog_check(self, ctx):
-        """A local check which applies to all commands in this cog."""
         if not ctx.guild:
             raise commands.NoPrivateMessage
         return True
