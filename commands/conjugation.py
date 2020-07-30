@@ -6,17 +6,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from config import chrome_driver_path
 from classes.webtable import WebTable
+from commands.utility import trim
 
 
 class Conjugation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.command()
-    async def trim(self, output: str):
-        if len(output) > 2048:
-            return output[:2048-len(output)-3]+'...'
-        return output
 
     @commands.command(aliases=['con'])
     async def c(self, ctx, query: str = "string"):
@@ -48,7 +43,7 @@ class Conjugation(commands.Cog):
                     await ctx.send(
                         embed=discord.Embed(
                             title=f"Conjugation of {query}",
-                            description=await self.trim("\n".join(des)),
+                            description=await trim("\n".join(des)),
                             color=0x00ff00
                         )
                     )

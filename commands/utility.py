@@ -88,25 +88,30 @@ class Utility(commands.Cog):
         else:
             for machine in slot_machines:
                 if machine["name"] == input_string:
-                    emojis = machine["emojis"]
+                    a = random.choice(machine["emojis"])
+                    b = random.choice(machine["emojis"])
+                    c = random.choice(machine["emojis"])
 
-            a = random.choice(emojis)
-            b = random.choice(emojis)
-            c = random.choice(emojis)
+                    msg = await ctx.send(f"**[ ? ? ? ] Spinning! Good luck!\n{ctx.author.name}**")
+                    await asyncio.sleep(3)
+                    await msg.edit(content=f"**[ {a} ? ? ]\n{ctx.author.name}**")
+                    await asyncio.sleep(1)
+                    await msg.edit(content=f"**[ {a} {b} ? ]\n{ctx.author.name}**")
+                    await asyncio.sleep(2.5)
+                    await msg.edit(content=f"**[ {a} {b} ? ]\n{ctx.author.name}**")
+                    if a == b == c:
+                        await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} All matching, you won! 🎉")
+                    elif a == b or a == c or b == c:
+                        await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} 2 in a row, you won! 🎉")
+                    else:
+                        await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} No match, you lost 😢")
+                    return
 
-            msg = await ctx.send(f"**[ ? ? ? ] Spinning! Good luck!\n{ctx.author.name}**")
-            await asyncio.sleep(3)
-            await msg.edit(content=f"**[ {a} ? ? ]\n{ctx.author.name}**")
-            await asyncio.sleep(1)
-            await msg.edit(content=f"**[ {a} {b} ? ]\n{ctx.author.name}**")
-            await asyncio.sleep(2.5)
-            await msg.edit(content=f"**[ {a} {b} ? ]\n{ctx.author.name}**")
-            if a == b == c:
-                await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} All matching, you won! 🎉")
-            elif a == b or a == c or b == c:
-                await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} 2 in a row, you won! 🎉")
-            else:
-                await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} No match, you lost 😢")
+
+async def trim(output: str = "", length: int = 2048):
+    if len(output) > length:
+        return output[:length - len(output) - 3] + '...'
+    return output
 
 
 def setup(bot):
