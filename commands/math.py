@@ -7,111 +7,83 @@ class Math(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['round_up'])
-    async def ceil(self, ctx, *, term):
+    async def ceil(self, ctx, term: str):
         if term:
-            await ctx.send(
-                f'ceil({term}) = {math.ceil(term)}'
-            )
+            term = float(term.replace(',', ""))
+            await ctx.send(f'ceil({term}) = {math.ceil(term)}')
         else:
-            await ctx.send(
-                'Please specify one term to round up!'
-            )
+            await ctx.send('Please specify one term to round up!')
 
     @commands.command(aliases=['round_down'])
-    async def floor(self, ctx, *, term):
+    async def floor(self, ctx, term: str):
         if term:
-            await ctx.send(
-                f'floor({term}) = {math.floor(term)}'
-            )
+            term = float(term.replace(',', ""))
+            await ctx.send(f'floor({term}) = {math.floor(term)}')
         else:
-            await ctx.send(
-                'Please specify one term to round down!'
-            )
+            await ctx.send('Please specify one term to round down!')
 
     @commands.command(aliases=['fact'])
-    async def factorial(self, ctx, *, term):
+    async def factorial(self, ctx, term: str):
         if term:
-            await ctx.send(
-                f'{term}! = {math.factorial(term)}'
-            )
+            term = float(term.replace(',', ""))
+            await ctx.send(f'{term}! = {math.factorial(term)}')
         else:
-            await ctx.send(
-                'Please specify one term to produce a factorial!'
-            )
+            await ctx.send('Please specify one term to produce a factorial!')
 
     @commands.command(aliases=['multiplication', 'multiply', 'times', 'prod'])
-    async def product(self, ctx, term1: int, term2: int):
+    async def product(self, ctx, term1: str, term2: str):
         if term1 and term2:
-            await ctx.send(
-                f'{term1} * {term2} = {term1*term2:,.2f}'
-            )
+            term1 = float(term1.replace(',', ""))
+            term2 = float(term2.replace(',', ""))
+            await ctx.send(f'{term1} * {term2} = {term1*term2:,.2f}')
         else:
-            await ctx.send(
-                'Please specify two terms to produce a product!'
-            )
+            await ctx.send('Please specify two terms to produce a product!')
 
     @commands.command(aliases=['divide', 'division', 'quot'])
-    async def quotient(self, ctx, term1: float, term2: float):
+    async def quotient(self, ctx, term1: str, term2: str):
         if term1 and term2:
-            await ctx.send(
-                f'{term1} / {term2} = {term1/term2:,.2f}'
-            )
+            term1 = float(term1.replace(',', ""))
+            term2 = float(term2.replace(',', ""))
+            await ctx.send(f'{term1} / {term2} = {term1/term2:,.2f}')
         else:
-            await ctx.send(
-                'Please specify two terms to produce a quotient!'
-            )
+            await ctx.send('Please specify two terms to produce a quotient!')
 
     @commands.command(aliases=['root', 'square_root'])
-    async def sqrt(self, ctx, term: float):
+    async def sqrt(self, ctx, term: str):
         if term:
-            await ctx.send(
-                f'sqrt({term}) = {math.sqrt(term):,.2f}'
-            )
+            term = float(term.replace(',', ""))
+            await ctx.send(f'sqrt({term}) = {math.sqrt(term):,.2f}')
         else:
             await ctx.send(
                 'Please specify one term to produce a square root!'
             )
 
     @commands.command(aliases=['power', 'raise', 'square'])
-    async def pow(self, ctx, term1: float, term2: float = 2):
+    async def pow(self, ctx, term1: str, term2: str = 2):
         if term1 and term2:
-            await ctx.send(
-                f'{term1}^{term2} = {math.pow(term1,term2):,.2f}'
-            )
+            term1 = float(term1.replace(',', ""))
+            term2 = float(term2.replace(',', ""))
+            await ctx.send(f'{term1}^{term2} = {math.pow(term1,term2):,.2f}')
         else:
-            await ctx.send(
-                'Please specify two term to produce a square root!'
-            )
+            await ctx.send('Please specify two term to produce a square root!')
 
-    @commands.command(
-        aliases=[
-            'add', 'plus', '+'
-        ]
-    )
-    async def addition(self, ctx, term1: float, term2: float):
+    @commands.command(aliases=['add', 'plus', '+'])
+    async def addition(self, ctx, term1: str, term2: str):
         if term1 and term2:
-            await ctx.send(
-                f'{term1} + {term2} = {term1 + term2:,.0f}'
-            )
+            term1 = float(term1.replace(',', ""))
+            term2 = float(term2.replace(',', ""))
+            await ctx.send(f'{term1} + {term2} = {term1 + term2:,.0f}')
         else:
-            await ctx.send(
-                'Please specify two terms to produce a quotient!'
-            )
+            await ctx.send('Please specify two terms to produce a quotient!')
 
-    @commands.command(
-        aliases=[
-            'subtract', 'minus', '-'
-        ]
-    )
-    async def subtraction(self, ctx, term1: float, term2: float):
+    @commands.command(aliases=['subtract', 'minus', '-'])
+    async def subtraction(self, ctx, term1: str, term2: str):
         if term1 and term2:
-            await ctx.send(
-                f'{term1} - {term2} = {term1 - term2:,.0f}'
-            )
+            term1 = float(term1.replace(',', ""))
+            term2 = float(term2.replace(',', ""))
+            await ctx.send(f'{term1} - {term2} = {term1 - term2:,.0f}')
         else:
-            await ctx.send(
-                'Please specify two terms to produce a quotient!'
-            )
+            await ctx.send('Please specify two terms to produce a quotient!')
 
             
 def setup(bot):

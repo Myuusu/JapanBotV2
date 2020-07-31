@@ -2,6 +2,7 @@ import discord
 import os
 from discord.ext import commands
 from config import bot_token, bot_prefix
+from storage import account_list, eight_ball_responses, level_list, slot_machines, station_list
 
 
 class Bot(commands.Bot):
@@ -11,6 +12,11 @@ class Bot(commands.Bot):
             command_prefix=bot_prefix,
             case_insensitive=True
         )
+        self.slot_machines = slot_machines
+        self.level_list = level_list
+        self.account_list = account_list
+        self.eight_ball_responses = eight_ball_responses
+        self.station_list = station_list
 
         for filename in os.listdir('./commands'):
             if filename.endswith('.py'):

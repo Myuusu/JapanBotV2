@@ -19,9 +19,7 @@ class Experience(commands.Cog):
         for i in range(lvl):
             points += math.floor(i + 300 * math.pow(2, i / 7))
         if external:
-            await ctx.send(
-                f'Level {lvl} is reached at: {math.floor(points / 4):,d} xp.'
-            )
+            await ctx.send(f'Level {lvl} is reached at: {math.floor(points / 4):,d} xp.')
         else:
             return math.floor(points / 4)
 
@@ -39,9 +37,7 @@ class Experience(commands.Cog):
             points += math.floor(lvl + 300 * math.pow(2, lvl / 7))
             if math.floor(points / 4) >= xp + 1:
                 if external:
-                    await ctx.send(
-                        f'{xp} xp means that you are level: {lvl}.'
-                    )
+                    await ctx.send(f'{xp} xp means that you are level: {lvl}.')
                 else:
                     return lvl
         if external:
@@ -49,33 +45,19 @@ class Experience(commands.Cog):
         else:
             return 99
 
-    @commands.command(
-        name='xp_to_99',
-        aliases=[
-            'xpto99', 'expto99', 'exp_to_99'
-        ]
-    )
+    @commands.command(name='xp_to_99', aliases=['xpto99', 'expto99', 'exp_to_99'])
     async def xp_to_99(self, ctx, xp, external=True):
         xp = int(xp.replace(',', ""))
         if external:
-            await ctx.send(
-                f'{13034431 - xp:,d} xp remaining till Level 99.'
-            )
+            await ctx.send(f'{13034431 - xp:,d} xp remaining till Level 99.')
         else:
             return 13034431 - xp
 
-    @commands.command(
-        name='xp_to_max',
-        aliases=[
-            'xptomax', 'exptomax', 'exp_to_max'
-        ]
-    )
+    @commands.command(name='xp_to_max', aliases=['xptomax', 'exptomax', 'exp_to_max'])
     async def xp_to_max(self, ctx, xp, external=True):
         xp = int(xp.replace(',', ""))
         if external:
-            await ctx.send(
-                f'{200000000 - xp:,d} xp remaining till Max (200M xp).'
-            )
+            await ctx.send(f'{200000000 - xp:,d} xp remaining till Max (200M xp).')
         else:
             return 200000000 - xp
 

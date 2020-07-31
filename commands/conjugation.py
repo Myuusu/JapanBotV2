@@ -1,7 +1,7 @@
 from discord.ext import commands
 import discord
 from selenium import webdriver
-from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from config import chrome_driver_path
@@ -21,13 +21,13 @@ class Conjugation(commands.Cog):
             wait = WebDriverWait(driver, 10)
             driver.get(f'https://tangorin.com/words?search={query}')
             link = wait.until(
-                expected_conditions.element_to_be_clickable((By.LINK_TEXT, "Inflection"))
+                ec.element_to_be_clickable((By.LINK_TEXT, "Inflection"))
             )
             if link:
                 '''Will Open The Results Page'''
                 link.click()
                 final_link = wait.until(
-                    expected_conditions.element_to_be_clickable((By.LINK_TEXT, "Inflection"))
+                    ec.element_to_be_clickable((By.LINK_TEXT, "Inflection"))
                 )
                 if final_link:
                     '''Will Open The Results Table'''
@@ -36,7 +36,7 @@ class Conjugation(commands.Cog):
                     des = []
                     table_data = WebTable(
                         wait.until(
-                            expected_conditions.presence_of_element_located((By.XPATH, base)))
+                            ec.presence_of_element_located((By.XPATH, base)))
                     ).get_all_data()
                     for row in table_data:
                         des.append(row.strip("'[]").replace("\n", "//"))

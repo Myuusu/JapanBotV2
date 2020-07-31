@@ -9,8 +9,24 @@ import wavelink
 import humanize
 from config import node_settings
 from discord.ext import commands
-from storage.station_list import station_list
 from typing import Union
+
+
+async def cog_check(ctx):
+    if not ctx.guild:
+        raise commands.NoPrivateMessage
+    return True
+
+
+async def cog_command_error(ctx, error):
+    if isinstance(error, commands.NoPrivateMessage):
+        try:
+            return await ctx.send('This command can not be used in Private Messages.')
+        except discord.HTTPException:
+            pass
+
+    print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+    traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 
 class MusicController:
@@ -45,6 +61,7 @@ class MusicController:
 class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.station_list = bot.station_list
         self.controllers = {}
         if not hasattr(bot, 'wavelink'):
             self.bot.wavelink = wavelink.Client(bot=self.bot)
@@ -75,7 +92,6 @@ class Music(commands.Cog):
             gid = value.guild.id
         else:
             gid = value.guild_id
-
         try:
             controller = self.controllers[gid]
         except KeyError:
@@ -91,12 +107,10 @@ class Music(commands.Cog):
                 channel = ctx.author.voice.channel
             except AttributeError:
                 raise discord.DiscordException('No channel to join. Please either specify a valid channel or join one.')
-
         player = self.bot.wavelink.get_player(ctx.guild.id)
         await ctx.send(f'Connecting to **`{channel.name}`**', delete_after=15)
         await player.connect(channel.id)
         await player.set_volume(40)
-
         controller = self.get_controller(ctx)
         controller.channel = ctx.channel
 
@@ -104,17 +118,13 @@ class Music(commands.Cog):
     async def play(self, ctx, *, query: str):
         if not re.compile('https?://.+').match(query):
             query = f'ytsearch:{query}'
-
         tracks = await self.bot.wavelink.get_tracks(f'{query}')
         if not tracks:
             return await ctx.send('Could not find any songs with that query.')
-
         player = self.bot.wavelink.get_player(ctx.guild.id)
         if not player.is_connected:
             await ctx.invoke(self.connect_)
-
         track = tracks[0]
-
         controller = self.get_controller(ctx)
         await controller.queue.put(track)
         await ctx.send(f'Added {str(track)} to the queue.', delete_after=15)
@@ -134,7 +144,6 @@ class Music(commands.Cog):
         player = self.bot.wavelink.get_player(ctx.guild.id)
         if not player.is_playing:
             return await ctx.send('I am not currently playing anything!', delete_after=15)
-
         await ctx.send('Pausing the song!', delete_after=15)
         await player.set_pause(True)
 
@@ -143,17 +152,14 @@ class Music(commands.Cog):
         player = self.bot.wavelink.get_player(ctx.guild.id)
         if not player.paused:
             return await ctx.send('I am not currently paused!', delete_after=15)
-
         await ctx.send('Resuming the player!', delete_after=15)
         await player.set_pause(False)
 
     @commands.command(aliases=['next'])
     async def skip(self, ctx):
         player = self.bot.wavelink.get_player(ctx.guild.id)
-
         if not player.is_playing:
             return await ctx.send('I am not currently playing anything!', delete_after=15)
-
         await ctx.send('Skipping the song!', delete_after=15)
         await player.stop()
 
@@ -161,10 +167,8 @@ class Music(commands.Cog):
     async def volume(self, ctx, *, vol: int):
         player = self.bot.wavelink.get_player(ctx.guild.id)
         controller = self.get_controller(ctx)
-
         vol = max(min(vol, 1000), 0)
         controller.volume = vol
-
         await ctx.send(f'Setting the player volume to `{vol}`')
         await player.set_volume(vol)
 
@@ -253,7 +257,7 @@ class Music(commands.Cog):
     @commands.command()
     async def get_station_url(self, ctx, search_id: int = 0):
         if 1 <= search_id <= len(station_list):
-            for current_station in station_list:
+            for current_station in self.station_list:
                 if search_id == current_station['id']:
                     return current_station['url']
         await ctx.send('For a full list, please issue the stations command with no parameters.')
@@ -261,26 +265,11 @@ class Music(commands.Cog):
     @commands.command()
     async def get_station_descriptions(self):
         des = []
-        for current_station in station_list:
+        for current_station in self.station_list:
             des.append(
                 f'**{current_station["id"]}.** {current_station["name"]}'
             )
         return des
-
-    async def cog_check(self, ctx):
-        if not ctx.guild:
-            raise commands.NoPrivateMessage
-        return True
-
-    async def cog_command_error(self, ctx, error):
-        if isinstance(error, commands.NoPrivateMessage):
-            try:
-                return await ctx.send('This command can not be used in Private Messages.')
-            except discord.HTTPException:
-                pass
-
-        print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
-        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 
 def setup(bot):

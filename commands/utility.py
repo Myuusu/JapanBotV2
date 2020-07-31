@@ -1,16 +1,55 @@
 import asyncio
+import aiohttp
+import lxml.html
 import secrets
 import discord
 import os
 import random
+import urllib
 from discord.ext import commands
-from storage.eight_ball_responses import responses
-from storage.slot_machines import slot_machines
+from urllib.parse import quote_plus
+
+
+async def trim(output: str = "", length: int = 2048):
+    if len(output) > length:
+        return output[:length - len(output) - 3] + '...'
+    return output
+
+
+async def url_encode(query: str):
+    return urllib.parse.quote_plus(query)
+
+
+async def fetch(formatted_url: str, session):
+    async with session.get(formatted_url) as resp:
+        assert resp.status == 200
+        return await resp.text()
+
+
+async def read_website(formatted_url: str):
+    async with aiohttp.ClientSession() as session:
+        text = await fetch(formatted_url=formatted_url, session=session)
+    await session.close()
+    return text
+
+
+async def find_in_site(search_url: str, xpath_location: str = '/'):
+    site_text = lxml.html.fromstring(
+        await read_website(search_url)
+    ).xpath(
+        xpath_location
+    )
+    output_string = ""
+    for text in site_text:
+        output_string += text.text_content().replace('\n', '').replace('\t', '')
+    return output_string.strip()
 
 
 class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.eight_ball_responses = bot.eight_ball_responses
+        self.slot_machines = bot.slot_machines
 
     @commands.command(name='load', aliases=['reload'])
     @commands.has_permissions(administrator=True)
@@ -38,7 +77,7 @@ class Utility(commands.Cog):
 
     @commands.command(name='eight_ball', aliases=['8ball', 'eightball', '8_ball', '8'])
     async def eight_ball(self, ctx, *, question):
-        await ctx.send(f'Question: {question}\nAnswer: {random.choice(responses)}')
+        await ctx.send(f'Question: {question}\nAnswer: {random.choice(self.responses)}')
 
     @commands.command(name='ping', aliases=['ding'])
     async def ping(self, ctx):
@@ -76,42 +115,6 @@ class Utility(commands.Cog):
         if hasattr(ctx, 'guild') and ctx.guild is not None:
             await ctx.send(f"Sending you a private message with your random generated password **{ctx.author.name}**")
         await ctx.author.send(f"🎁 **Here is your password:**\n{secrets.token_urlsafe(num_bytes)}")
-
-    @commands.command(aliases=['slots', 'bet'])
-    @commands.cooldown(rate=1, per=3.0, type=commands.BucketType.user)
-    async def slot(self, ctx, input_string: str = "help"):
-        if input_string == "help":
-            des = ["Enter the slot command, followed by the name of the slot machine you'd like to play!"]
-            for current in slot_machines:
-                des.append(f'Name: {current["name"]}\n Emojis: {current["emojis"]}')
-            return await ctx.send("\n".join(des))
-        else:
-            for machine in slot_machines:
-                if machine["name"] == input_string:
-                    a = random.choice(machine["emojis"])
-                    b = random.choice(machine["emojis"])
-                    c = random.choice(machine["emojis"])
-
-                    msg = await ctx.send(f"**[ ? ? ? ] Spinning! Good luck!\n{ctx.author.name}**")
-                    await asyncio.sleep(3)
-                    await msg.edit(content=f"**[ {a} ? ? ]\n{ctx.author.name}**")
-                    await asyncio.sleep(1)
-                    await msg.edit(content=f"**[ {a} {b} ? ]\n{ctx.author.name}**")
-                    await asyncio.sleep(2.5)
-                    await msg.edit(content=f"**[ {a} {b} ? ]\n{ctx.author.name}**")
-                    if a == b == c:
-                        await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} All matching, you won! 🎉")
-                    elif a == b or a == c or b == c:
-                        await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} 2 in a row, you won! 🎉")
-                    else:
-                        await msg.edit(content=f"**[{a} {b} {c}]**\n{ctx.author.name} No match, you lost 😢")
-                    return
-
-
-async def trim(output: str = "", length: int = 2048):
-    if len(output) > length:
-        return output[:length - len(output) - 3] + '...'
-    return output
 
 
 def setup(bot):
