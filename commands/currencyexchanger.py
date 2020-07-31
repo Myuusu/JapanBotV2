@@ -10,7 +10,7 @@ class CurrencyExchanger(commands.Cog):
     @commands.command(name='exc', aliases=['$'])
     async def exc(self, ctx, input_amount: float, base_currency: str = 'EUR'):
         base_currency = base_currency.upper()
-        if base_currency == 'EUR':
+        if base_currency == 'JPY':
             output_currency = ['JPY', 'GBP', 'USD']
         elif base_currency == 'JPY':
             output_currency = ['EUR', 'GBP', 'USD']
