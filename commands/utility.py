@@ -50,6 +50,7 @@ class Utility(commands.Cog):
         self.bot = bot
         self.eight_ball_responses = bot.eight_ball_responses
         self.slot_machines = bot.slot_machines
+        self.account_list = bot.account_list
 
     @commands.command(name='load', aliases=['reload'])
     @commands.has_permissions(administrator=True)
@@ -115,6 +116,25 @@ class Utility(commands.Cog):
         if hasattr(ctx, 'guild') and ctx.guild is not None:
             await ctx.send(f"Sending you a private message with your random generated password **{ctx.author.name}**")
         await ctx.author.send(f"🎁 **Here is your password:**\n{secrets.token_urlsafe(num_bytes)}")
+
+    @commands.command(name="bless", aliases=['resetrng', 'reset', 'saverng'])
+    async def bless(self, ctx, user: discord.Member = None):
+        if not user:
+            responses = [
+                "...It's not very effective.",
+                "...Maybe you should get someone else to do it.",
+                "...I've seen roadkill with better luck.",
+                "...Today is not your lucky day.",
+                "...You got this for sure!",
+                "...You feel inspired to try your luck!",
+                "...You may as well just cancel that task.",
+                "...I didn't know they made RNG this bad."
+            ]
+            msg = await ctx.send(f"You bless your own rng...")
+            await asyncio.sleep(3)
+            await msg.edit(content=random.choice(responses))
+        else:
+            await ctx.send(f":blessRNG: :blessRNG: :blessRNG: Blessed {user}'s rng :blessRNG: :blessRNG: :blessRNG:")
 
 
 def setup(bot):

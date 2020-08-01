@@ -1,5 +1,6 @@
 from discord.ext import commands
 from commands.utility import url_encode, find_in_site
+import discord
 
 
 class Jisho(commands.Cog):
@@ -17,7 +18,7 @@ class Jisho(commands.Cog):
                         await find_in_site(url, f'{base}/div[1]/div[1]/div/span[1]'),
                         await find_in_site(url, f'{base}/div[1]/div[1]/div/span[2]/span')
                     ]
-                ),
+                ).replace('\n', ''),
                 await find_in_site(url, f'{base}/div[1]/div[2]/span[2]'),
                 await find_in_site(url, f'{base}/div[2]/div/div[1]'),
                 " ".join(
@@ -25,33 +26,37 @@ class Jisho(commands.Cog):
                         await find_in_site(url, f'{base}/div[2]/div/div[2]/div/span[1]'),
                         await find_in_site(url, f'{base}/div[2]/div/div[2]/div/span[2]')
                     ]
-                ).strip('\n\r '),
+                ).replace('\n', ''),
                 " ".join(
                     [
                         await find_in_site(url, f'{base}/div[2]/div/div[3]/div/span[1]'),
                         await find_in_site(url, f'{base}/div[2]/div/div[3]/div/span[2]')
                     ]
-                ).strip('\n\r '),
+                ).replace('\n', ''),
                 " ".join(
                     [
                         await find_in_site(url, f'{base}/div[2]/div/div[4]/div/span[1]'),
                         await find_in_site(url, f'{base}/div[2]/div/div[4]/div/span[2]')
                     ]
-                ).strip('\n\r '),
+                ).replace('\n', ''),
                 " ".join(
                     [
                         await find_in_site(url, f'{base}/div[2]/div/div[5]/div/span[1]'),
                         await find_in_site(url, f'{base}/div[2]/div/div[5]/div/span[2]')
                     ]
-                ).strip('\n\r '),
+                ).replace('\n', ''),
                 " ".join(
                     [
                         await find_in_site(url, f'{base}/div[2]/div/div[6]/div/span[1]'),
                         await find_in_site(url, f'{base}/div[2]/div/div[6]/div/span[2]')
                     ]
-                ).strip('\n\r ')
+                ).replace('\n', '')
             ]
-        await ctx.send(embed=discord.Embed(title=f'Definition For - {params}', description=output))
+        embed_object = discord.Embed(
+            title=f'Definition For - {params}',
+            description="\n".join(filter(None, output))
+        )
+        await ctx.send(embed=embed_object)
 
 
 def setup(bot):
