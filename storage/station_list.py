@@ -69,7 +69,11 @@ station_list = [
         'url': 'http://149.56.147.197:9071/stream'
     }, {
         'id': 18,
-        'name': 'Starred on Spotify',
-        'url': 'spotify:playlist:5Fi71Kq5x6kDkf3mHEDDSf'
+        'name': 'Umeda FM',
+        'url': 'https://musicbird.leanstream.co/JCB068-MP3?args=tunein_02'
+    }, {
+        'id': 19,
+        'name': 'NHK World',
+        'url': 'https://musicbird.leanstream.co/JCB068-MP3?args=tunein_02'
     }
 ]
