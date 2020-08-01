@@ -67,13 +67,5 @@ station_list = [
         'id': 17,
         'name': '97.9 Home Radio',
         'url': 'http://149.56.147.197:9071/stream'
-    }, {
-        'id': 18,
-        'name': 'Umeda FM',
-        'url': 'https://musicbird.leanstream.co/JCB068-MP3?args=tunein_02'
-    }, {
-        'id': 19,
-        'name': 'NHK World',
-        'url': 'https://musicbird.leanstream.co/JCB068-MP3?args=tunein_02'
     }
 ]
