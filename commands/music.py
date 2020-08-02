@@ -256,7 +256,7 @@ class Music(commands.Cog):
 
     @commands.command()
     async def get_station_url(self, ctx, search_id: int = 0):
-        if 1 <= search_id <= len(station_list):
+        if 1 <= search_id <= len(self.station_list):
             for current_station in self.station_list:
                 if search_id == current_station['id']:
                     return current_station['url']
@@ -267,7 +267,7 @@ class Music(commands.Cog):
         des = []
         for current_station in self.station_list:
             des.append(
-                f'**{current_station["id"]}.** {current_station["name"]}'
+                f'**{current_station.get_station_id}.** {current_station["name"]}'
             )
         return des
 

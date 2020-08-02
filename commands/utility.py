@@ -10,17 +10,17 @@ from discord.ext import commands
 from urllib.parse import quote_plus
 
 
-async def trim(output: str = "", length: int = 2048):
+def trim(output: str = "", length: int = 2048):
     if len(output) > length:
         return output[:length - len(output) - 3] + '...'
     return output
 
 
-async def url_encode(query: str):
+def url_encode(query: str):
     return urllib.parse.quote_plus(query)
 
 
-async def fetch(formatted_url: str, session):
+def fetch(formatted_url: str, session):
     async with session.get(formatted_url) as resp:
         assert resp.status == 200
         return await resp.text()
@@ -36,9 +36,7 @@ async def read_website(formatted_url: str):
 async def find_in_site(search_url: str, xpath_location: str = '/'):
     site_text = lxml.html.fromstring(
         await read_website(search_url)
-    ).xpath(
-        xpath_location
-    )
+    ).xpath(xpath_location)
     output_string = ""
     for text in site_text:
         output_string += text.text_content().replace('\n', '').replace('\t', '')
@@ -49,8 +47,6 @@ class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.eight_ball_responses = bot.eight_ball_responses
-        self.slot_machines = bot.slot_machines
-        self.account_list = bot.account_list
 
     @commands.command(name='load', aliases=['reload'])
     @commands.has_permissions(administrator=True)
@@ -78,7 +74,7 @@ class Utility(commands.Cog):
 
     @commands.command(name='eight_ball', aliases=['8ball', 'eightball', '8_ball', '8'])
     async def eight_ball(self, ctx, *, question):
-        await ctx.send(f'Question: {question}\nAnswer: {random.choice(self.responses)}')
+        await ctx.send(f'Question: {question}\nAnswer: {random.choice(self.bot.eight_ball_responses)}')
 
     @commands.command(name='ping', aliases=['ding'])
     async def ping(self, ctx):
@@ -116,25 +112,6 @@ class Utility(commands.Cog):
         if hasattr(ctx, 'guild') and ctx.guild is not None:
             await ctx.send(f"Sending you a private message with your random generated password **{ctx.author.name}**")
         await ctx.author.send(f"🎁 **Here is your password:**\n{secrets.token_urlsafe(num_bytes)}")
-
-    @commands.command(name="bless", aliases=['resetrng', 'reset', 'saverng'])
-    async def bless(self, ctx, user: discord.Member = None):
-        if not user:
-            responses = [
-                "...It's not very effective.",
-                "...Maybe you should get someone else to do it.",
-                "...I've seen roadkill with better luck.",
-                "...Today is not your lucky day.",
-                "...You got this for sure!",
-                "...You feel inspired to try your luck!",
-                "...You may as well just cancel that task.",
-                "...I didn't know they made RNG this bad."
-            ]
-            msg = await ctx.send(f"You bless your own rng...")
-            await asyncio.sleep(3)
-            await msg.edit(content=random.choice(responses))
-        else:
-            await ctx.send(f":blessRNG: :blessRNG: :blessRNG: Blessed {user}'s rng :blessRNG: :blessRNG: :blessRNG:")
 
 
 def setup(bot):

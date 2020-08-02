@@ -43,7 +43,7 @@ class Conjugation(commands.Cog):
                     await ctx.send(
                         embed=discord.Embed(
                             title=f"Conjugation of {query}",
-                            description=await trim("\n".join(des)),
+                            description=trim("\n".join(des)),
                             color=0x00ff00
                         )
                     )
