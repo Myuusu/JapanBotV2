@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from config import chrome_driver_path
 from classes.webtable import WebTable
 from commands.utility import trim
+import asyncio
 
 
 class Conjugation(commands.Cog):
@@ -16,41 +17,34 @@ class Conjugation(commands.Cog):
     @commands.command(aliases=['con'])
     async def c(self, ctx, query: str = "string"):
         options = webdriver.ChromeOptions()
-        options.add_argument("headless")
+#        options.add_argument("headless")
         with webdriver.Chrome(executable_path=chrome_driver_path, options=options) as driver:
-            wait = WebDriverWait(driver, 10)
+#            wait = WebDriverWait(driver, 5)
             driver.get(f'https://tangorin.com/words?search={query}')
-            link = wait.until(
-                ec.element_to_be_clickable((By.LINK_TEXT, "Inflection"))
+            page_link = driver.find_element_by_xpath(
+                '//*[@class="results-dl "]/*/a'
             )
-            if link:
-                '''Will Open The Results Page'''
-                link.click()
-                final_link = wait.until(
-                    ec.element_to_be_clickable((By.LINK_TEXT, "Inflection"))
+            page_link.click()
+            await asyncio.sleep(5)
+            table_link = driver.find_element_by_xpath(
+                '//*/section/div/dl/div/dt/a'
+            )
+            table_link.click()
+            des = []
+            table_data = driver.find_element_by_xpath(
+                '//*/section/*/table'
+            )
+            for row in WebTable(table_data).get_all_data(40):
+                des.append(
+                    row.strip("'[]").replace("\n", "//")
                 )
-                if final_link:
-                    '''Will Open The Results Table'''
-                    final_link.click()
-                    base = '//*/table'
-                    des = []
-                    table_data = WebTable(
-                        wait.until(
-                            ec.presence_of_element_located((By.XPATH, base)))
-                    ).get_all_data()
-                    for row in table_data:
-                        des.append(row.strip("'[]").replace("\n", "//"))
-                    await ctx.send(
-                        embed=discord.Embed(
-                            title=f"Conjugation of {query}",
-                            description=trim("\n".join(des)),
-                            color=0x00ff00
-                        )
-                    )
-                else:
-                    await ctx.send("Secondary page could not be found!")
-            else:
-                await ctx.send("Conjugation could not be found.")
+            await ctx.send(
+                embed=discord.Embed(
+                    title=f"Conjugation of {query}",
+                    description=await trim("\n".join(des)),
+                    color=0x00ff00
+                )
+            )
         driver.quit()
 
 
