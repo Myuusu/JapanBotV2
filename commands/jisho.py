@@ -26,31 +26,31 @@ class Jisho(commands.Cog):
                         await find_in_site(url, f'{base}/div[2]/div/div[2]/div/span[1]'),
                         await find_in_site(url, f'{base}/div[2]/div/div[2]/div/span[2]')
                     ]
-                ).strip('\n\r '),
+                ),
                 " ".join(
                     [
                         await find_in_site(url, f'{base}/div[2]/div/div[3]/div/span[1]'),
                         await find_in_site(url, f'{base}/div[2]/div/div[3]/div/span[2]')
                     ]
-                ).strip('\n\r '),
+                ),
                 " ".join(
                     [
                         await find_in_site(url, f'{base}/div[2]/div/div[4]/div/span[1]'),
                         await find_in_site(url, f'{base}/div[2]/div/div[4]/div/span[2]')
                     ]
-                ).strip('\n\r '),
+                ),
                 " ".join(
                     [
                         await find_in_site(url, f'{base}/div[2]/div/div[5]/div/span[1]'),
                         await find_in_site(url, f'{base}/div[2]/div/div[5]/div/span[2]')
                     ]
-                ).strip('\n\r '),
+                ),
                 " ".join(
                     [
                         await find_in_site(url, f'{base}/div[2]/div/div[6]/div/span[1]'),
                         await find_in_site(url, f'{base}/div[2]/div/div[6]/div/span[2]')
                     ]
-                ).strip('\n\r ')
+                )
             ]
         await ctx.send(embed=Embed(title=f'Definition For - {params}', description="\n".join(output)))
 

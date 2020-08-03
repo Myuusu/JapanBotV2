@@ -10,7 +10,7 @@ from discord.ext import commands
 from urllib.parse import quote_plus
 
 
-def trim(output: str = "", length: int = 2048):
+async def trim(output: str = "", length: int = 2048):
     if len(output) > length:
         return output[:length - len(output) - 3] + '...'
     return output
@@ -20,7 +20,7 @@ def url_encode(query: str):
     return urllib.parse.quote_plus(query)
 
 
-def fetch(formatted_url: str, session):
+async def fetch(formatted_url: str, session):
     async with session.get(formatted_url) as resp:
         assert resp.status == 200
         return await resp.text()
