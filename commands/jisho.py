@@ -9,7 +9,7 @@ class Jisho(commands.Cog):
 
     @commands.command(aliases=['jisho'])
     async def j(self, ctx, *, params: str = "string"):
-        url = f'https://jisho.org/search/{await url_encode(query=params)}'
+        url = f'https://jisho.org/search/{url_encode(query=params)}'
         base = '//*[@id="primary"]/div[1]/div[1]'
         output = [
                 " ".join(

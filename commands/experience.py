@@ -1,5 +1,22 @@
 import math
+import re
 from discord.ext import commands
+
+
+async def clean_int(string_to_process):
+    if isinstance(string_to_process, int) or isinstance(string_to_process, float):
+        return int(string_to_process)
+    else:
+        return \
+            int(
+                re.sub(",", "",
+                       re.sub("(?i)k", "000",
+                              re.sub("(?i)m", "000000",
+                                     re.sub("(?i)b", "000000000", string_to_process)
+                                     )
+                              )
+                       )
+            )
 
 
 class Experience(commands.Cog):
@@ -14,7 +31,7 @@ class Experience(commands.Cog):
         ]
     )
     async def convert_lvl_to_xp(self, ctx, lvl, external=True):
-        lvl = int(lvl.replace(',', ""))
+        lvl = await clean_int(lvl)
         points = 0
         for i in range(lvl):
             points += math.floor(i + 300 * math.pow(2, i / 7))
@@ -31,7 +48,7 @@ class Experience(commands.Cog):
         ]
     )
     async def convert_xp_to_lvl(self, ctx, xp, external=True):
-        xp = int(xp.replace(',', ""))
+        xp = await clean_int(xp)
         points = 0
         for lvl in range(99):
             points += math.floor(lvl + 300 * math.pow(2, lvl / 7))
@@ -47,7 +64,7 @@ class Experience(commands.Cog):
 
     @commands.command(name='xp_to_99', aliases=['xpto99', 'expto99', 'exp_to_99'])
     async def xp_to_99(self, ctx, xp, external=True):
-        xp = int(xp.replace(',', ""))
+        xp = await clean_int(xp)
         if external:
             await ctx.send(f'{13034431 - xp:,d} xp remaining till Level 99.')
         else:
@@ -55,7 +72,7 @@ class Experience(commands.Cog):
 
     @commands.command(name='xp_to_max', aliases=['xptomax', 'exptomax', 'exp_to_max'])
     async def xp_to_max(self, ctx, xp, external=True):
-        xp = int(xp.replace(',', ""))
+        xp = await clean_int(xp)
         if external:
             await ctx.send(f'{200000000 - xp:,d} xp remaining till Max (200M xp).')
         else:
@@ -64,12 +81,12 @@ class Experience(commands.Cog):
     @commands.command(
         name='xp_to_lvl',
         aliases=[
-            'xptolvl', 'xptogoal', 'exptolvl', 'exptolevel', 'xptolevel'
-            'exptogoal', 'xp_to_goal', 'exp_to_lvl', 'exp_to_goal'
+            'xptolvl', 'xptogoal', 'exptolvl', 'exptolevel',
+            'xptolevel', 'exptogoal', 'xp_to_goal', 'exp_to_lvl', 'exp_to_goal'
         ]
     )
     async def xp_to_lvl(self, ctx, xp, lvl, external=True):
-        xp = int(xp.replace(',', ""))
+        xp = await clean_int(xp)
         goal_exp = await self.convert_lvl_to_xp(ctx=ctx, lvl=lvl, external=False)
         if external:
             await ctx.send(
