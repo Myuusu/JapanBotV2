@@ -6,11 +6,11 @@ from storage.account_list import account_list
 from storage.eight_ball_responses import responses
 from storage.level_list import level_list
 from storage.slot_machines import slot_machines
+from storage.station_list import station_list
 from classes.machine import Machine
 from classes.account import Account
 from classes.level import Level
 from classes.station import Station
-from storage.station_list import station_list
 
 
 class Bot(commands.Bot):
