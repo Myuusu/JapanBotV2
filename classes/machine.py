@@ -2,6 +2,22 @@ import random
 import asyncio
 
 
+class Card:
+    def __init__(self, rank, suit):
+        self.rank = rank
+        self.suit = suit
+
+    def __str__(self):
+        return self.rank + " of " + self.suit
+
+
+class Deck:
+    def __init__(self):
+        ranks = ["Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"]
+        suits = ["Clubs", "Diamonds", "Hearts", "Spades"]
+        self.contents = [Card(rank, suit) for rank in ranks for suit in suits]
+
+
 class Machine:
     def __init__(self, name, emojis, cost, machine_type):
         self.machine = {
@@ -66,3 +82,21 @@ class Machine:
                 content=f"**[{a} {b} {c}]**\n"
                         f"{ctx.author.name} No match, you lost {-outcome}! 😢")
         return outcome
+
+
+class SlotMachine:
+    def __init__(self, machine, type, cost, emojis):
+        __super__().__init__(machine, type, cost)
+        self.machine = machine
+        self.type = type
+        self.cost = cost
+        self.emojis = emojis
+
+
+class Poker:
+    def __init__(self, machine, type, cost, deck: Deck):
+        __super__().__init__(machine, type, cost)
+        self.machine = machine
+        self.type = type
+        self.cost = cost
+        self.deck = deck

@@ -1,6 +1,11 @@
-from discord.ext import commands
-from classes.machine import Machine
+import aiohttp
+import asyncio
+import discord
+import random
 from classes.account import Account
+from classes.machine import Machine
+from classes.card import Card
+from discord.ext import commands
 from discord import Embed
 
 
@@ -15,13 +20,22 @@ async def alter_point_balance(account: Account, qty):
 class Gamble(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.account_list = bot.account_list
+        self.deck = [Card(value, color) for value in range(1, 14) for color in ['heart', 'diamonds', 'spades', 'clubs']]
         self.slot_machines = bot.slot_machines
 
-    async def lookup_account(self, user_id):
-        for user in self.account_list:
-            if user.get_user_id() == user_id:
-                return user
+    async def get_user(self, user: discord.User):
+        for i in self.bot.account_list:
+            if i["user_id"] == user.id:
+                return i
+        return None
+
+    async def update_user_points(self, user: discord.User, amount: int):
+        current = await self.get_user(user)
+        if current:
+            current["balance"] += amount
+            return current["balance"]
+        else:
+            return None
 
     @commands.command(aliases=['slots', 'bet'])
     @commands.cooldown(rate=1, per=3, type=commands.BucketType.user)

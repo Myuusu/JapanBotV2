@@ -1,5 +1,6 @@
-from discord.ext import commands
+import discord
 from commands.utility import url_encode, find_in_site
+from discord.ext import commands
 from discord import Embed
 
 

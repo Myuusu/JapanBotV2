@@ -2,15 +2,15 @@ import discord
 import os
 from discord.ext import commands
 from config import bot_token, bot_prefix
-from storage.station_list import station_list
-from storage.level_list import level_list
 from storage.account_list import account_list
 from storage.eight_ball_responses import responses
+from storage.level_list import level_list
 from storage.slot_machines import slot_machines
 from classes.machine import Machine
 from classes.account import Account
 from classes.level import Level
 from classes.station import Station
+from storage.station_list import station_list
 
 
 class Bot(commands.Bot):
@@ -40,7 +40,7 @@ class Bot(commands.Bot):
             )
 
         self.eight_ball_responses = responses
-        self.station_list = station_list
+        self.slot_machines = slot_machines
         self.station_list = []
         for station in station_list:
             self.station_list.append(Station(station["station_id"], station["name"], station["url"]))
@@ -57,6 +57,9 @@ class Bot(commands.Bot):
             )
         )
         print(f'Logged in as {self.user.name} | {self.user.id}')
+
+    async def on_command_error(self, ctx, exception):
+        print(f'Context: {ctx} | Exception: {exception}')
 
 
 bot = Bot()
