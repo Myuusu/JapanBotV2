@@ -154,7 +154,7 @@ class Station:
         return self.station[item]
 
     def get_station_id(self):
-        return self.__getitem__("station")
+        return self.__getitem__("station_id")
 
     def get_name(self):
         return self.__getitem__("name")

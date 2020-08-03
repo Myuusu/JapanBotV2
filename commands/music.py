@@ -26,7 +26,9 @@ async def cog_command_error(ctx, error):
             pass
 
     print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
-    traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+    traceback.print_exception(
+        type(error), error, error.__traceback__, file=sys.stderr
+    )
 
 
 class MusicController:
@@ -101,17 +103,24 @@ class Music(commands.Cog):
 
     @commands.command(name='connect')
     async def connect_(self, ctx, channel: discord.VoiceChannel = None):
-        if not channel:
+        if channel:
+            player = self.bot.wavelink.get_player(ctx.guild.id)
+            await ctx.send(f'Connecting to **`{channel.name}`**', delete_after=15)
+            await player.connect(channel.id)
+            await player.set_volume(40)
+            controller = self.get_controller(ctx)
+            controller.channel = ctx.channel
+        else:
             try:
                 channel = ctx.author.voice.channel
             except AttributeError:
-                raise discord.DiscordException('No channel to join. Please either specify a valid channel or join one.')
-        player = self.bot.wavelink.get_player(ctx.guild.id)
-        await ctx.send(f'Connecting to **`{channel.name}`**', delete_after=15)
-        await player.connect(channel.id)
-        await player.set_volume(40)
-        controller = self.get_controller(ctx)
-        controller.channel = ctx.channel
+                return await ctx.send('No channel to join. Please either specify a valid channel or join one.')
+            player = self.bot.wavelink.get_player(ctx.guild.id)
+            await ctx.send(f'Connecting to **`{channel.name}`**', delete_after=15)
+            await player.connect(channel.id)
+            await player.set_volume(40)
+            controller = self.get_controller(ctx)
+            controller.channel = ctx.channel
 
     @commands.command()
     async def play(self, ctx, *, query: str):
@@ -255,18 +264,18 @@ class Music(commands.Cog):
 
     @commands.command()
     async def get_station_url(self, ctx, search_id: int = 0):
-        if 1 <= search_id <= len(self.station_list):
-            for current_station in self.station_list:
-                if search_id == current_station['id']:
-                    return current_station['url']
+        if 1 <= search_id <= len(self.bot.station_list):
+            for current_station in self.bot.station_list:
+                if search_id == current_station.get_station_id():
+                    return current_station.get_url()
         await ctx.send('For a full list, please issue the stations command with no parameters.')
 
     @commands.command()
     async def get_station_descriptions(self):
         des = []
-        for current_station in self.station_list:
+        for current_station in self.bot.station_list:
             des.append(
-                f'**{current_station.get_station_id}.** {current_station["name"]}'
+                f'**{current_station.get_station_id()}.** {current_station.get_name()}'
             )
         return des
 
