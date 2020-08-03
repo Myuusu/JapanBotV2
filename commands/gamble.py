@@ -2,9 +2,7 @@ import aiohttp
 import asyncio
 import discord
 import random
-from classes.account import Account
-from classes.machine import Machine
-from classes.card import Card
+from classes import Account, Machine, Card
 from discord.ext import commands
 from discord import Embed
 

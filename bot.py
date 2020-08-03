@@ -9,10 +9,7 @@ from storage.eight_ball_responses import responses
 from storage.level_list import level_list
 from storage.slot_machines import slot_machines
 from storage.station_list import station_list
-from classes.machine import Machine
-from classes.account import Account
-from classes.level import Level
-from classes.station import Station
+from classes import Machine, Account, Level, Station
 
 
 class Bot(commands.Bot):
@@ -60,10 +57,10 @@ class Bot(commands.Bot):
         )
         print(f'Logged in as {self.user.name} | {self.user.id}')
 
-    async def on_command_error(self, ctx, exception):
-        print(f'Context: {ctx} | Exception: {exception}')
+
+async def on_command_error(ctx, exception):
+    print(f'Context: {ctx} | Exception: {exception}')
 
 
 bot = Bot()
 bot.run(bot_token)
-

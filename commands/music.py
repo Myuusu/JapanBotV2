@@ -30,7 +30,6 @@ async def cog_command_error(ctx, error):
 
 
 class MusicController:
-
     def __init__(self, bot, guild_id):
         self.bot = bot
         self.guild_id = guild_id

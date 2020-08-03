@@ -1,6 +1,6 @@
-from discord.ext import commands
 from commands.utility import url_encode, find_in_site
 from discord import Embed
+from discord.ext import commands
 
 
 class Jisho(commands.Cog):

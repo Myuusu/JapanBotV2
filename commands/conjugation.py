@@ -1,13 +1,13 @@
-from discord.ext import commands
+import asyncio
 import discord
+from classes import WebTable
+from commands.utility import trim
+from config import chrome_driver_path
+from discord.ext import commands
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from config import chrome_driver_path
-from classes.webtable import WebTable
-from commands.utility import trim
-import asyncio
+from selenium.webdriver.common.by import By
 
 
 class Conjugation(commands.Cog):
