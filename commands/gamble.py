@@ -23,19 +23,10 @@ class Gamble(commands.Cog):
         self.deck = [Card(value, color) for value in range(1, 14) for color in ['heart', 'diamonds', 'spades', 'clubs']]
         self.slot_machines = bot.slot_machines
 
-    async def get_user(self, user: discord.User):
-        for i in self.bot.account_list:
-            if i["user_id"] == user.id:
-                return i
-        return None
-
-    async def update_user_points(self, user: discord.User, amount: int):
-        current = await self.get_user(user)
-        if current:
-            current["balance"] += amount
-            return current["balance"]
-        else:
-            return None
+    async def lookup_account(self, user_id):
+        for user in self.bot.account_list:
+            if user.get_user_id() == user_id:
+                return user
 
     @commands.command(aliases=['slots', 'bet'])
     @commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
