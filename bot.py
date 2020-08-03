@@ -2,6 +2,8 @@ import discord
 import os
 from discord.ext import commands
 from config import bot_token, bot_prefix
+from storage.station_list import station_list
+from storage.level_list import level_list
 from storage.account_list import account_list
 from storage.eight_ball_responses import responses
 from storage.level_list import level_list
@@ -64,3 +66,4 @@ class Bot(commands.Bot):
 
 bot = Bot()
 bot.run(bot_token)
+

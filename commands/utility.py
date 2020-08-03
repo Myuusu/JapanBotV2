@@ -1,10 +1,10 @@
-import aiohttp
 import asyncio
-import discord
+import aiohttp
 import lxml.html
+import secrets
+import discord
 import os
 import random
-import secrets
 import urllib
 from discord.ext import commands
 from urllib.parse import quote_plus

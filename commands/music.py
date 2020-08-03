@@ -1,12 +1,12 @@
 import asyncio
 import datetime
 import discord
-import humanize
 import itertools
 import re
 import sys
 import traceback
 import wavelink
+import humanize
 from config import node_settings
 from discord.ext import commands
 from typing import Union
