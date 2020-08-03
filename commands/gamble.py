@@ -3,8 +3,8 @@ import asyncio
 import discord
 import random
 from classes import Account, Machine, Card
-from discord.ext import commands
 from discord import Embed
+from discord.ext import commands
 
 
 async def check_point_balance(account: Account, machine: Machine):
@@ -18,15 +18,15 @@ async def alter_point_balance(account: Account, qty):
 class Gamble(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.deck = [Card(value, color) for value in range(1, 14) for color in ['heart', 'diamonds', 'spades', 'clubs']]
         self.slot_machines = bot.slot_machines
+        self.deck = [Card(value, color) for value in range(1, 14) for color in ['heart', 'diamonds', 'spades', 'clubs']]
 
     async def lookup_account(self, user_id):
         for user in self.bot.account_list:
             if user.get_user_id() == user_id:
                 return user
 
-    @commands.command(aliases=['slots', 'bet'])
+    @commands.command(name='slot', aliases=['slots', 'bet'])
     @commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
     async def slot(self, ctx, input_string: str = "help"):
         if input_string == "help":
@@ -49,7 +49,7 @@ class Gamble(commands.Cog):
                         await ctx.send('You do not have enough points!\nMaybe try to get some charity.')
                     return
 
-    @commands.command(aliases=['pts', 'check_points'])
+    @commands.command(name='points', aliases=['pts', 'check_points'])
     async def points(self, ctx):
         user = await self.lookup_account(ctx.author.id)
         points = user.get_balance()
