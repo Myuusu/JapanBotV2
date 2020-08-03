@@ -39,10 +39,11 @@ class Bot(commands.Bot):
             )
 
         self.eight_ball_responses = responses
-        self.slot_machines = slot_machines
         self.station_list = []
         for station in station_list:
-            self.station_list.append(Station(station["station_id"], station["name"], station["url"]))
+            self.station_list.append(
+                Station(station["station_id"], station["name"], station["url"])
+            )
 
         for filename in os.listdir('./commands'):
             if filename.endswith('.py'):
