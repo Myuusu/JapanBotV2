@@ -20,12 +20,44 @@ class Deck:
 
 
 class Machine:
-    def __init__(self, name, emojis, cost, machine_type):
+    def __init__(self, name, cost, machine_type):
         self.machine = {
             "name": name,
-            "emojis": emojis,
             "cost": cost,
             "machine_type": machine_type
+        }
+
+
+class Emoji:
+    def __init__(self, emoji, rank, weight):
+        self.emoji = {
+            "emoji": emoji,
+            "rank": rank,
+            "weight": weight
+        }
+
+    def __getitem__(self, item):
+        return self.emoji[item]
+
+    def get_emoji(self):
+        return self.__getitem__("emoji")
+
+    def get_rank(self):
+        return self.__getitem__("rank")
+
+    def get_weight(self):
+        return self.__getitem__("weight")
+
+
+class SlotMachine:
+    def __init__(self, name, cost, emojis):
+        self.machine = {
+            "name": name,
+            "cost": cost,
+            "emojis": emojis,
+            "play_count": 0,
+            "winnings": 0,
+            "profit": 0
         }
 
     def __getitem__(self, key):
@@ -37,14 +69,39 @@ class Machine:
     def get_name(self):
         return self.__getitem__("name")
 
-    def get_emojis(self):
-        return self.__getitem__("emojis")
+    def get_emoji_data(self):
+        emojis = []
+        weights = []
+        ranks = []
+        for i in self.__getitem__("emojis"):
+            emojis.append(i.get_emoji())
+            ranks.append(i.get_rank())
+            weights.append(i.get_weight())
+        return emojis, ranks, weights
 
     def get_cost(self):
         return self.__getitem__("cost")
 
     def get_machine_type(self):
         return self.__getitem__("machine_type")
+
+    def get_play_count(self):
+        return self.__getitem__("play_count")
+
+    def get_winnings(self):
+        return self.__getitem__("winnings")
+
+    def get_profit(self):
+        return self.__getitem__("profit")
+
+    def set_winnings(self, value):
+        return self.__setitem__(key="winnings", value=value)
+
+    def set_play_count(self, value):
+        return self.__setitem__(key="play_count", value=value)
+
+    def set_profit(self, value):
+        return self.__setitem__(key="profit", value=value)
 
     def print(self):
         return f'Cost: {self.__getitem__("cost")} | ' \
@@ -55,36 +112,65 @@ class Machine:
         return self.__getitem__("cost") * winnings_multiplier
 
     async def spin(self, ctx, multiplier=1):
-        res = random.choices(
-            population=self.__getitem__("emojis"),
-            weights=(1/45, 2.3909817807/45, 3.571652367/45, 7.6948917615/45, 18.54578385/45),
-            k=3
-        )
+        """ This is where the machine will "spin" each of its wheels """
+        emojis, ranks, weights = self.get_emoji_data()
 
-        msg = await ctx.send(f"**[? ? ?] Spinning! Good luck!\n{ctx.author.name}**")
-        await asyncio.sleep(3)
-        await msg.edit(content=f"**[{res[0]} ? ?]\n{ctx.author.name}**")
-        await asyncio.sleep(1)
-        await msg.edit(content=f"**[{res[0]} {res[1]} ?]\n{ctx.author.name}**")
-        await asyncio.sleep(2.5)
-        await msg.edit(content=f'**[{res[0]} {res[1]} {res[2]}]\n{ctx.author.name}**')
+        res = [
+            random.choices(
+                population=emojis,
+                weights=weights,
+                cum_weights=None,
+                k=3
+            ),
+            random.choices(
+                population=emojis,
+                weights=weights,
+                cum_weights=None,
+                k=3
+            ),
+            random.choices(
+                population=emojis,
+                weights=weights,
+                cum_weights=None,
+                k=3
+            )
+        ]
+
+        msg = await ctx.send(
+            f"Spinning! Good luck {ctx.author.name}!\n"
+            f"|?|?|?|\n"
+            f"|?|?|?|\n"
+            f"|?|?|?|"
+        )
+        await asyncio.sleep(random.uniform(1, 4))
+        await msg.edit(content=
+                       f"Spinning! Good luck {ctx.author.name}!\n"
+                       f"|{res[0][0]}|?|?|\n"
+                       f"|{res[0][1]}|?|?|\n"
+                       f"|{res[0][2]}|?|?|"
+                       )
+        await asyncio.sleep(random.uniform(2, 5))
+        await msg.edit(content=
+                       f"Spinning! Good luck {ctx.author.name}!\n"
+                       f"|{res[0][0]}|{res[1][0]}|?|\n"
+                       f"|{res[0][1]}|{res[1][1]}|?|\n"
+                       f"|{res[0][2]}|{res[1][2]}|?|"
+                       )
+        await asyncio.sleep(random.uniform(2, 7))
+        await msg.edit(content=
+                       f"Spinning! Good luck {ctx.author.name}!\n"
+                       f"|{res[0][0]}|{res[1][0]}|{res[2][0]}|\n"
+                       f"|{res[0][1]}|{res[1][1]}|{res[2][1]}|\n"
+                       f"|{res[0][2]}|{res[1][2]}|{res[2][2]}|"
+                       )
         return self.calculate_winnings(ctx, res, multiplier)
 
 
-class SlotMachine:
-    def __init__(self, machine, machine_type, cost, emojis):
-        self.machine = machine
-        self.type = machine_type
-        self.cost = cost
-        self.emojis = emojis
-
-
 class Poker:
-    def __init__(self, machine, machine_type, cost, deck: Deck):
+    def __init__(self, machine, cost):
         self.machine = machine
-        self.type = machine_type
         self.cost = cost
-        self.deck = deck
+        self.deck = Deck()
 
 
 class Account:

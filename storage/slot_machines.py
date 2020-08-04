@@ -1,43 +1,211 @@
 slot_machines = [
     {
         "name": "smileys",
-        "emojis": "😀😃😄😁😆",
         "cost": 3,
-        "machine_type": "slot"
+        "emojis": [
+            {
+                "emoji": "😀",
+                "rank": 1,
+                "weight": 2.222222222
+            }, {
+                "emoji": "😃",
+                "rank": 2,
+                "weight": 5.313292846
+            }, {
+                "emoji": "😄",
+                "rank": 3,
+                "weight": 7.93700526
+            }, {
+                "emoji": "😁",
+                "rank": 4,
+                "weight": 17.09975947
+            }, {
+                "emoji": "😆",
+                "rank": 5,
+                "weight": 41.212853
+            }
+        ]
     }, {
         "name": "desserts",
-        "emojis": "🍨🍦🍰🍧🎂",
         "cost": 3,
-        "machine_type": "slot"
+        "emojis": [
+            {
+                "emoji": "🍨",
+                "rank": 1,
+                "weight": 2.222222222
+            }, {
+                "emoji": "🍦",
+                "rank": 2,
+                "weight": 5.313292846
+            }, {
+                "emoji": "🍰",
+                "rank": 3,
+                "weight": 7.93700526
+            }, {
+                "emoji": "🍧",
+                "rank": 4,
+                "weight": 17.09975947
+            }, {
+                "emoji": "🎂",
+                "rank": 5,
+                "weight": 41.212853
+            }
+        ]
     }, {
         "name": "fruits",
-        "emojis": "🍎🍊🍐🍋🍉",
         "cost": 3,
-        "machine_type": "slot"
+        "emojis": [
+            {
+                "emoji": "🍎",
+                "rank": 1,
+                "weight": 2.222222222
+            }, {
+                "emoji": "🍊",
+                "rank": 2,
+                "weight": 5.313292846
+            }, {
+                "emoji": "🍐",
+                "rank": 3,
+                "weight": 7.93700526
+            }, {
+                "emoji": "🍋",
+                "rank": 4,
+                "weight": 17.09975947
+            }, {
+                "emoji": "🍉",
+                "rank": 5,
+                "weight": 41.212853
+            }
+        ]
     }, {
         "name": "animals",
-        "emojis": "🐫🐧🐠🐍🐢",
         "cost": 3,
-        "machine_type": "slot"
+        "emojis": [
+            {
+                "emoji": "🐫",
+                "rank": 1,
+                "weight": 2.222222222
+            }, {
+                "emoji": "🐧",
+                "rank": 2,
+                "weight": 5.313292846
+            }, {
+                "emoji": "🐠",
+                "rank": 3,
+                "weight": 7.93700526
+            }, {
+                "emoji": "🐍",
+                "rank": 4,
+                "weight": 17.09975947
+            }, {
+                "emoji": "🐢",
+                "rank": 5,
+                "weight": 41.212853
+            }
+        ]
     }, {
         "name": "cats",
-        "emojis": "😺😸😹😻😼",
         "cost": 3,
-        "machine_type": "slot"
+        "emojis": [
+            {
+                "emoji": "😺",
+                "rank": 1,
+                "weight": 2.222222222
+            }, {
+                "emoji": "😸",
+                "rank": 2,
+                "weight": 5.313292846
+            }, {
+                "emoji": "😹",
+                "rank": 3,
+                "weight": 7.93700526
+            }, {
+                "emoji": "😻",
+                "rank": 4,
+                "weight": 17.09975947
+            }, {
+                "emoji": "😼",
+                "rank": 5,
+                "weight": 41.212853
+            }
+        ]
     }, {
         "name": "moons",
-        "emojis": "🌗🌘🌑🌒🌔",
         "cost": 3,
-        "machine_type": "slot"
+        "emojis": [
+            {
+                "emoji": "🌗",
+                "rank": 1,
+                "weight": 2.222222222
+            }, {
+                "emoji": "🌘",
+                "rank": 2,
+                "weight": 5.313292846
+            }, {
+                "emoji": "🌑",
+                "rank": 3,
+                "weight": 7.93700526
+            }, {
+                "emoji": "🌒",
+                "rank": 4,
+                "weight": 17.09975947
+            }, {
+                "emoji": "🌔",
+                "rank": 5,
+                "weight": 41.212853
+            }
+        ]
     }, {
         "name": "hearts",
-        "emojis": "❤💛💚💙💜",
         "cost": 3,
-        "machine_type": "slot"
+        "emojis": [
+            {
+                "emoji": "❤",
+                "rank": 1,
+                "weight": 2.222222222
+            }, {
+                "emoji": "💛",
+                "rank": 2,
+                "weight": 5.313292846
+            }, {
+                "emoji": "💚",
+                "rank": 3,
+                "weight": 7.93700526
+            }, {
+                "emoji": "💙",
+                "rank": 4,
+                "weight": 17.09975947
+            }, {
+                "emoji": "💜",
+                "rank": 5,
+                "weight": 41.212853
+            }
+        ]
     }, {
         "name": "osrs",
-        "emojis": "🧙🦹🦸🧛🧜‍",
         "cost": 3,
-        "machine_type": "slot"
+        "emojis": [
+            {
+                "emoji": "🧙‍",
+                "rank": 1,
+                "weight": 2.222222222
+            }, {
+                "emoji": "🦹",
+                "rank": 2,
+                "weight": 5.313292846
+            }, {
+                "emoji": "🦸",
+                "rank": 3,
+                "weight": 7.93700526
+            }, {
+                "emoji": "🧛",
+                "rank": 4,
+                "weight": 17.09975947
+            }, {
+                "emoji": "🧜",
+                "rank": 5,
+                "weight": 41.212853
+            }
+        ]
     }
 ]

@@ -40,7 +40,8 @@ class Gamble(commands.Cog):
                 if machine.get_name() == input_string:
                     user = await self.lookup_account(ctx.author.id)
                     if machine.get_cost() <= user.get_balance():
-                        user.set_balance(user.get_balance() - await machine.spin(ctx))
+                        result = await machine.spin(ctx)
+                        user.set_balance(user.get_balance() - result)
                     else:
                         await ctx.send('You do not have enough points!\nMaybe try to get some charity.')
                     return

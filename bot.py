@@ -9,7 +9,7 @@ from storage.eight_ball_responses import responses
 from storage.level_list import level_list
 from storage.slot_machines import slot_machines
 from storage.station_list import station_list
-from classes import Machine, Account, Level, Station
+from classes import SlotMachine, Account, Level, Station, Emoji
 
 
 class Bot(commands.Bot):
@@ -28,8 +28,13 @@ class Bot(commands.Bot):
 
         self.slot_machines = []
         for machine in slot_machines:
+            emoji_array = []
+            for emoji in machine["emojis"]:
+                emoji_array.append(
+                    Emoji(emoji["emoji"], emoji["rank"], emoji["weight"])
+                )
             self.slot_machines.append(
-                Machine(machine["name"], machine["emojis"], machine["cost"], machine["machine_type"])
+                SlotMachine(machine["name"], machine["cost"], emoji_array)
             )
 
         self.level_list = []
@@ -52,9 +57,7 @@ class Bot(commands.Bot):
     async def on_ready(self):
         await self.change_presence(
             status=discord.Status.online,
-            activity=discord.Game(
-                'streams of your favorite stations! [!s]'
-            )
+            activity=discord.Game('streams of your favorite stations! [!s]')
         )
         print(f'Logged in as {self.user.name} | {self.user.id}')
 
