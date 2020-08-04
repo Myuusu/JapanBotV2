@@ -33,9 +33,6 @@ class Gamble(commands.Cog):
             des = []
             for machine in self.slot_machines:
                 des.append(machine.print())
-            col_width = max(len(word) for row in des for word in row) + 2
-            for row in des:
-                "".join(word.ljust(col_width) for word in row)
             des.append("Enter the slot command, followed by the name of the slot machine you'd like to play!")
             await ctx.send(embed=Embed(title="Slot Machine List", description="\n".join(des), color=0x00ff00))
         else:
@@ -43,8 +40,7 @@ class Gamble(commands.Cog):
                 if machine.get_name() == input_string:
                     user = await self.lookup_account(ctx.author.id)
                     if machine.get_cost() <= user.get_balance():
-                        result = await machine.spin(ctx)
-                        user.set_balance(user.get_balance() - machine.get_cost() + result)
+                        user.set_balance(user.get_balance() - await machine.spin(ctx))
                     else:
                         await ctx.send('You do not have enough points!\nMaybe try to get some charity.')
                     return

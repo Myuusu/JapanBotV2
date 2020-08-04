@@ -9,7 +9,7 @@ class Card:
         self.suit = suit
 
     def __str__(self):
-        return self.rank + " of " + self.suit
+        return f'{self.rank} of {self.suit}'
 
 
 class Deck:
@@ -51,53 +51,38 @@ class Machine:
                f'Name: {self.__getitem__("name")} | ' \
                f'Emojis: {self.__getitem__("emojis")}'
 
-    def calculate_winnings(self, winnings_multiplier):
-        return self.get_cost() * winnings_multiplier
+    def calculate_winnings(self, ctx, machine_output, winnings_multiplier):
+        return self.__getitem__("cost") * winnings_multiplier
 
-    async def spin(self, ctx):
-        a = random.choice(self.__getitem__("emojis"))
-        b = random.choice(self.__getitem__("emojis"))
-        c = random.choice(self.__getitem__("emojis"))
+    async def spin(self, ctx, multiplier=1):
+        res = random.choices(
+            population=self.__getitem__("emojis"),
+            weights=(1/45, 2.3909817807/45, 3.571652367/45, 7.6948917615/45, 18.54578385/45),
+            k=3
+        )
 
-        msg = await ctx.send(f"**[ ? ? ? ] Spinning! Good luck!\n{ctx.author.name}**")
+        msg = await ctx.send(f"**[? ? ?] Spinning! Good luck!\n{ctx.author.name}**")
         await asyncio.sleep(3)
-        await msg.edit(content=f"**[ {a} ? ? ]\n{ctx.author.name}**")
+        await msg.edit(content=f"**[{res[0]} ? ?]\n{ctx.author.name}**")
         await asyncio.sleep(1)
-        await msg.edit(content=f"**[ {a} {b} ? ]\n{ctx.author.name}**")
+        await msg.edit(content=f"**[{res[0]} {res[1]} ?]\n{ctx.author.name}**")
         await asyncio.sleep(2.5)
-        await msg.edit(content=f"**[ {a} {b} ? ]\n{ctx.author.name}**")
-        if a == b == c:
-            outcome = self.calculate_winnings(3)
-            await msg.edit(
-                content=f"**[{a} {b} {c}]**\n"
-                        f"{ctx.author.name} All matching, you won {outcome}! 🎉"
-            )
-        elif a == b or a == c or b == c:
-            outcome = self.calculate_winnings(1)
-            await msg.edit(
-                content=f"**[{a} {b} {c}]**\n"
-                        f"{ctx.author.name} 2 in a row, you won {outcome}! 🎉")
-        else:
-            outcome = self.calculate_winnings(-1)
-            await msg.edit(
-                content=f"**[{a} {b} {c}]**\n"
-                        f"{ctx.author.name} No match, you lost {-outcome}! 😢")
-        return outcome
+        await msg.edit(content=f'**[{res[0]} {res[1]} {res[2]}]\n{ctx.author.name}**')
+        return self.calculate_winnings(ctx, res, multiplier)
 
 
 class SlotMachine:
-    def __init__(self, machine, type, cost, emojis):
+    def __init__(self, machine, machine_type, cost, emojis):
         self.machine = machine
-        self.type = type
+        self.type = machine_type
         self.cost = cost
         self.emojis = emojis
 
 
 class Poker:
-    def __init__(self, machine, type, cost, deck: Deck):
-        __super__().__init__(machine, type, cost)
+    def __init__(self, machine, machine_type, cost, deck: Deck):
         self.machine = machine
-        self.type = type
+        self.type = machine_type
         self.cost = cost
         self.deck = deck
 
@@ -186,17 +171,14 @@ class WebTable:
     def row_data(self, row_number):
         if row_number == 0:
             raise Exception("Row number starts from 1")
-        row_number = row_number + 1
-        row = self.table["table"].find_elements_by_xpath(f'//tr[{str(row_number)}]/td')
         r_data = []
-        for webElement in row:
+        for webElement in self.table["table"].find_elements_by_xpath(f'//tr[{str(row_number + 1)}]/td'):
             r_data.append(webElement.text)
         return r_data
 
     def column_data(self, column_number):
-        col = self.table["table"].find_elements_by_xpath(f'//tr/td[{str(column_number)}]')
         r_data = []
-        for webElement in col:
+        for webElement in self.table["table"].find_elements_by_xpath(f'//tr/td[{str(column_number)}]'):
             r_data.append(webElement.text)
         return r_data
 
@@ -224,15 +206,12 @@ class WebTable:
         return all_data
 
     def presence_of_data(self, data):
-        data_size = len(self.table["table"].find_elements_by_xpath(f'//td[normalize-space(text())="{data}"]'))
         presence = False
-        if data_size > 0:
+        if len(self.table["table"].find_elements_by_xpath(f'//td[normalize-space(text())="{data}"]')) > 0:
             presence = True
         return presence
 
     def get_cell_data(self, row_number, column_number):
         if row_number == 0:
             raise Exception("Row number starts from 1")
-        row_number = row_number + 1
-        cell_data = self.table["table"].find_element_by_xpath(f'//tr[{str(row_number)}]/td[{str(column_number)}]').text
-        return cell_data
+        return self.table["table"].find_element_by_xpath(f'//tr[{str(row_number + 1)}]/td[{str(column_number)}]').text
