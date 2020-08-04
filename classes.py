@@ -97,8 +97,8 @@ class SlotMachine:
     def set_winnings(self, value):
         return self.__setitem__(key="winnings", value=value)
 
-    def set_play_count(self, value):
-        return self.__setitem__(key="play_count", value=value)
+    def increment_play_count(self):
+        return self.__setitem__(key="play_count", value=self.get_play_count()+1)
 
     def set_profit(self, value):
         return self.__setitem__(key="profit", value=value)
@@ -115,26 +115,12 @@ class SlotMachine:
         """ This is where the machine will "spin" each of its wheels """
         emojis, ranks, weights = self.get_emoji_data()
 
-        res = [
-            random.choices(
+        res = random.choices(
                 population=emojis,
                 weights=weights,
                 cum_weights=None,
-                k=3
-            ),
-            random.choices(
-                population=emojis,
-                weights=weights,
-                cum_weights=None,
-                k=3
-            ),
-            random.choices(
-                population=emojis,
-                weights=weights,
-                cum_weights=None,
-                k=3
+                k=9
             )
-        ]
 
         msg = await ctx.send(
             f"Spinning! Good luck {ctx.author.name}!\n"
@@ -145,24 +131,26 @@ class SlotMachine:
         await asyncio.sleep(random.uniform(1, 4))
         await msg.edit(content=
                        f"Spinning! Good luck {ctx.author.name}!\n"
-                       f"|{res[0][0]}|?|?|\n"
-                       f"|{res[0][1]}|?|?|\n"
-                       f"|{res[0][2]}|?|?|"
+                       f"|{res[0]}|?|?|\n"
+                       f"|{res[3]}|?|?|\n"
+                       f"|{res[6]}|?|?|"
                        )
         await asyncio.sleep(random.uniform(2, 5))
         await msg.edit(content=
                        f"Spinning! Good luck {ctx.author.name}!\n"
-                       f"|{res[0][0]}|{res[1][0]}|?|\n"
-                       f"|{res[0][1]}|{res[1][1]}|?|\n"
-                       f"|{res[0][2]}|{res[1][2]}|?|"
+                       f"|{res[0]}|{res[1]}|?|\n"
+                       f"|{res[3]}|{res[4]}|?|\n"
+                       f"|{res[6]}|{res[7]}|?|"
                        )
         await asyncio.sleep(random.uniform(2, 7))
         await msg.edit(content=
                        f"Spinning! Good luck {ctx.author.name}!\n"
-                       f"|{res[0][0]}|{res[1][0]}|{res[2][0]}|\n"
-                       f"|{res[0][1]}|{res[1][1]}|{res[2][1]}|\n"
-                       f"|{res[0][2]}|{res[1][2]}|{res[2][2]}|"
+                       f"|{res[0]}|{res[1]}|{res[2]}|\n"
+                       f"|{res[3]}|{res[4]}|{res[5]}|\n"
+                       f"|{res[6]}|{res[7]}|{res[8]}|"
                        )
+        self.increment_play_count()
+        await ctx.send(f'This machine has been played: {self.get_play_count()} times!')
         return self.calculate_winnings(ctx, res, multiplier)
 
 

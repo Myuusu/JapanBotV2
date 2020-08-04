@@ -6,23 +6,27 @@ slot_machines = [
             {
                 "emoji": "😀",
                 "rank": 1,
-                "weight": 2.222222222
+                "weight": 2.22
             }, {
                 "emoji": "😃",
                 "rank": 2,
-                "weight": 5.313292846
+                "weight": 5.31
             }, {
                 "emoji": "😄",
                 "rank": 3,
-                "weight": 7.93700526
+                "weight": 7.94
             }, {
                 "emoji": "😁",
                 "rank": 4,
-                "weight": 17.09975947
+                "weight": 17.1
             }, {
                 "emoji": "😆",
                 "rank": 5,
-                "weight": 41.212853
+                "weight": 41.21
+            }, {
+                "emoji": "[B]",
+                "rank": 6,
+                "weight": 26.215
             }
         ]
     }, {
@@ -32,23 +36,27 @@ slot_machines = [
             {
                 "emoji": "🍨",
                 "rank": 1,
-                "weight": 2.222222222
+                "weight": 2.22
             }, {
                 "emoji": "🍦",
                 "rank": 2,
-                "weight": 5.313292846
+                "weight": 5.31
             }, {
                 "emoji": "🍰",
                 "rank": 3,
-                "weight": 7.93700526
+                "weight": 7.94
             }, {
                 "emoji": "🍧",
                 "rank": 4,
-                "weight": 17.09975947
+                "weight": 17.1
             }, {
                 "emoji": "🎂",
                 "rank": 5,
-                "weight": 41.212853
+                "weight": 41.21
+            }, {
+                "emoji": "[B]",
+                "rank": 6,
+                "weight": 26.215
             }
         ]
     }, {
@@ -58,23 +66,27 @@ slot_machines = [
             {
                 "emoji": "🍎",
                 "rank": 1,
-                "weight": 2.222222222
+                "weight": 2.22
             }, {
                 "emoji": "🍊",
                 "rank": 2,
-                "weight": 5.313292846
+                "weight": 5.31
             }, {
                 "emoji": "🍐",
                 "rank": 3,
-                "weight": 7.93700526
+                "weight": 7.94
             }, {
                 "emoji": "🍋",
                 "rank": 4,
-                "weight": 17.09975947
+                "weight": 17.1
             }, {
                 "emoji": "🍉",
                 "rank": 5,
-                "weight": 41.212853
+                "weight": 41.21
+            }, {
+                "emoji": "[B]",
+                "rank": 6,
+                "weight": 26.215
             }
         ]
     }, {
@@ -84,23 +96,27 @@ slot_machines = [
             {
                 "emoji": "🐫",
                 "rank": 1,
-                "weight": 2.222222222
+                "weight": 2.22
             }, {
                 "emoji": "🐧",
                 "rank": 2,
-                "weight": 5.313292846
+                "weight": 5.31
             }, {
                 "emoji": "🐠",
                 "rank": 3,
-                "weight": 7.93700526
+                "weight": 7.94
             }, {
                 "emoji": "🐍",
                 "rank": 4,
-                "weight": 17.09975947
+                "weight": 17.1
             }, {
                 "emoji": "🐢",
                 "rank": 5,
-                "weight": 41.212853
+                "weight": 41.21
+            }, {
+                "emoji": "[B]",
+                "rank": 6,
+                "weight": 26.215
             }
         ]
     }, {
@@ -110,23 +126,27 @@ slot_machines = [
             {
                 "emoji": "😺",
                 "rank": 1,
-                "weight": 2.222222222
+                "weight": 2.22
             }, {
                 "emoji": "😸",
                 "rank": 2,
-                "weight": 5.313292846
+                "weight": 5.31
             }, {
                 "emoji": "😹",
                 "rank": 3,
-                "weight": 7.93700526
+                "weight": 7.94
             }, {
                 "emoji": "😻",
                 "rank": 4,
-                "weight": 17.09975947
+                "weight": 17.1
             }, {
                 "emoji": "😼",
                 "rank": 5,
-                "weight": 41.212853
+                "weight": 41.21
+            }, {
+                "emoji": "[B]",
+                "rank": 6,
+                "weight": 26.215
             }
         ]
     }, {
@@ -136,23 +156,27 @@ slot_machines = [
             {
                 "emoji": "🌗",
                 "rank": 1,
-                "weight": 2.222222222
+                "weight": 2.22
             }, {
                 "emoji": "🌘",
                 "rank": 2,
-                "weight": 5.313292846
+                "weight": 5.31
             }, {
                 "emoji": "🌑",
                 "rank": 3,
-                "weight": 7.93700526
+                "weight": 7.94
             }, {
                 "emoji": "🌒",
                 "rank": 4,
-                "weight": 17.09975947
+                "weight": 17.1
             }, {
                 "emoji": "🌔",
                 "rank": 5,
-                "weight": 41.212853
+                "weight": 41.21
+            }, {
+                "emoji": "[B]",
+                "rank": 6,
+                "weight": 26.215
             }
         ]
     }, {
@@ -162,23 +186,27 @@ slot_machines = [
             {
                 "emoji": "❤",
                 "rank": 1,
-                "weight": 2.222222222
+                "weight": 2.22
             }, {
                 "emoji": "💛",
                 "rank": 2,
-                "weight": 5.313292846
+                "weight": 5.31
             }, {
                 "emoji": "💚",
                 "rank": 3,
-                "weight": 7.93700526
+                "weight": 7.94
             }, {
                 "emoji": "💙",
                 "rank": 4,
-                "weight": 17.09975947
+                "weight": 17.1
             }, {
                 "emoji": "💜",
                 "rank": 5,
-                "weight": 41.212853
+                "weight": 41.21
+            }, {
+                "emoji": "[B]",
+                "rank": 6,
+                "weight": 26.215
             }
         ]
     }, {
@@ -188,23 +216,27 @@ slot_machines = [
             {
                 "emoji": "🧙‍",
                 "rank": 1,
-                "weight": 2.222222222
+                "weight": 2.22
             }, {
                 "emoji": "🦹",
                 "rank": 2,
-                "weight": 5.313292846
+                "weight": 5.31
             }, {
                 "emoji": "🦸",
                 "rank": 3,
-                "weight": 7.93700526
+                "weight": 7.94
             }, {
                 "emoji": "🧛",
                 "rank": 4,
-                "weight": 17.09975947
+                "weight": 17.1
             }, {
                 "emoji": "🧜",
                 "rank": 5,
-                "weight": 41.212853
+                "weight": 41.21
+            }, {
+                "emoji": "[B]",
+                "rank": 6,
+                "weight": 26.215
             }
         ]
     }
