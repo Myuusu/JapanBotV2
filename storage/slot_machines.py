@@ -1,42 +1,42 @@
 slot_machines = [
     {
         "name": "smileys",
-        "emojis": "😀😃😄😁😆😅😂🤣",
+        "emojis": "😀😃😄😁😆",
         "cost": 3,
         "machine_type": "slot"
     }, {
         "name": "desserts",
-        "emojis": "🍨🍦🍰🍧🎂🍩🍪🍫🍡",
+        "emojis": "🍨🍦🍰🍧🎂",
         "cost": 3,
         "machine_type": "slot"
     }, {
         "name": "fruits",
-        "emojis": "🍎🍊🍐🍋🍉🍇🍓🍒",
+        "emojis": "🍎🍊🍐🍋🍉",
         "cost": 3,
         "machine_type": "slot"
     }, {
         "name": "animals",
-        "emojis": "🐫🦚🦉🐧🐠🐍🐢🦝",
+        "emojis": "🐫🐧🐠🐍🐢",
         "cost": 3,
         "machine_type": "slot"
     }, {
         "name": "cats",
-        "emojis": "😺😸😹😻😼😽🙀😾",
+        "emojis": "😺😸😹😻😼",
         "cost": 3,
         "machine_type": "slot"
     }, {
         "name": "moons",
-        "emojis": "🌕🌖🌗🌘🌑🌒🌓🌔",
+        "emojis": "🌗🌘🌑🌒🌔",
         "cost": 3,
         "machine_type": "slot"
     }, {
         "name": "hearts",
-        "emojis": "❤️🧡💛💚💙💜🖤💔",
+        "emojis": "❤💛💚💙💜",
         "cost": 3,
         "machine_type": "slot"
     }, {
         "name": "osrs",
-        "emojis": "🧙🦹🦸🧛🧜🧝🧟🧞‍",
+        "emojis": "🧙🦹🦸🧛🧜‍",
         "cost": 3,
         "machine_type": "slot"
     }
