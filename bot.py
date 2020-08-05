@@ -68,3 +68,35 @@ async def on_command_error(ctx, exception):
 
 bot = Bot()
 bot.run(bot_token)
+
+"""
+To do list:
+Gambling:
+Bet / Winning Modifier
+Weighting modifications
+Jackpot announcements on Animal slot for lion
+Server admin right to toggle "Jackpot Winner" role
+Configure daily point dispenser
+Add custom emotes to a server for the slots
+
+Conjugation:
+Fix elements, unable to locate currently
+Fix Issue with overload of conjugations
+
+Station:
+Add a type and subtype for each station so that users can filter through genres
+
+Jisho:
+Fix encoding issue when use a space for ex. to go
+Possibly look into changing from jisho to the website conjugation uses
+
+Currencyexchanger:
+Fix Key Error 'rates'
+
+Stroke order:
+Create a new command called !so for pulling pictures of the stroke orders for kanji
+        https://jisho.org/search/%23kanji%20(input) <- make sure you type the japanese word in kanji
+        https://gyazo.com/fe9f8c8b4ea6661107c04203b5bc0bf1 <-- reference picture
+If possible, have the automated drawing left side of the picture also be output as a gif or something
+        https://gyazo.com/8f61500ae94e96175bc7433b5e7dd619 <-- reference picture
+"""
