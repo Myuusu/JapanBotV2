@@ -93,6 +93,10 @@ Possibly look into changing from jisho to the website conjugation uses
 Currencyexchanger:
 Fix Key Error 'rates'
 
+Papago sentence translator:
+Add the API we talked bout of https://papago.naver.com/ to translate entire sentences
+Add the audio output of the translated sentences into the VC function from music.py
+
 Stroke order:
 Create a new command called !so for pulling pictures of the stroke orders for kanji
         https://jisho.org/search/%23kanji%20(input) <- make sure you type the japanese word in kanji
