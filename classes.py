@@ -56,7 +56,7 @@ class Emoji:
 
 
 class SlotMachine:
-    def __init__(self, name: str, cost: int, rows: int, reels: int, emojis: Emoji):
+    def __init__(self, name: str, cost: int, rows: int, reels: int, emojis: list[Emoji] | Emoji):
         self.machine = {
             "name": name,
             "cost": cost,
@@ -115,6 +115,8 @@ class SlotMachine:
         )
 
     def calculate_winnings(self, ctx, spin_results, multiplier=1):
+        print(spin_results)
+        print(ctx.author)
         return self.__getitem__("cost") * multiplier
 
     def get_reel_weight(self):
