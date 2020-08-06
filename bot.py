@@ -31,10 +31,10 @@ class Bot(commands.Bot):
             emoji_array = []
             for emoji in machine["emojis"]:
                 emoji_array.append(
-                    Emoji(emoji["emoji"], emoji["rank"], emoji["weight"])
+                    Emoji(emoji["emoji"], emoji["rank"], emoji["weights"])
                 )
             self.slot_machines.append(
-                SlotMachine(machine["name"], machine["cost"], emoji_array)
+                SlotMachine(machine["name"], machine["cost"], machine["rows"], machine["reels"], emoji_array)
             )
 
         self.level_list = []
