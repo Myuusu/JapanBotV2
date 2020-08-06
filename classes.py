@@ -1,5 +1,5 @@
-import random
 import asyncio
+import random
 from selenium.common.exceptions import NoSuchElementException
 
 

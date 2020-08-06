@@ -2,13 +2,13 @@ import asyncio
 import discord
 from classes import WebTable
 from commands.utility import trim
+from commands.utility import url_encode, find_in_site
 from config import chrome_driver_path
 from discord.ext import commands
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-from commands.utility import url_encode, find_in_site
 
 
 class Conjugation(commands.Cog):
