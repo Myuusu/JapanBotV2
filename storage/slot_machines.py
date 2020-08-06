@@ -1,242 +1,318 @@
 slot_machines = [
     {
-        "name": "smileys",
+        "name": "classic",
         "cost": 3,
+        "rows": 3,
+        "reels": 3,
         "emojis": [
             {
-                "emoji": "😀",
+                "emoji": "<:bar:740998677979725864>",
                 "rank": 1,
-                "weight": 2.22
+                "weights": [
+                    4.347826086,
+                    4.347826086,
+                    4.347826086
+                ]
             }, {
-                "emoji": "😃",
+                "emoji": ":seven:",
                 "rank": 2,
-                "weight": 5.31
+                "weights": [
+                    13.04347826,
+                    4.347826086,
+                    4.347826086
+                ]
             }, {
-                "emoji": "😄",
+                "emoji": "🍒",
                 "rank": 3,
-                "weight": 7.94
+                "weights": [
+                    17.39130435,
+                    13.04347826,
+                    13.04347826
+                ]
             }, {
-                "emoji": "😁",
+                "emoji": "🍊",
                 "rank": 4,
-                "weight": 17.1
+                "weights": [
+                    21.73913044,
+                    26.08695652,
+                    26.08695652
+                ]
             }, {
-                "emoji": "😆",
+                "emoji": "🍌",
                 "rank": 5,
-                "weight": 41.21
+                "weights": [
+                    21.73913044,
+                    26.08695652,
+                    26.08695652
+                ]
             }, {
-                "emoji": "[B]",
+                "emoji": "🍋",
                 "rank": 6,
-                "weight": 26.215
+                "weights": [
+                    21.73913044,
+                    26.08695652,
+                    26.08695652
+                ]
             }
         ]
     }, {
         "name": "desserts",
         "cost": 3,
+        "rows": 3,
+        "reels": 3,
         "emojis": [
             {
                 "emoji": "🍨",
                 "rank": 1,
-                "weight": 2.22
+                "weights": 2.22
             }, {
                 "emoji": "🍦",
                 "rank": 2,
-                "weight": 5.31
+                "weights": 5.31
             }, {
                 "emoji": "🍰",
                 "rank": 3,
-                "weight": 7.94
+                "weights": 7.94
             }, {
                 "emoji": "🍧",
                 "rank": 4,
-                "weight": 17.1
+                "weights": 17.1
             }, {
                 "emoji": "🎂",
                 "rank": 5,
-                "weight": 41.21
+                "weights": 41.21
             }, {
                 "emoji": "[B]",
                 "rank": 6,
-                "weight": 26.215
+                "weights": 26.215
             }
         ]
     }, {
         "name": "fruits",
         "cost": 3,
+        "rows": 3,
+        "reels": 3,
         "emojis": [
             {
                 "emoji": "🍎",
                 "rank": 1,
-                "weight": 2.22
+                "weights": 2.22
             }, {
                 "emoji": "🍊",
                 "rank": 2,
-                "weight": 5.31
+                "weights": 5.31
             }, {
                 "emoji": "🍐",
                 "rank": 3,
-                "weight": 7.94
+                "weights": 7.94
             }, {
                 "emoji": "🍋",
                 "rank": 4,
-                "weight": 17.1
+                "weights": 17.1
             }, {
                 "emoji": "🍉",
                 "rank": 5,
-                "weight": 41.21
+                "weights": 41.21
             }, {
                 "emoji": "[B]",
                 "rank": 6,
-                "weight": 26.215
+                "weights": 26.215
             }
         ]
     }, {
         "name": "animals",
         "cost": 3,
+        "rows": 3,
+        "reels": 3,
         "emojis": [
             {
                 "emoji": "🐫",
                 "rank": 1,
-                "weight": 2.22
+                "weights": 2.22
             }, {
                 "emoji": "🐧",
                 "rank": 2,
-                "weight": 5.31
+                "weights": 5.31
             }, {
                 "emoji": "🐠",
                 "rank": 3,
-                "weight": 7.94
+                "weights": 7.94
             }, {
                 "emoji": "🐍",
                 "rank": 4,
-                "weight": 17.1
+                "weights": 17.1
             }, {
                 "emoji": "🐢",
                 "rank": 5,
-                "weight": 41.21
+                "weights": 41.21
             }, {
                 "emoji": "[B]",
                 "rank": 6,
-                "weight": 26.215
+                "weights": 26.215
             }
         ]
     }, {
         "name": "cats",
         "cost": 3,
+        "rows": 3,
+        "reels": 3,
         "emojis": [
             {
                 "emoji": "😺",
                 "rank": 1,
-                "weight": 2.22
+                "weights": 2.22
             }, {
                 "emoji": "😸",
                 "rank": 2,
-                "weight": 5.31
+                "weights": 5.31
             }, {
                 "emoji": "😹",
                 "rank": 3,
-                "weight": 7.94
+                "weights": 7.94
             }, {
                 "emoji": "😻",
                 "rank": 4,
-                "weight": 17.1
+                "weights": 17.1
             }, {
                 "emoji": "😼",
                 "rank": 5,
-                "weight": 41.21
+                "weights": 41.21
             }, {
                 "emoji": "[B]",
                 "rank": 6,
-                "weight": 26.215
+                "weights": 26.215
             }
         ]
     }, {
         "name": "moons",
         "cost": 3,
+        "rows": 3,
+        "reels": 3,
         "emojis": [
             {
                 "emoji": "🌗",
                 "rank": 1,
-                "weight": 2.22
+                "weights": 2.22
             }, {
                 "emoji": "🌘",
                 "rank": 2,
-                "weight": 5.31
+                "weights": 5.31
             }, {
                 "emoji": "🌑",
                 "rank": 3,
-                "weight": 7.94
+                "weights": 7.94
             }, {
                 "emoji": "🌒",
                 "rank": 4,
-                "weight": 17.1
+                "weights": 17.1
             }, {
                 "emoji": "🌔",
                 "rank": 5,
-                "weight": 41.21
+                "weights": 41.21
             }, {
                 "emoji": "[B]",
                 "rank": 6,
-                "weight": 26.215
+                "weights": 26.215
             }
         ]
     }, {
         "name": "hearts",
         "cost": 3,
+        "rows": 3,
+        "reels": 5,
         "emojis": [
             {
                 "emoji": "❤",
                 "rank": 1,
-                "weight": 2.22
+                "weights": [
+                    4.347826086,
+                    4.347826086,
+                    4.347826086,
+                    4.347826086,
+                    4.347826086
+                ]
             }, {
                 "emoji": "💛",
                 "rank": 2,
-                "weight": 5.31
+                "weights": [
+                    13.04347826,
+                    4.347826086,
+                    4.347826086,
+                    4.347826086,
+                    4.347826086
+                ]
             }, {
                 "emoji": "💚",
                 "rank": 3,
-                "weight": 7.94
+                "weights": [
+                    17.39130435,
+                    13.04347826,
+                    13.04347826,
+                    13.04347826,
+                    13.04347826
+                ]
             }, {
                 "emoji": "💙",
                 "rank": 4,
-                "weight": 17.1
+                "weights": [
+                    21.73913044,
+                    26.08695652,
+                    26.08695652,
+                    26.08695652,
+                    26.08695652
+                ]
             }, {
                 "emoji": "💜",
                 "rank": 5,
-                "weight": 41.21
+                "weights": [
+                    21.73913044,
+                    26.08695652,
+                    26.08695652,
+                    26.08695652,
+                    26.08695652
+                ]
             }, {
-                "emoji": "[B]",
+                "emoji": "<:bar:740998677979725864>",
                 "rank": 6,
-                "weight": 26.215
+                "weights": [
+                    21.73913044,
+                    26.08695652,
+                    26.08695652,
+                    26.08695652,
+                    26.08695652
+                ]
             }
         ]
     }, {
         "name": "osrs",
         "cost": 3,
+        "rows": 3,
+        "reels": 3,
         "emojis": [
             {
                 "emoji": "🧙‍",
                 "rank": 1,
-                "weight": 2.22
+                "weights": 2.22
             }, {
                 "emoji": "🦹",
                 "rank": 2,
-                "weight": 5.31
+                "weights": 5.31
             }, {
                 "emoji": "🦸",
                 "rank": 3,
-                "weight": 7.94
+                "weights": 7.94
             }, {
                 "emoji": "🧛",
                 "rank": 4,
-                "weight": 17.1
+                "weights": 17.1
             }, {
                 "emoji": "🧜",
                 "rank": 5,
-                "weight": 41.21
+                "weights": 41.21
             }, {
                 "emoji": "[B]",
                 "rank": 6,
-                "weight": 26.215
+                "weights": 26.215
             }
         ]
     }
