@@ -31,19 +31,19 @@ class Machine:
         self.name = name
         self.cost = cost
         self.machine_type = machine_type
-        self.play_count = 0
-        self.winnings = 0
-        self.profit = 0
 
 
 class SlotMachine:
-    def __init__(self, name: str, cost: int, rows: int, reels: int, machine_type: str, emojis: [Emoji]):
+    def __init__(self, name: str, cost: int, rows: int, reels: int, emojis: [Emoji], machine_type: str = "slot"):
         self.name = name
         self.cost = cost
         self.machine_type = machine_type
         self.rows = rows
         self.reels = reels
         self.emojis = emojis
+        self.play_count = 0
+        self.winnings = 0
+        self.profit = 0
 
     def print(self):
         return f'Cost: {self.cost} | Emojis: {" ".join([self.emojis.emoji])} | Name: {self.name}'

@@ -38,7 +38,7 @@ class Bot(commands.Bot):
                     Emoji(emoji["emoji"], emoji["rank"], emoji["weights"])
                 )
             self.slot_machines.append(
-                SlotMachine(machine["name"], machine["cost"], machine["rows"], machine["reels"], "slot", emoji_array)
+                SlotMachine(machine["name"], machine["cost"], machine["rows"], machine["reels"], emoji_array, "slot")
             )
 
         self.level_list = []
