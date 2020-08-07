@@ -7,8 +7,8 @@ from discord import Embed
 from discord.ext import commands
 
 
-async def check_point_balance(account: Account, machine: Machine):
-    return machine.cost >= account.balance
+async def check_point_balance(user: Account, machine: Machine):
+    return machine.cost >= user.balance
 
 
 class Gamble(commands.Cog):
@@ -19,7 +19,7 @@ class Gamble(commands.Cog):
 
     async def lookup_account(self, user_id):
         for user in self.bot.account_list:
-            if user.get_user_id() == user_id:
+            if user.user_id == user_id:
                 return user
 
     @commands.command(name='slot', aliases=['slots', 'bet'])
@@ -35,9 +35,8 @@ class Gamble(commands.Cog):
             for machine in self.slot_machines:
                 if machine.name == input_string:
                     user = await self.lookup_account(ctx.author.id)
-                    if machine.cost <= user.get_balance():
-                        result = await machine.spin(ctx)
-                        user.set_balance(user.get_balance() - result)
+                    if machine.cost <= user.balance:
+                        user.balance += await machine.spin(ctx)
                     else:
                         await ctx.send('You do not have enough points!\nMaybe try to get some charity.')
                     return
@@ -45,7 +44,7 @@ class Gamble(commands.Cog):
     @commands.command(name='points', aliases=['pts', 'check_points'])
     async def points(self, ctx):
         user = await self.lookup_account(ctx.author.id)
-        points = user.get_balance()
+        points = user.balance
         await ctx.send(f'{ctx.author.name} currently has {points} points!')
         return points
 
