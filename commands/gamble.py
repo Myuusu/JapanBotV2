@@ -8,18 +8,14 @@ from discord.ext import commands
 
 
 async def check_point_balance(account: Account, machine: Machine):
-    return machine.get_cost() >= account.get_balance()
-
-
-async def alter_point_balance(account: Account, qty):
-    return account.set_balance(account.get_balance() + qty)
+    return machine.cost >= account.balance
 
 
 class Gamble(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.slot_machines = bot.slot_machines
-        self.deck = [Card(value, color) for value in range(1, 14) for color in ['heart', 'diamonds', 'spades', 'clubs']]
+        self.deck = Deck()
 
     async def lookup_account(self, user_id):
         for user in self.bot.account_list:
