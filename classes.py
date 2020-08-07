@@ -65,7 +65,7 @@ class SlotMachine:
         for _ in range(self.reels):
             current_reel_weight = []
             for curr in self.get_reel_weight():
-                current_reel_weight.append(curr.pop())
+                current_reel_weight.append(curr[-1])
             spin_results.append(
                 random.choices(
                     population=self.emojis,

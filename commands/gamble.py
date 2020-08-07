@@ -1,7 +1,3 @@
-import aiohttp
-import asyncio
-import discord
-import random
 from classes import Account, Machine, Card, Deck
 from discord import Embed
 from discord.ext import commands
