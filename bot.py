@@ -1,15 +1,19 @@
 import discord
 import os
-from classes import SlotMachine, Account, Level, Station, Emoji
-from config import bot_token, bot_prefix
 from discord.ext import commands
+from config import bot_token, bot_prefix
+from storage.station_list import station_list
+from storage.level_list import level_list
 from storage.account_list import account_list
 from storage.eight_ball_responses import responses
 from storage.level_list import level_list
-from storage.level_list import level_list
 from storage.slot_machines import slot_machines
 from storage.station_list import station_list
-from storage.station_list import station_list
+from classes import SlotMachine, Account, Level, Station, Emoji
+
+
+async def on_command_error(ctx, exception):
+    print(f'Context: {ctx} | Exception: {exception}')
 
 
 class Bot(commands.Bot):
@@ -34,7 +38,7 @@ class Bot(commands.Bot):
                     Emoji(emoji["emoji"], emoji["rank"], emoji["weights"])
                 )
             self.slot_machines.append(
-                SlotMachine(machine["name"], machine["cost"], machine["rows"], machine["reels"], emoji_array)
+                SlotMachine(machine["name"], machine["cost"], machine["rows"], machine["reels"], "slot", emoji_array)
             )
 
         self.level_list = []
@@ -60,10 +64,6 @@ class Bot(commands.Bot):
             activity=discord.Game('streams of your favorite stations! [!s]')
         )
         print(f'Logged in as {self.user.name} | {self.user.id}')
-
-
-async def on_command_error(ctx, exception):
-    print(f'Context: {ctx} | Exception: {exception}')
 
 
 bot = Bot()

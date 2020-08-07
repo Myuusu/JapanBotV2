@@ -37,9 +37,9 @@ class Gamble(commands.Cog):
             await ctx.send(embed=Embed(title="Slot Machine List", description="\n".join(des), color=0x00ff00))
         else:
             for machine in self.slot_machines:
-                if machine.get_name() == input_string:
+                if machine.name == input_string:
                     user = await self.lookup_account(ctx.author.id)
-                    if machine.get_cost() <= user.get_balance():
+                    if machine.cost <= user.get_balance():
                         result = await machine.spin(ctx)
                         user.set_balance(user.get_balance() - result)
                     else:

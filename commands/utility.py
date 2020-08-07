@@ -80,9 +80,15 @@ class Utility(commands.Cog):
     async def ping(self, ctx):
         await ctx.send(f'Pong! {round(self.bot.latency * 1000)}ms')
 
-    @commands.command(name='test', aliases=['testt'])
-    async def test(self, ctx):
-        await ctx.send(f'<:Tangleroot:740607927257399347> <:RiftGuardian:740607758780596334> <:GiantSquirrel:740607823280603166> <:BlackRocky:740607984916496475> <:Beaver:740607855685533787>')
+    @commands.command(name='test_emojis', aliases=['test_emoji'])
+    async def test_emojis(self, ctx):
+        await ctx.send(
+            f'<:Tangleroot:740607927257399347> '
+            f'<:RiftGuardian:740607758780596334> '
+            f'<:GiantSquirrel:740607823280603166> '
+            f'<:BlackRocky:740607984916496475> '
+            f'<:Beaver:740607855685533787>'
+        )
 
     @commands.command(name='hack', aliases=['code', 'initiate_hack'])
     async def hack(self, ctx, user: discord.Member):
@@ -102,7 +108,8 @@ class Utility(commands.Cog):
         await asyncio.sleep(3)
         await msg.edit(content="Retrieving Login Info... [▓▓▓▓▓▓ ]")
         await asyncio.sleep(4)
-        await msg.edit(content=f"Completed hacking of {user}'s account. Please check log for Information. <a:peepohack:740653897772826724>")
+        await msg.edit(content=f"Completed hacking of {user}'s account.\n"
+                               f"Please check log for Information. <a:peepohack:740653897772826724>")
 
     @commands.command(name='reverse', aliases=['rev', 'backwards'])
     async def reverse(self, ctx, *, text: str):

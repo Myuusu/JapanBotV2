@@ -19,145 +19,78 @@ class Deck:
         self.contents = [Card(rank, suit) for rank in ranks for suit in suits]
 
 
-class Machine:
-    def __init__(self, name, cost, machine_type):
-        self.machine = {
-            "name": name,
-            "cost": cost,
-            "machine_type": machine_type
-        }
-
-
 class Emoji:
     def __init__(self, emoji, rank, weights):
-        self.emoji = {
-            "emoji": emoji,
-            "rank": rank,
-            "weights": weights
-        }
+        self.emoji = emoji
+        self.rank = rank
+        self.weights = weights
 
-    def __getitem__(self, item):
-        return self.emoji[item]
 
-    def __setitem__(self, key, value):
-        self.emoji[key] = value
-
-    def __str__(self):
-        return self.__getitem__("emoji")
-
-    def get_emoji(self):
-        return self.__getitem__("emoji")
-
-    def get_rank(self):
-        return self.__getitem__("rank")
-
-    def get_weights(self):
-        return self.__getitem__("weights")
+class Machine:
+    def __init__(self, name, cost, machine_type):
+        self.name = name
+        self.cost = cost
+        self.machine_type = machine_type
+        self.play_count = 0
+        self.winnings = 0
+        self.profit = 0
 
 
 class SlotMachine:
-    def __init__(self, name: str, cost: int, rows: int, reels: int, emojis: list[Emoji] | Emoji):
-        self.machine = {
-            "name": name,
-            "cost": cost,
-            "rows": rows,
-            "reels": reels,
-            "emojis": emojis,
-            "play_count": 0,
-            "winnings": 0,
-            "profit": 0
-        }
-
-    def __getitem__(self, key):
-        return self.machine[key]
-
-    def __setitem__(self, key, value):
-        self.machine[key] = value
-
-    def get_name(self):
-        return self.__getitem__("name")
-
-    def get_cost(self):
-        return self.__getitem__("cost")
-
-    def get_rows(self):
-        return self.__getitem__("rows")
-
-    def get_reels(self):
-        return self.__getitem__("reels")
-
-    def get_play_count(self):
-        return self.__getitem__("play_count")
-
-    def get_winnings(self):
-        return self.__getitem__("winnings")
-
-    def get_profit(self):
-        return self.__getitem__("profit")
-
-    def get_emojis(self):
-        return self.__getitem__("emojis")
-
-    def set_winnings(self, value):
-        return self.__setitem__(key="winnings", value=value)
-
-    def increment_play_count(self):
-        return self.__setitem__(key="play_count", value=self.__getitem__("play_count")+1)
-
-    def set_profit(self, value):
-        return self.__setitem__(key="profit", value=value)
+    def __init__(self, name: str, cost: int, rows: int, reels: int, machine_type: str, emojis: [Emoji]):
+        self.name = name
+        self.cost = cost
+        self.machine_type = machine_type
+        self.rows = rows
+        self.reels = reels
+        self.emojis = emojis
 
     def print(self):
-        return " | ".join(
-            f'Cost: {self.__getitem__("cost")}',
-            f'Emojis: {" ".join(self.__getitem__("emojis").get_emoji())}',
-            f'Name: {self.__getitem__("name")}'
-        )
+        return f'Cost: {self.cost} | Emojis: {" ".join([self.emojis.emoji])} | Name: {self.name}'
 
     def calculate_winnings(self, ctx, spin_results, multiplier=1):
         print(spin_results)
         print(ctx.author)
-        return self.__getitem__("cost") * multiplier
+        return self.cost * multiplier
 
     def get_reel_weight(self):
         weights = []
-        for i in self.__getitem__("emojis"):
-            weights.append(i.get_weights())
+        for i in self.emojis:
+            weights.append(i.weights)
         return weights
 
     async def spin(self, ctx, multiplier=1):
         """ This is where the machine will "spin" each of its wheels """
         spin_results = []
-        for i in range(self.__getitem__("reels")):
+        for _ in range(self.reels):
             current_reel_weight = []
             for curr in self.get_reel_weight():
                 current_reel_weight.append(curr.pop())
             spin_results.append(
                 random.choices(
-                    population=self.__getitem__("emojis"),
+                    population=self.emojis,
                     weights=current_reel_weight,
-                    k=self.__getitem__("rows")
+                    k=self.rows
                 )
             )
         else:
-            emoji_matrix = [["?" for j in range(self.__getitem__("reels"))] for i in range(self.__getitem__("rows"))]
-            ranks_matrix = [["#" for j in range(self.__getitem__("reels"))] for i in range(self.__getitem__("rows"))]
+            emoji_matrix = [["?" for _ in range(self.reels)] for _ in range(self.rows)]
+            ranks_matrix = [["#" for _ in range(self.reels)] for _ in range(self.rows)]
             msg = await ctx.send(f"Spinning! Good luck {ctx.author.name}!")
-            for j in range(self.__getitem__("reels")):
+            for j in range(self.reels):
                 await asyncio.sleep(random.uniform(1, 4))
-                for i in range(self.__getitem__("rows")):
-                    ranks_matrix[i][j] = spin_results[j][i].get_rank()
-                    emoji_matrix[i][j] = spin_results[j][i].get_emoji()
+                for i in range(self.rows):
+                    ranks_matrix[i][j] = spin_results[j][i].rank
+                    emoji_matrix[i][j] = spin_results[j][i].emoji
                 output = '\n'.join(['|'.join([str(item) for item in row]) for row in emoji_matrix])
                 await msg.edit(content=f"Spinning! Good luck {ctx.author.name}!\n{output}")
             else:
                 return self.calculate_winnings(ctx, ranks_matrix, multiplier)
 
 
-class Poker:
-    def __init__(self, machine, cost):
-        self.machine = machine
-        self.cost = cost
+class Poker(Machine):
+    def __init__(self):
+        super().__init__(self, name, cost, "poker")
         self.deck = Deck()
 
 
