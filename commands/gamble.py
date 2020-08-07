@@ -7,10 +7,6 @@ from discord import Embed
 from discord.ext import commands
 
 
-async def check_point_balance(user: Account, machine: Machine):
-    return machine.cost >= user.balance
-
-
 class Gamble(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
