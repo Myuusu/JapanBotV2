@@ -2,8 +2,6 @@ import discord
 import os
 from discord.ext import commands
 from config import bot_token, bot_prefix
-from storage.station_list import station_list
-from storage.level_list import level_list
 from storage.account_list import account_list
 from storage.eight_ball_responses import responses
 from storage.level_list import level_list
@@ -81,11 +79,11 @@ bot.run(bot_token)
 To do list:
 Gambling:
 Bet / Winning Modifier
+Add a message everytime you win or lose
 Weighting modifications
 Jackpot announcements on Animal slot for lion
 Server admin right to toggle "Jackpot Winner" role
 Configure daily point dispenser
-Add custom emotes to a server for the slots
 
 Conjugation:
 Fix elements, unable to locate currently
