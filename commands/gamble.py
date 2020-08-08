@@ -15,7 +15,7 @@ class Gamble(commands.Cog):
                 return user
 
     @commands.command(name='slot', aliases=['slots', 'bet'])
-    @commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=10, type=commands.BucketType.user)
     async def slot(self, ctx, input_string: str = "help"):
         if input_string == "help":
             des = []
