@@ -15,6 +15,14 @@ from classes import SlotMachine, Account, Level, Station, Emoji
 async def on_command_error(ctx, exception):
     print(f'Context: {ctx} | Exception: {exception}')
 
+#   f = open("temp.txt", "w+")
+#   for i in range(0, 6):
+#       for j in range(0, 6):
+#           for k in range(0, 6):
+#               f.write(f'{{\n\t"winnings": [{i}, {j}, {k}],\n\t"payout": 1 \n}}, ')
+#   else:
+#       f.close()
+
 
 class Bot(commands.Bot):
 
