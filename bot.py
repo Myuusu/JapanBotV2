@@ -1,6 +1,7 @@
 import discord
 import os
 import datetime
+import json
 from discord.ext import commands
 from config import bot_token, bot_prefix
 from storage.account_list import account_list
@@ -14,6 +15,7 @@ from classes import SlotMachine, Account, Level, Station, Emoji
 async def on_command_error(ctx, exception):
     print(f'Context: {ctx} | Exception: {exception}')
 
+
 #   f = open("temp.txt", "w+")
 #   for i in range(0, 6):
 #       for j in range(0, 6):
@@ -21,6 +23,33 @@ async def on_command_error(ctx, exception):
 #               f.write(f'{{\n\t"winnings": [{i}, {j}, {k}],\n\t"payout": 1 \n}}, ')
 #   else:
 #       f.close()
+
+
+def get_prefix(client, message):
+    with open('prefixes.json', 'r') as f:
+        prefixes = json.load(f)
+
+    return prefixes[str(message.guild.id)]
+
+
+async def on_guild_join(guild):
+    with open('prefixes.json', 'r') as f:
+        prefixes = json.load(f)
+
+    prefixes[str(guild.id)] = '!'
+
+    with open('prefixes.json', 'w') as f:
+        json.dump(prefixes, f, indent=4)
+
+
+async def on_guild_remove(guild):
+    with open('prefixes.json', 'r') as f:
+        prefixes = json.load(f)
+
+    prefixes.pop(str(guild.id))
+
+    with open('prefixes.json', 'w') as f:
+        json.dump(prefixes, f, indent=4)
 
 
 class Bot(commands.Bot):

@@ -4,6 +4,7 @@ import discord
 import datetime
 import lxml.html
 import os
+import json
 import random
 import secrets
 import urllib
@@ -94,6 +95,19 @@ class Utility(commands.Cog):
         await log_channel.send(embed=embed)
         await ctx.message.add_reaction('✅')
         await self.bot.close()
+
+    @commands.command(name='prefix')
+    @commands.has_permissions(administrator=True)
+    async def prefix(self, ctx, prefix):
+        with open('prefixes.json', 'r') as f:
+            prefixes = json.load(f)
+
+        prefixes[str(ctx.guild.id)] = prefix
+
+        with open('prefixes.json', 'w') as f:
+            json.dump(prefixes, f, indent=4)
+
+        await ctx.send(f'Prefix changed to {prefix}')
 
     @commands.command(name='eight_ball', aliases=['8ball', 'eightball', '8_ball', '8'])
     async def eight_ball(self, ctx, *, question):
