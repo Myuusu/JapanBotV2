@@ -56,7 +56,7 @@ class Bot(commands.Bot):
 
     def __init__(self):
         super(Bot, self).__init__(
-            command_prefix=bot_prefix,
+            command_prefix=get_prefix,
             case_insensitive=True
         )
 
