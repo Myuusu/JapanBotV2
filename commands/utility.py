@@ -96,7 +96,7 @@ class Utility(commands.Cog):
         await ctx.message.add_reaction('✅')
         await self.bot.close()
 
-    @commands.command(name='prefix')
+    @commands.command(name='prefix', help='Set your prefix with this')
     @commands.has_permissions(administrator=True)
     async def prefix(self, ctx, prefix):
         with open('prefixes.json', 'r') as f:

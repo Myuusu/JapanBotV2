@@ -119,6 +119,7 @@ bot.run(bot_token, reconnect=True)
 
 """
 To do list:
+
 Gambling:
 Bet / Winning Modifier
 Add a message everytime you win or lose
