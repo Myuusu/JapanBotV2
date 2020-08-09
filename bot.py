@@ -1,5 +1,6 @@
 import discord
 import os
+import datetime
 from discord.ext import commands
 from config import bot_token, bot_prefix
 from storage.account_list import account_list
@@ -66,14 +67,26 @@ class Bot(commands.Bot):
 
     async def on_ready(self):
         await self.change_presence(
-            status=discord.Status.online,
-            activity=discord.Game('streams of your favorite stations! [!s]')
+            status=discord.Status.dnd,
+            activity=discord.Activity(type=discord.ActivityType.listening, name=('[!s]'))
         )
+        embed = discord.Embed(
+            title=f"{self.user.name} Online!",
+            color=discord.Color.from_rgb(0, 0, 0),
+            timestamp=datetime.datetime.now(datetime.timezone.utc)
+        )
+        embed.set_footer(
+            text="Why am I still doing this",
+            icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Flag_of_Japan.svg/120px-Flag_of_Japan.svg.png"
+        )
+        log_channel_id = 741755498193223710
+        log_channel = self.get_channel(log_channel_id)
+        await log_channel.send(embed=embed)
         print(f'Logged in as {self.user.name} | {self.user.id}')
 
 
 bot = Bot()
-bot.run(bot_token)
+bot.run(bot_token, reconnect=True)
 
 """
 To do list:
