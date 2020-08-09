@@ -97,7 +97,7 @@ class Bot(commands.Bot):
     async def on_ready(self):
         await self.change_presence(
             status=discord.Status.dnd,
-            activity=discord.Activity(type=discord.ActivityType.listening, name=('[!s]'))
+            activity=discord.Activity(type=discord.ActivityType.listening, name='[!s]')
         )
         embed = discord.Embed(
             title=f"{self.user.name} Online!",
