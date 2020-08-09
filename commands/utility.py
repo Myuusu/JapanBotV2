@@ -1,6 +1,7 @@
 import aiohttp
 import asyncio
 import discord
+import datetime
 import lxml.html
 import os
 import random
@@ -71,6 +72,28 @@ class Utility(commands.Cog):
     async def ban(self, ctx, member: discord.Member, *, reason=None):
         await member.ban(reason=reason)
         await ctx.send(f'Banned {member.mention}')
+
+    @commands.command(name='shutdown', help="Shut down the bot")
+    @commands.has_permissions(administrator=True)
+    async def shutdown(self, ctx):
+        embed = discord.Embed(
+            title=f"{self.bot.user.name} shutting down!",
+            color=discord.Color.from_rgb(0, 0, 0),
+            timestamp=datetime.datetime.now(datetime.timezone.utc)
+        )
+        embed.set_author(
+            name=ctx.author.name,
+            icon_url=ctx.author.avatar_url
+        )
+        embed.set_footer(
+            text="Why am I still doing this",
+            icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Flag_of_Japan.svg/120px-Flag_of_Japan.svg.png"
+        )
+        log_channel_id = 741755498193223710
+        log_channel = self.bot.get_channel(log_channel_id)
+        await log_channel.send(embed=embed)
+        await ctx.message.add_reaction('✅')
+        await self.bot.close()
 
     @commands.command(name='eight_ball', aliases=['8ball', 'eightball', '8_ball', '8'])
     async def eight_ball(self, ctx, *, question):
