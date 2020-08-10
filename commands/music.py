@@ -239,43 +239,38 @@ class Music(commands.Cog):
         if station_id == 0:
             des = await self.get_station_descriptions()
             des.append("*Please Respond With The Station Number!*")
-            await ctx.send(embed=discord.Embed(title="Station List", description="\n".join(des), color=0x00ff00))
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Station List", description="\n".join(des), color=0x00ff00
+                ),
+                delete_after=30
+            )
 
             def test(m):
                 return ctx.channel == m.channel and ctx.author == m.author
             try:
                 response = await self.bot.wait_for('message', check=test, timeout=10)
-                player = self.bot.wavelink.get_player(ctx.guild.id)
-                if player.is_connected:
-                    await player.stop()
-                current_station_url = await self.get_station_url(ctx, int(response.content))
-                if current_station_url:
-                    await self.play_station(ctx, current_station_url)
+                if response in self.bot.station_list:
+                    player = self.bot.wavelink.get_player(ctx.guild.id)
+                    if player.is_connected:
+                        await player.stop()
+                    await self.play_station(ctx, self.bot.station_list[response.content].url)
+                else:
+                    await ctx.send('Please make sure that your entry is a valid station number.')
             except asyncio.TimeoutError:
-                await ctx.send('Too Slow')
+                await ctx.send('Timed Out. Please reissue command.')
         else:
             player = self.bot.wavelink.get_player(ctx.guild.id)
             if player.is_connected:
                 await player.stop()
-
-            current_station_url = await self.get_station_url(ctx, station_id)
-            if current_station_url:
-                await self.play_station(ctx, current_station_url)
-
-    @commands.command()
-    async def get_station_url(self, ctx, search_id: int = 0):
-        if 1 <= search_id <= len(self.bot.station_list):
-            for current_station in self.bot.station_list:
-                if search_id == current_station.get_station_id():
-                    return current_station.get_url()
-        await ctx.send('For a full list, please issue the stations command with no parameters.')
+            await self.play_station(ctx, self.bot.station_list[station_id].url)
 
     @commands.command()
     async def get_station_descriptions(self):
         des = []
-        for current_station in self.bot.station_list:
+        for i in self.bot.station_list:
             des.append(
-                f'**{current_station.get_station_id()}.** {current_station.get_name()}'
+                f'**{self.bot.station_list[i].station_id}.** {self.bot.station_list[i].name}'
             )
         return des
 

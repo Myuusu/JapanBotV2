@@ -1,6 +1,7 @@
 import asyncio
 import random
 from selenium.common.exceptions import NoSuchElementException
+import json
 
 
 class Card:
@@ -121,23 +122,9 @@ class Level:
 
 class Station:
     def __init__(self, station_id, name, url):
-        self.station = {
-            "station_id": station_id,
-            "name": name,
-            "url": url
-        }
-
-    def __getitem__(self, item):
-        return self.station[item]
-
-    def get_station_id(self):
-        return self.__getitem__("station_id")
-
-    def get_name(self):
-        return self.__getitem__("name")
-
-    def get_url(self):
-        return self.__getitem__("url")
+        self.station_id = station_id
+        self.name = name
+        self.url = url
 
 
 class WebTable:
@@ -204,3 +191,21 @@ class WebTable:
         if row_number == 0:
             raise Exception("Row number starts from 1")
         return self.table["table"].find_element_by_xpath(f'//tr[{str(row_number + 1)}]/td[{str(column_number)}]').text
+
+
+class Guild:
+    def __init__(self, guild_id, prefix, message_count=0, active=True, log_channel_id=None):
+        self.guild_id = guild_id
+        self.prefix = prefix
+        self.message_count = message_count
+        self.active = active
+        self.log_channel_id = log_channel_id
+
+    def get_json(self):
+        return f'{{' \
+               f'\r        "guild_id": {int(self.guild_id)}, ' \
+               f'\r        "prefix": "{self.prefix}", ' \
+               f'\r        "message_count": {int(self.message_count)}, ' \
+               f'\r        "active": {self.active}, ' \
+               f'\r        "log_channel_id": {self.log_channel_id}' \
+               f'\r    }}'

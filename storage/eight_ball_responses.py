@@ -1,4 +1,4 @@
-responses = [
+eight_ball_responses = [
   "It is certain.",
   "It is decidedly so.",
   "Without a doubt.",

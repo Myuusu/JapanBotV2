@@ -1,121 +1,139 @@
 import discord
 import os
 import datetime
-import json
 from discord.ext import commands
 from config import bot_token, bot_prefix
 from storage.account_list import account_list
-from storage.eight_ball_responses import responses
+from storage.eight_ball_responses import eight_ball_responses
 from storage.level_list import level_list
 from storage.slot_machines import slot_machines
 from storage.station_list import station_list
-from classes import SlotMachine, Account, Level, Station, Emoji
-
-
-async def on_command_error(ctx, exception):
-    print(f'Context: {ctx} | Exception: {exception}')
-
-
-#   f = open("temp.txt", "w+")
-#   for i in range(0, 6):
-#       for j in range(0, 6):
-#           for k in range(0, 6):
-#               f.write(f'{{\n\t"winnings": [{i}, {j}, {k}],\n\t"payout": 1 \n}}, ')
-#   else:
-#       f.close()
+from storage.guild_list import guild_list
+from classes import SlotMachine, Account, Level, Station, Emoji, Guild
 
 
 def get_prefix(client, message):
-    with open('prefixes.json', 'r') as f:
-        prefixes = json.load(f)
-
-    return prefixes[str(message.guild.id)]
-
-
-async def on_guild_join(guild):
-    with open('prefixes.json', 'r') as f:
-        prefixes = json.load(f)
-
-    prefixes[str(guild.id)] = '!'
-
-    with open('prefixes.json', 'w') as f:
-        json.dump(prefixes, f, indent=4)
-
-
-async def on_guild_remove(guild):
-    with open('prefixes.json', 'r') as f:
-        prefixes = json.load(f)
-
-    prefixes.pop(str(guild.id))
-
-    with open('prefixes.json', 'w') as f:
-        json.dump(prefixes, f, indent=4)
+    if client.guild_list[str(message.guild.id)]:
+        return client.guild_list[str(message.guild.id)].prefix
 
 
 class Bot(commands.Bot):
-
     def __init__(self):
-        super(Bot, self).__init__(
-            command_prefix=get_prefix,
-            case_insensitive=True
-        )
+        super(Bot, self).__init__(case_insensitive=True, command_prefix=get_prefix)
 
-        self.account_list = []
-        for account in account_list:
-            self.account_list.append(
-                Account(account["user_id"], account["balance"])
-            )
-
-        self.slot_machines = []
-        for machine in slot_machines:
-            emoji_array = []
-            for emoji in machine["emojis"]:
-                emoji_array.append(
-                    Emoji(emoji["emoji"], emoji["rank"], emoji["weights"])
-                )
-            self.slot_machines.append(
-                SlotMachine(machine["name"], machine["cost"], machine["rows"], machine["reels"], emoji_array, "slot")
-            )
-
-        self.level_list = []
-        for level in level_list:
-            self.level_list.append(
-                Level(level["level"], level["exp"])
-            )
-
-        self.eight_ball_responses = responses
-        self.station_list = []
-        for station in station_list:
-            self.station_list.append(
-                Station(station["station_id"], station["name"], station["url"])
-            )
+        self.account_list = account_list
+        self.guild_list = guild_list
+        self.level_list = level_list
+        self.eight_ball_responses = eight_ball_responses
+        self.slot_machines = slot_machines
+        self.station_list = station_list
+#        self.slot_machines = {}
+#        for machine in slot_machines:
+#            emoji_array = []
+#            for emoji in machine["emojis"]:
+#                emoji_array.append(
+#                    Emoji(emoji["emoji"], emoji["rank"], emoji["weights"])
+#                )
+#            self.slot_machines.update(
+#                {
+#                    machine["name"]:
+#                        SlotMachine(
+#                            machine["name"],
+#                            machine["cost"],
+#                            machine["rows"],
+#                            machine["reels"],
+#                            emoji_array,
+#                            "slot"
+#                        )
+#                }
+#            )
+#        self.level_list = {}
+#        for level in level_list:
+#            self.level_list.update(
+#                {
+#                    level["level"]:
+#                        Level(level["level"], level["exp"])
+#                }
+#            )
+#        self.station_list = {}
+#        for station in station_list:
+#            self.station_list.update(
+#                {
+#                    station["station_id"]:
+#                        Station(station["station_id"], station["name"], station["url"])
+#                }
+#            )
 
         for filename in os.listdir('./commands'):
             if filename.endswith('.py'):
                 self.load_extension(f'commands.{filename[:-3]}')
+
+    async def update_guild_list(self):
+        output = []
+        for guild_id in self.guild_list.keys():
+            output.append(self.guild_list[guild_id].get_json())
+        else:
+            with open('storage/guild_list.py', mode='w+') as fp:
+                string_output = ", ".join(output)
+                fp.write(f'guild_list = [{string_output}]')
 
     async def on_ready(self):
         await self.change_presence(
             status=discord.Status.dnd,
             activity=discord.Activity(type=discord.ActivityType.listening, name='[!s]')
         )
-        embed = discord.Embed(
-            title=f"{self.user.name} Online!",
-            color=discord.Color.from_rgb(0, 0, 0),
-            timestamp=datetime.datetime.now(datetime.timezone.utc)
-        )
-        embed.set_footer(
-            text="Why am I still doing this",
-            icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Flag_of_Japan.svg/120px-Flag_of_Japan.svg.png"
-        )
-        log_channel_id = 741755498193223710
-        log_channel = self.get_channel(log_channel_id)
-        await log_channel.send(embed=embed)
+#        embed = discord.Embed(
+#            title=f"{self.user.name} Online!",
+#            color=discord.Color.from_rgb(0, 0, 0),
+#            timestamp=datetime.datetime.now(datetime.timezone.utc)
+#        )
+#        embed.set_footer(
+#            text="Why am I still doing this",
+#            icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Flag_of_Japan.svg/120px-Flag_of_Japan.svg.png"
+#        )
+#        log_channel_id = 730995381177024532
+#        await self.get_channel(log_channel_id).send(embed=embed, delete_after=10)
         print(f'Logged in as {self.user.name} | {self.user.id}')
+
+    async def on_guild_join(self, guild):
+        self.guild_list.update(
+            {
+                guild["guild_id"]:
+                    Guild(
+                        guild["guild_id"],
+                        "!",
+                        guild["message_count"],
+                        True,
+                        guild["log_channel_id"]
+                    )
+            }
+        )
+        print(f'Reconnected To: {str(guild.id)}')
+        await self.update_guild_list()
+
+    async def on_guild_remove(self, guild):
+        self.guild_list.update(
+            {
+                guild["guild_id"]:
+                    Guild(
+                        guild["guild_id"],
+                        guild["prefix"],
+                        guild["message_count"],
+                        False,
+                        guild["log_channel_id"]
+                    )
+            }
+        )
+        print(f'Disconnected From: {str(guild.id)}')
+        await self.update_guild_list()
+
+    async def on_command_error(self, ctx, exception):
+        print(f'Context: {ctx} | Exception: {exception}')
 
 
 bot = Bot()
 bot.run(bot_token, reconnect=True)
+
 
 """
 To do list:

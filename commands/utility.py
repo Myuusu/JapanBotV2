@@ -12,6 +12,22 @@ from discord.ext import commands
 from urllib.parse import quote_plus
 
 
+def clean_int(string_to_process):
+    if isinstance(string_to_process, int) or isinstance(string_to_process, float):
+        return int(string_to_process)
+    else:
+        return \
+            int(
+                re.sub(",", "",
+                       re.sub("(?i)k", "000",
+                              re.sub("(?i)m", "000000",
+                                     re.sub("(?i)b", "000000000", string_to_process)
+                                     )
+                              )
+                       )
+            )
+
+
 async def trim(output: str = "", length: int = 2048):
     if len(output) > length:
         return output[:length - len(output) - 3] + '...'
@@ -48,7 +64,17 @@ async def find_in_site(search_url: str, xpath_location: str = '/'):
 class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.guild_list = bot.guild_list
         self.eight_ball_responses = bot.eight_ball_responses
+
+    def update_guild_list(self):
+        output = []
+        for guild_id in self.guild_list.keys():
+            output.append(self.guild_list[guild_id].get_json())
+        else:
+            with open('storage/guild_list.py', mode='w+') as fp:
+                string_output = ", ".join(output)
+                fp.write(f'guild_list = [\r    {string_output}\r]\r')
 
     @commands.command(name='load', aliases=['reload'])
     @commands.has_permissions(administrator=True)
@@ -88,10 +114,9 @@ class Utility(commands.Cog):
         )
         embed.set_footer(
             text="Why am I still doing this",
-            icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Flag_of_Japan.svg/120px-Flag_of_Japan.svg.png"
+            icon_url="https://en.wikipedia.org/wiki/Flag_of_Japan#/media/File:Flag_of_Japan.svg"
         )
-        log_channel_id = 741755498193223710
-        log_channel = self.bot.get_channel(log_channel_id)
+        log_channel = self.bot.get_channel(self.guild_list[ctx.guild.id].log_channel)
         await log_channel.send(embed=embed)
         await ctx.message.add_reaction('✅')
         await self.bot.close()
@@ -99,15 +124,19 @@ class Utility(commands.Cog):
     @commands.command(name='prefix', help='Set your prefix with this')
     @commands.has_permissions(administrator=True)
     async def prefix(self, ctx, prefix):
-        with open('prefixes.json', 'r') as f:
-            prefixes = json.load(f)
+        if prefix not in ["'", '"']:
+            self.guild_list[ctx.guild.id].prefix = prefix
+            self.update_guild_list()
+            await ctx.send(f'The prefix has been changed to: {prefix}')
+        else:
+            await ctx.send('Invalid Prefix. Prefix has not changed.')
 
-        prefixes[str(ctx.guild.id)] = prefix
-
-        with open('prefixes.json', 'w') as f:
-            json.dump(prefixes, f, indent=4)
-
-        await ctx.send(f'Prefix changed to {prefix}')
+    @commands.command(name='log', aliases=['log_channel', 'update_log'], help='Set your log_channel with this')
+    @commands.has_permissions(administrator=True)
+    async def log(self, ctx, log_channel_id):
+        self.guild_list[ctx.guild.id].log_channel_id = log_channel_id
+        self.update_guild_list()
+        await ctx.send(f'The log_channel has been changed to this channel id: {log_channel_id}')
 
     @commands.command(name='eight_ball', aliases=['8ball', 'eightball', '8_ball', '8'])
     async def eight_ball(self, ctx, *, question):
