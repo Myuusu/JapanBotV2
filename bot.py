@@ -1,19 +1,28 @@
 import discord
 import os
-import datetime
 from discord.ext import commands
-from config import bot_token, bot_prefix
+from config import bot_token
 from storage.account_list import account_list
 from storage.eight_ball_responses import eight_ball_responses
 from storage.level_list import level_list
 from storage.slot_machines import slot_machines
 from storage.station_list import station_list
 from storage.guild_list import guild_list
-from classes import SlotMachine, Account, Level, Station, Emoji, Guild
+from classes import Guild
 
 
 def get_prefix(client, message):
-    if client.guild_list[str(message.guild.id)]:
+    try:
+        if client.guild_list[str(message.guild.id)]:
+            return client.guild_list[str(message.guild.id)].prefix
+    except KeyError:
+        client.guild_list[str(message.guild.id)] = Guild(
+            guild_id=message.guild.id,
+            prefix="!",
+            message_count=0,
+            active=True,
+            log_channel_id=None
+        )
         return client.guild_list[str(message.guild.id)].prefix
 
 
@@ -27,42 +36,6 @@ class Bot(commands.Bot):
         self.eight_ball_responses = eight_ball_responses
         self.slot_machines = slot_machines
         self.station_list = station_list
-#        self.slot_machines = {}
-#        for machine in slot_machines:
-#            emoji_array = []
-#            for emoji in machine["emojis"]:
-#                emoji_array.append(
-#                    Emoji(emoji["emoji"], emoji["rank"], emoji["weights"])
-#                )
-#            self.slot_machines.update(
-#                {
-#                    machine["name"]:
-#                        SlotMachine(
-#                            machine["name"],
-#                            machine["cost"],
-#                            machine["rows"],
-#                            machine["reels"],
-#                            emoji_array,
-#                            "slot"
-#                        )
-#                }
-#            )
-#        self.level_list = {}
-#        for level in level_list:
-#            self.level_list.update(
-#                {
-#                    level["level"]:
-#                        Level(level["level"], level["exp"])
-#                }
-#            )
-#        self.station_list = {}
-#        for station in station_list:
-#            self.station_list.update(
-#                {
-#                    station["station_id"]:
-#                        Station(station["station_id"], station["name"], station["url"])
-#                }
-#            )
 
         for filename in os.listdir('./commands'):
             if filename.endswith('.py'):
@@ -75,7 +48,16 @@ class Bot(commands.Bot):
         else:
             with open('storage/guild_list.py', mode='w+') as fp:
                 string_output = ", ".join(output)
-                fp.write(f'guild_list = [{string_output}]')
+                fp.write(f'from classes import Guild\n\nguild_list = [{string_output}]')
+
+    async def update_account_list(self):
+        output = []
+        for account_id in self.account_list.keys():
+            output.append(self.account_list[account_id].get_json())
+        else:
+            with open('storage/account_list.py', mode='w+') as fp:
+                string_output = ", ".join(output)
+                fp.write(f'from classes import Account\n\naccount_list = [{string_output}]')
 
     async def on_ready(self):
         await self.change_presence(
@@ -98,13 +80,13 @@ class Bot(commands.Bot):
     async def on_guild_join(self, guild):
         self.guild_list.update(
             {
-                guild["guild_id"]:
+                str(guild["guild_id"]):
                     Guild(
-                        guild["guild_id"],
+                        str(guild["guild_id"]),
                         "!",
                         guild["message_count"],
                         True,
-                        guild["log_channel_id"]
+                        str(guild["log_channel_id"])
                     )
             }
         )
@@ -114,13 +96,13 @@ class Bot(commands.Bot):
     async def on_guild_remove(self, guild):
         self.guild_list.update(
             {
-                guild["guild_id"]:
+                str(guild["guild_id"]):
                     Guild(
-                        guild["guild_id"],
+                        str(guild["guild_id"]),
                         guild["prefix"],
                         guild["message_count"],
                         False,
-                        guild["log_channel_id"]
+                        str(guild["log_channel_id"])
                     )
             }
         )

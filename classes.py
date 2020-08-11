@@ -1,7 +1,6 @@
 import asyncio
 import random
 from selenium.common.exceptions import NoSuchElementException
-import json
 
 
 class Card:
@@ -101,6 +100,12 @@ class Account:
     def __init__(self, user_id, balance):
         self.user_id = user_id
         self.balance = balance
+
+    def get_json(self):
+        return f'{{' \
+               f'\r        "user_id": {str(self.user_id)}, ' \
+               f'\r        "balance": "{self.balance}", ' \
+               f'\r    }}'
 
 
 class Level:
@@ -203,9 +208,9 @@ class Guild:
 
     def get_json(self):
         return f'{{' \
-               f'\r        "guild_id": {int(self.guild_id)}, ' \
+               f'\r        "guild_id": {str(self.guild_id)}, ' \
                f'\r        "prefix": "{self.prefix}", ' \
-               f'\r        "message_count": {int(self.message_count)}, ' \
+               f'\r        "message_count": {self.message_count}, ' \
                f'\r        "active": {self.active}, ' \
-               f'\r        "log_channel_id": {self.log_channel_id}' \
+               f'\r        "log_channel_id": {str(self.log_channel_id)}' \
                f'\r    }}'
