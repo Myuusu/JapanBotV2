@@ -4,7 +4,7 @@ import discord
 import datetime
 import lxml.html
 import os
-import json
+import re
 import random
 import secrets
 import urllib
