@@ -1,6 +1,5 @@
 bot_token = ""
-chrome_driver_path = "C:\\JapanBotV2\\Lavalink\\chromedriver.exe"
-bot_prefix = ["!", "'", "73"]
+chrome_driver_path = ""
 node_settings = dict(
     host="127.0.0.1",
     port=80,
