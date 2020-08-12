@@ -109,6 +109,8 @@ class Bot(commands.Bot):
     async def get_prefix(self, message):
         try:
             if self.guild_list[message.guild.id]:
+                self.guild_list[message.guild.id].message_count += 1
+                await self.update_guild_list()
                 return self.guild_list[message.guild.id].prefix
         except KeyError:
             self.guild_list.update(
