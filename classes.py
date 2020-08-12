@@ -1,6 +1,11 @@
-import asyncio
 import random
+import json
+import asyncio
 from selenium.common.exceptions import NoSuchElementException
+from storage.winnings_table import \
+    three_by_three_lines, three_by_one_lines, three_reel_winnings, \
+    five_by_one_lines, five_by_three_lines, five_reel_winnings
+from commands.utility import resolve_line
 
 
 class Card:
@@ -25,6 +30,10 @@ class Emoji:
         self.rank = rank
         self.weights = weights
 
+    def get_json(self):
+        weights = json.dumps(self.weights)
+        return f"            Emoji(emoji=u'{self.emoji}', rank={self.rank}, weights={weights})"
+
 
 class Machine:
     def __init__(self, name, cost, machine_type):
@@ -34,42 +43,57 @@ class Machine:
 
 
 class SlotMachine:
-    def __init__(self, name: str, cost: int, rows: int, reels: int, emojis: [Emoji], machine_type: str = "slot"):
+    def __init__(self, name: str, cost: int, rows: int, reels: int, emojis: [Emoji],
+                 machine_type: str = "slot", play_count=0, winnings=0, profit=0
+                 ):
         self.name = name
         self.cost = cost
         self.machine_type = machine_type
         self.rows = rows
         self.reels = reels
         self.emojis = emojis
-        self.play_count = 0
-        self.winnings = 0
-        self.profit = 0
+        self.play_count = play_count
+        self.winnings = winnings
+        self.profit = profit
 
     def print(self):
         return f'Cost: {self.cost} | Emojis: {" ".join([self.emojis.emoji])} | Name: {self.name}'
 
-    def calculate_winnings(self, ctx, spin_results, multiplier=1):
-        print(spin_results)
-        print(ctx.author)
-        return self.cost * multiplier
+    def calculate_winnings(self, ranks_matrix: [[]], multiplier=1):
+        winnings = 0
+        if self.reels == 3:
+            if self.rows == 1:
+                for line in three_by_one_lines:
+                    winnings = winnings + int(resolve_line(ranks_matrix, line, three_reel_winnings))
+            if self.rows == 3:
+                for line in three_by_three_lines:
+                    winnings = winnings + int(resolve_line(ranks_matrix, line, three_reel_winnings))
+        if self.reels == 5:
+            if self.rows == 1:
+                for line in five_by_one_lines:
+                    winnings = winnings + int(resolve_line(ranks_matrix, line, five_reel_winnings))
+            if self.rows == 3:
+                for line in five_by_three_lines:
+                    winnings = winnings + int(resolve_line(ranks_matrix, line, five_reel_winnings))
+        self.winnings += multiplier * winnings
+        self.profit += multiplier * (self.cost - winnings)
+        self.play_count += 1
+        return multiplier * winnings
 
-    def get_reel_weight(self):
-        weights = []
-        for i in self.emojis:
-            weights.append(i.weights)
-        return weights
+    def get_reel_weight(self, reel_position: int):
+        weights_from_each_emoji = []
+        for current_emoji in self.emojis:
+            weights_from_each_emoji.append(current_emoji.weights[reel_position])
+        return weights_from_each_emoji
 
-    async def spin(self, ctx, multiplier=1):
+    async def spin(self, ctx, multiplier: int = 1):
         """ This is where the machine will "spin" each of its wheels """
         spin_results = []
-        for _ in range(self.reels):
-            current_reel_weight = []
-            for curr in self.get_reel_weight():
-                current_reel_weight.append(curr[-1])
+        for i in range(self.reels):
             spin_results.append(
                 random.choices(
                     population=self.emojis,
-                    weights=current_reel_weight,
+                    weights=self.get_reel_weight(i),
                     k=self.rows
                 )
             )
@@ -85,44 +109,68 @@ class SlotMachine:
                 output = '\n'.join(['|'.join([str(item) for item in row]) for row in emoji_matrix])
                 await msg.edit(content=f"Spinning! Good luck {ctx.author.name}!\n{output}")
             else:
-                return self.calculate_winnings(ctx, ranks_matrix, multiplier)
+                output = self.calculate_winnings(ranks_matrix, multiplier)
+                if output > (self.cost * multiplier * 3.5):
+                    msg = await ctx.send(f'*HUGE WINNER!!* {str(output)}')
+                    for i in range(10):
+                        await asyncio.sleep(1)
+                        await msg.edit(content=f'***HUGE WINNER!!*** {str(output)}')
+                        await asyncio.sleep(.5)
+                        await msg.edit(content=f'*HUGE WINNER!!* {str(output)}')
+                elif output > (self.cost * multiplier):
+                    await ctx.send(f'*Winner!* {str(output)}')
+                else:
+                    await ctx.send(f"Don't Give Up, Try Again! {str(output)}")
+                return output
+
+    def get_json(self):
+        emoji_output = []
+        for emoji in self.emojis:
+            emoji_output.append(emoji.get_json())
+        emoji_output = ",\n".join(emoji_output)
+        return f'"{self.name}": SlotMachine(' \
+               f'\n        name="{self.name}",' \
+               f'\n        cost={self.cost},' \
+               f'\n        rows={self.rows},' \
+               f'\n        reels={self.reels},' \
+               f'\n        machine_type="slot",' \
+               f'\n        play_count={self.play_count},' \
+               f'\n        winnings={self.winnings},' \
+               f'\n        profit={self.profit}, ' \
+               f'\n        emojis=[' \
+               f'\n{emoji_output}' \
+               f'\n        ]' \
+               f'\n    )'
 
 
 class Poker:
     def __init__(self, name, cost, machine_type="poker"):
+        ranks = ["Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"]
+        suits = ["Clubs", "Diamonds", "Hearts", "Spades"]
         self.name = name
         self.cost = cost
         self.type = machine_type
-        self.deck = Deck()
+        self.deck = [Card(rank, suit) for rank in ranks for suit in suits]
 
 
 class Account:
-    def __init__(self, user_id, balance):
+    def __init__(self, user_id, balance, jackpot_winner=False):
         self.user_id = user_id
         self.balance = balance
+        self.jackpot_winner = jackpot_winner
 
     def get_json(self):
-        return f'{{' \
-               f'\r        "user_id": {str(self.user_id)}, ' \
-               f'\r        "balance": "{self.balance}", ' \
-               f'\r    }}'
+        return f'{self.user_id}: Account(' \
+               f'\n\t\tuser_id={self.user_id},' \
+               f'\n\t\tbalance={self.balance},' \
+               f'\n\t\tjackpot_winner={self.jackpot_winner}' \
+               f'\n\t)'
 
 
 class Level:
     def __init__(self, level, exp):
-        self.level = {
-            "level": level,
-            "exp": exp
-        }
-
-    def __getitem__(self, key):
-        return self.level[key]
-
-    def __setitem__(self, key, value):
-        return
-
-    def get_exp(self):
-        return self.__getitem__("exp")
+        self.level = level,
+        self.exp = exp
 
 
 class Station:
@@ -207,10 +255,5 @@ class Guild:
         self.log_channel_id = log_channel_id
 
     def get_json(self):
-        return f'{{' \
-               f'\r        "guild_id": {str(self.guild_id)}, ' \
-               f'\r        "prefix": "{self.prefix}", ' \
-               f'\r        "message_count": {self.message_count}, ' \
-               f'\r        "active": {self.active}, ' \
-               f'\r        "log_channel_id": {str(self.log_channel_id)}' \
-               f'\r    }}'
+        return f'{self.guild_id}: Guild(guild_id={self.guild_id}, prefix="{self.prefix}", ' \
+               f'message_count={self.message_count}, active={self.active}, log_channel_id={self.log_channel_id}'

@@ -1,651 +1,126 @@
-two_by_three = [
-    {
-        "winnings": [0, 0, 0],
-        "payout": 1
-    }, {
-        "winnings": [0, 0, 1],
-        "payout": 1
-    }, {
-        "winnings": [0, 0, 2],
-        "payout": 1
-    }, {
-        "winnings": [0, 0, 3],
-        "payout": 1
-    }, {
-        "winnings": [0, 0, 4],
-        "payout": 1
-    }, {
-        "winnings": [0, 0, 5],
-        "payout": 1
-    }, {
-        "winnings": [0, 1, 0],
-        "payout": 1
-    }, {
-        "winnings": [0, 1, 1],
-        "payout": 1
-    }, {
-        "winnings": [0, 1, 2],
-        "payout": 1
-    }, {
-        "winnings": [0, 1, 3],
-        "payout": 1
-    }, {
-        "winnings": [0, 1, 4],
-        "payout": 1
-    }, {
-        "winnings": [0, 1, 5],
-        "payout": 1
-    }, {
-        "winnings": [0, 2, 0],
-        "payout": 1
-    }, {
-        "winnings": [0, 2, 1],
-        "payout": 1
-    }, {
-        "winnings": [0, 2, 2],
-        "payout": 1
-    }, {
-        "winnings": [0, 2, 3],
-        "payout": 1
-    }, {
-        "winnings": [0, 2, 4],
-        "payout": 1
-    }, {
-        "winnings": [0, 2, 5],
-        "payout": 1
-    }, {
-        "winnings": [0, 3, 0],
-        "payout": 1
-    }, {
-        "winnings": [0, 3, 1],
-        "payout": 1
-    }, {
-        "winnings": [0, 3, 2],
-        "payout": 1
-    }, {
-        "winnings": [0, 3, 3],
-        "payout": 1
-    }, {
-        "winnings": [0, 3, 4],
-        "payout": 1
-    }, {
-        "winnings": [0, 3, 5],
-        "payout": 1
-    }, {
-        "winnings": [0, 4, 0],
-        "payout": 1
-    }, {
-        "winnings": [0, 4, 1],
-        "payout": 1
-    }, {
-        "winnings": [0, 4, 2],
-        "payout": 1
-    }, {
-        "winnings": [0, 4, 3],
-        "payout": 1
-    }, {
-        "winnings": [0, 4, 4],
-        "payout": 1
-    }, {
-        "winnings": [0, 4, 5],
-        "payout": 1
-    }, {
-        "winnings": [0, 5, 0],
-        "payout": 1
-    }, {
-        "winnings": [0, 5, 1],
-        "payout": 1
-    }, {
-        "winnings": [0, 5, 2],
-        "payout": 1
-    }, {
-        "winnings": [0, 5, 3],
-        "payout": 1
-    }, {
-        "winnings": [0, 5, 4],
-        "payout": 1
-    }, {
-        "winnings": [0, 5, 5],
-        "payout": 1
-    }, {
-        "winnings": [1, 0, 0],
-        "payout": 1
-    }, {
-        "winnings": [1, 0, 1],
-        "payout": 1
-    }, {
-        "winnings": [1, 0, 2],
-        "payout": 1
-    }, {
-        "winnings": [1, 0, 3],
-        "payout": 1
-    }, {
-        "winnings": [1, 0, 4],
-        "payout": 1
-    }, {
-        "winnings": [1, 0, 5],
-        "payout": 1
-    }, {
-        "winnings": [1, 1, 0],
-        "payout": 1
-    }, {
-        "winnings": [1, 1, 1],
-        "payout": 1
-    }, {
-        "winnings": [1, 1, 2],
-        "payout": 1
-    }, {
-        "winnings": [1, 1, 3],
-        "payout": 1
-    }, {
-        "winnings": [1, 1, 4],
-        "payout": 1
-    }, {
-        "winnings": [1, 1, 5],
-        "payout": 1
-    }, {
-        "winnings": [1, 2, 0],
-        "payout": 1
-    }, {
-        "winnings": [1, 2, 1],
-        "payout": 1
-    }, {
-        "winnings": [1, 2, 2],
-        "payout": 1
-    }, {
-        "winnings": [1, 2, 3],
-        "payout": 1
-    }, {
-        "winnings": [1, 2, 4],
-        "payout": 1
-    }, {
-        "winnings": [1, 2, 5],
-        "payout": 1
-    }, {
-        "winnings": [1, 3, 0],
-        "payout": 1
-    }, {
-        "winnings": [1, 3, 1],
-        "payout": 1
-    }, {
-        "winnings": [1, 3, 2],
-        "payout": 1
-    }, {
-        "winnings": [1, 3, 3],
-        "payout": 1
-    }, {
-        "winnings": [1, 3, 4],
-        "payout": 1
-    }, {
-        "winnings": [1, 3, 5],
-        "payout": 1
-    }, {
-        "winnings": [1, 4, 0],
-        "payout": 1
-    }, {
-        "winnings": [1, 4, 1],
-        "payout": 1
-    }, {
-        "winnings": [1, 4, 2],
-        "payout": 1
-    }, {
-        "winnings": [1, 4, 3],
-        "payout": 1
-    }, {
-        "winnings": [1, 4, 4],
-        "payout": 1
-    }, {
-        "winnings": [1, 4, 5],
-        "payout": 1
-    }, {
-        "winnings": [1, 5, 0],
-        "payout": 1
-    }, {
-        "winnings": [1, 5, 1],
-        "payout": 1
-    }, {
-        "winnings": [1, 5, 2],
-        "payout": 1
-    }, {
-        "winnings": [1, 5, 3],
-        "payout": 1
-    }, {
-        "winnings": [1, 5, 4],
-        "payout": 1
-    }, {
-        "winnings": [1, 5, 5],
-        "payout": 1
-    }, {
-        "winnings": [2, 0, 0],
-        "payout": 1
-    }, {
-        "winnings": [2, 0, 1],
-        "payout": 1
-    }, {
-        "winnings": [2, 0, 2],
-        "payout": 1
-    }, {
-        "winnings": [2, 0, 3],
-        "payout": 1
-    }, {
-        "winnings": [2, 0, 4],
-        "payout": 1
-    }, {
-        "winnings": [2, 0, 5],
-        "payout": 1
-    }, {
-        "winnings": [2, 1, 0],
-        "payout": 1
-    }, {
-        "winnings": [2, 1, 1],
-        "payout": 1
-    }, {
-        "winnings": [2, 1, 2],
-        "payout": 1
-    }, {
-        "winnings": [2, 1, 3],
-        "payout": 1
-    }, {
-        "winnings": [2, 1, 4],
-        "payout": 1
-    }, {
-        "winnings": [2, 1, 5],
-        "payout": 1
-    }, {
-        "winnings": [2, 2, 0],
-        "payout": 1
-    }, {
-        "winnings": [2, 2, 1],
-        "payout": 1
-    }, {
-        "winnings": [2, 2, 2],
-        "payout": 1
-    }, {
-        "winnings": [2, 2, 3],
-        "payout": 1
-    }, {
-        "winnings": [2, 2, 4],
-        "payout": 1
-    }, {
-        "winnings": [2, 2, 5],
-        "payout": 1
-    }, {
-        "winnings": [2, 3, 0],
-        "payout": 1
-    }, {
-        "winnings": [2, 3, 1],
-        "payout": 1
-    }, {
-        "winnings": [2, 3, 2],
-        "payout": 1
-    }, {
-        "winnings": [2, 3, 3],
-        "payout": 1
-    }, {
-        "winnings": [2, 3, 4],
-        "payout": 1
-    }, {
-        "winnings": [2, 3, 5],
-        "payout": 1
-    }, {
-        "winnings": [2, 4, 0],
-        "payout": 1
-    }, {
-        "winnings": [2, 4, 1],
-        "payout": 1
-    }, {
-        "winnings": [2, 4, 2],
-        "payout": 1
-    }, {
-        "winnings": [2, 4, 3],
-        "payout": 1
-    }, {
-        "winnings": [2, 4, 4],
-        "payout": 1
-    }, {
-        "winnings": [2, 4, 5],
-        "payout": 1
-    }, {
-        "winnings": [2, 5, 0],
-        "payout": 1
-    }, {
-        "winnings": [2, 5, 1],
-        "payout": 1
-    }, {
-        "winnings": [2, 5, 2],
-        "payout": 1
-    }, {
-        "winnings": [2, 5, 3],
-        "payout": 1
-    }, {
-        "winnings": [2, 5, 4],
-        "payout": 1
-    }, {
-        "winnings": [2, 5, 5],
-        "payout": 1
-    }, {
-        "winnings": [3, 0, 0],
-        "payout": 1
-    }, {
-        "winnings": [3, 0, 1],
-        "payout": 1
-    }, {
-        "winnings": [3, 0, 2],
-        "payout": 1
-    }, {
-        "winnings": [3, 0, 3],
-        "payout": 1
-    }, {
-        "winnings": [3, 0, 4],
-        "payout": 1
-    }, {
-        "winnings": [3, 0, 5],
-        "payout": 1
-    }, {
-        "winnings": [3, 1, 0],
-        "payout": 1
-    }, {
-        "winnings": [3, 1, 1],
-        "payout": 1
-    }, {
-        "winnings": [3, 1, 2],
-        "payout": 1
-    }, {
-        "winnings": [3, 1, 3],
-        "payout": 1
-    }, {
-        "winnings": [3, 1, 4],
-        "payout": 1
-    }, {
-        "winnings": [3, 1, 5],
-        "payout": 1
-    }, {
-        "winnings": [3, 2, 0],
-        "payout": 1
-    }, {
-        "winnings": [3, 2, 1],
-        "payout": 1
-    }, {
-        "winnings": [3, 2, 2],
-        "payout": 1
-    }, {
-        "winnings": [3, 2, 3],
-        "payout": 1
-    }, {
-        "winnings": [3, 2, 4],
-        "payout": 1
-    }, {
-        "winnings": [3, 2, 5],
-        "payout": 1
-    }, {
-        "winnings": [3, 3, 0],
-        "payout": 1
-    }, {
-        "winnings": [3, 3, 1],
-        "payout": 1
-    }, {
-        "winnings": [3, 3, 2],
-        "payout": 1
-    }, {
-        "winnings": [3, 3, 3],
-        "payout": 1
-    }, {
-        "winnings": [3, 3, 4],
-        "payout": 1
-    }, {
-        "winnings": [3, 3, 5],
-        "payout": 1
-    }, {
-        "winnings": [3, 4, 0],
-        "payout": 1
-    }, {
-        "winnings": [3, 4, 1],
-        "payout": 1
-    }, {
-        "winnings": [3, 4, 2],
-        "payout": 1
-    }, {
-        "winnings": [3, 4, 3],
-        "payout": 1
-    }, {
-        "winnings": [3, 4, 4],
-        "payout": 1
-    }, {
-        "winnings": [3, 4, 5],
-        "payout": 1
-    }, {
-        "winnings": [3, 5, 0],
-        "payout": 1
-    }, {
-        "winnings": [3, 5, 1],
-        "payout": 1
-    }, {
-        "winnings": [3, 5, 2],
-        "payout": 1
-    }, {
-        "winnings": [3, 5, 3],
-        "payout": 1
-    }, {
-        "winnings": [3, 5, 4],
-        "payout": 1
-    }, {
-        "winnings": [3, 5, 5],
-        "payout": 1
-    }, {
-        "winnings": [4, 0, 0],
-        "payout": 1
-    }, {
-        "winnings": [4, 0, 1],
-        "payout": 1
-    }, {
-        "winnings": [4, 0, 2],
-        "payout": 1
-    }, {
-        "winnings": [4, 0, 3],
-        "payout": 1
-    }, {
-        "winnings": [4, 0, 4],
-        "payout": 1
-    }, {
-        "winnings": [4, 0, 5],
-        "payout": 1
-    }, {
-        "winnings": [4, 1, 0],
-        "payout": 1
-    }, {
-        "winnings": [4, 1, 1],
-        "payout": 1
-    }, {
-        "winnings": [4, 1, 2],
-        "payout": 1
-    }, {
-        "winnings": [4, 1, 3],
-        "payout": 1
-    }, {
-        "winnings": [4, 1, 4],
-        "payout": 1
-    }, {
-        "winnings": [4, 1, 5],
-        "payout": 1
-    }, {
-        "winnings": [4, 2, 0],
-        "payout": 1
-    }, {
-        "winnings": [4, 2, 1],
-        "payout": 1
-    }, {
-        "winnings": [4, 2, 2],
-        "payout": 1
-    }, {
-        "winnings": [4, 2, 3],
-        "payout": 1
-    }, {
-        "winnings": [4, 2, 4],
-        "payout": 1
-    }, {
-        "winnings": [4, 2, 5],
-        "payout": 1
-    }, {
-        "winnings": [4, 3, 0],
-        "payout": 1
-    }, {
-        "winnings": [4, 3, 1],
-        "payout": 1
-    }, {
-        "winnings": [4, 3, 2],
-        "payout": 1
-    }, {
-        "winnings": [4, 3, 3],
-        "payout": 1
-    }, {
-        "winnings": [4, 3, 4],
-        "payout": 1
-    }, {
-        "winnings": [4, 3, 5],
-        "payout": 1
-    }, {
-        "winnings": [4, 4, 0],
-        "payout": 1
-    }, {
-        "winnings": [4, 4, 1],
-        "payout": 1
-    }, {
-        "winnings": [4, 4, 2],
-        "payout": 1
-    }, {
-        "winnings": [4, 4, 3],
-        "payout": 1
-    }, {
-        "winnings": [4, 4, 4],
-        "payout": 1
-    }, {
-        "winnings": [4, 4, 5],
-        "payout": 1
-    }, {
-        "winnings": [4, 5, 0],
-        "payout": 1
-    }, {
-        "winnings": [4, 5, 1],
-        "payout": 1
-    }, {
-        "winnings": [4, 5, 2],
-        "payout": 1
-    }, {
-        "winnings": [4, 5, 3],
-        "payout": 1
-    }, {
-        "winnings": [4, 5, 4],
-        "payout": 1
-    }, {
-        "winnings": [4, 5, 5],
-        "payout": 1
-    }, {
-        "winnings": [5, 0, 0],
-        "payout": 1
-    }, {
-        "winnings": [5, 0, 1],
-        "payout": 1
-    }, {
-        "winnings": [5, 0, 2],
-        "payout": 1
-    }, {
-        "winnings": [5, 0, 3],
-        "payout": 1
-    }, {
-        "winnings": [5, 0, 4],
-        "payout": 1
-    }, {
-        "winnings": [5, 0, 5],
-        "payout": 1
-    }, {
-        "winnings": [5, 1, 0],
-        "payout": 1
-    }, {
-        "winnings": [5, 1, 1],
-        "payout": 1
-    }, {
-        "winnings": [5, 1, 2],
-        "payout": 1
-    }, {
-        "winnings": [5, 1, 3],
-        "payout": 1
-    }, {
-        "winnings": [5, 1, 4],
-        "payout": 1
-    }, {
-        "winnings": [5, 1, 5],
-        "payout": 1
-    }, {
-        "winnings": [5, 2, 0],
-        "payout": 1
-    }, {
-        "winnings": [5, 2, 1],
-        "payout": 1
-    }, {
-        "winnings": [5, 2, 2],
-        "payout": 1
-    }, {
-        "winnings": [5, 2, 3],
-        "payout": 1
-    }, {
-        "winnings": [5, 2, 4],
-        "payout": 1
-    }, {
-        "winnings": [5, 2, 5],
-        "payout": 1
-    }, {
-        "winnings": [5, 3, 0],
-        "payout": 1
-    }, {
-        "winnings": [5, 3, 1],
-        "payout": 1
-    }, {
-        "winnings": [5, 3, 2],
-        "payout": 1
-    }, {
-        "winnings": [5, 3, 3],
-        "payout": 1
-    }, {
-        "winnings": [5, 3, 4],
-        "payout": 1
-    }, {
-        "winnings": [5, 3, 5],
-        "payout": 1
-    }, {
-        "winnings": [5, 4, 0],
-        "payout": 1
-    }, {
-        "winnings": [5, 4, 1],
-        "payout": 1
-    }, {
-        "winnings": [5, 4, 2],
-        "payout": 1
-    }, {
-        "winnings": [5, 4, 3],
-        "payout": 1
-    }, {
-        "winnings": [5, 4, 4],
-        "payout": 1
-    }, {
-        "winnings": [5, 4, 5],
-        "payout": 1
-    }, {
-        "winnings": [5, 5, 0],
-        "payout": 1
-    }, {
-        "winnings": [5, 5, 1],
-        "payout": 1
-    }, {
-        "winnings": [5, 5, 2],
-        "payout": 1
-    }, {
-        "winnings": [5, 5, 3],
-        "payout": 1
-    }, {
-        "winnings": [5, 5, 4],
-        "payout": 1
-    }, {
-        "winnings": [5, 5, 5],
-        "payout": 1
-    }
+three_reel_winnings = {
+    0: 60,
+    2: 1,
+    12: 1,
+    20: 1,
+    21: 1,
+    22: 3,
+    23: 1,
+    24: 1,
+    25: 1,
+    32: 1,
+    42: 1,
+    52: 1,
+    102: 1,
+    111: 40,
+    112: 1,
+    120: 1,
+    121: 1,
+    122: 3,
+    123: 1,
+    124: 1,
+    125: 1,
+    132: 1,
+    142: 1,
+    152: 1,
+    200: 1,
+    201: 1,
+    202: 3,
+    203: 1,
+    204: 1,
+    205: 1,
+    210: 1,
+    211: 1,
+    212: 3,
+    213: 1,
+    214: 1,
+    215: 1,
+    220: 1,
+    221: 1,
+    222: 3,
+    223: 3,
+    224: 3,
+    225: 3,
+    230: 1,
+    231: 1,
+    232: 3,
+    233: 1,
+    234: 1,
+    235: 1,
+    240: 1,
+    241: 1,
+    242: 3,
+    243: 1,
+    244: 1,
+    245: 1,
+    250: 1,
+    251: 1,
+    252: 3,
+    253: 1,
+    254: 1,
+    255: 1,
+    302: 1,
+    312: 1,
+    320: 1,
+    321: 1,
+    322: 3,
+    323: 1,
+    324: 1,
+    325: 1,
+    332: 1,
+    333: 10,
+    342: 1,
+    352: 1,
+    402: 1,
+    412: 1,
+    420: 1,
+    421: 1,
+    422: 3,
+    423: 1,
+    424: 1,
+    425: 1,
+    432: 1,
+    442: 1,
+    444: 10,
+    452: 1,
+    502: 1,
+    512: 1,
+    520: 1,
+    521: 1,
+    522: 3,
+    523: 1,
+    524: 1,
+    525: 1,
+    532: 1,
+    542: 1,
+    552: 1,
+    555: 10
+}
+
+five_reel_winnings = {
+    00000: 60
+}
+
+three_by_one_lines = [
+    [(0, 0), (0, 1), (0, 2)]
+]
+
+three_by_three_lines = [
+    [(0, 0), (1, 0), (2, 0)],
+    [(0, 0), (1, 1), (2, 2)],
+    [(0, 1), (1, 1), (2, 1)],
+    [(0, 2), (1, 2), (2, 2)],
+    [(0, 2), (1, 1), (2, 0)]
+]
+
+five_by_one_lines = [
+    [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4)]
+]
+
+five_by_three_lines = [
+    [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4)],
+    [(0, 1), (1, 1), (2, 1), (3, 1), (4, 1)],
+    [(0, 2), (1, 2), (2, 2), (3, 2), (4, 2)],
+    [(0, 3), (1, 3), (2, 3), (3, 3), (4, 3)],
+    [(0, 4), (1, 4), (2, 4), (3, 4), (4, 4)]
 ]

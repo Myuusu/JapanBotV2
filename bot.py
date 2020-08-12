@@ -11,24 +11,9 @@ from storage.guild_list import guild_list
 from classes import Guild
 
 
-def get_prefix(client, message):
-    try:
-        if client.guild_list[str(message.guild.id)]:
-            return client.guild_list[str(message.guild.id)].prefix
-    except KeyError:
-        client.guild_list[str(message.guild.id)] = Guild(
-            guild_id=message.guild.id,
-            prefix="!",
-            message_count=0,
-            active=True,
-            log_channel_id=None
-        )
-        return client.guild_list[str(message.guild.id)].prefix
-
-
 class Bot(commands.Bot):
     def __init__(self):
-        super(Bot, self).__init__(case_insensitive=True, command_prefix=get_prefix)
+        super(Bot, self).__init__(case_insensitive=True, command_prefix=self.get_prefix)
 
         self.account_list = account_list
         self.guild_list = guild_list
@@ -46,18 +31,27 @@ class Bot(commands.Bot):
         for guild_id in self.guild_list.keys():
             output.append(self.guild_list[guild_id].get_json())
         else:
-            with open('storage/guild_list.py', mode='w+') as fp:
-                string_output = ", ".join(output)
-                fp.write(f'from classes import Guild\n\nguild_list = [{string_output}]')
+            output_string = ",\n\t".join(output)
+            with open('storage/guild_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
+                fp.write(f'from classes import Guild\n\nguild_list = {{\n\t{output_string}]')
 
     async def update_account_list(self):
         output = []
         for account_id in self.account_list.keys():
             output.append(self.account_list[account_id].get_json())
         else:
-            with open('storage/account_list.py', mode='w+') as fp:
-                string_output = ", ".join(output)
-                fp.write(f'from classes import Account\n\naccount_list = [{string_output}]')
+            output_string = ",\n\t".join(output)
+            with open('storage/account_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
+                fp.write(f'from classes import Account\n\naccount_list = {{\n\t{output_string}\n}}')
+
+    async def update_slot_machines(self):
+        output = []
+        for slot_machine_name in self.slot_machines.keys():
+            output.append(self.slot_machines[slot_machine_name].get_json())
+        else:
+            output_string = ",\n    ".join(output)
+            with open('storage/slot_machines.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
+                fp.write(f'from classes import SlotMachine, Emoji\n\nslot_machines = {{\n    {output_string}\n}}')
 
     async def on_ready(self):
         await self.change_presence(
@@ -80,13 +74,13 @@ class Bot(commands.Bot):
     async def on_guild_join(self, guild):
         self.guild_list.update(
             {
-                str(guild["guild_id"]):
+                guild["guild_id"]:
                     Guild(
-                        str(guild["guild_id"]),
+                        guild["guild_id"],
                         "!",
                         guild["message_count"],
                         True,
-                        str(guild["log_channel_id"])
+                        guild["log_channel_id"]
                     )
             }
         )
@@ -96,13 +90,13 @@ class Bot(commands.Bot):
     async def on_guild_remove(self, guild):
         self.guild_list.update(
             {
-                str(guild["guild_id"]):
+                guild["guild_id"]:
                     Guild(
-                        str(guild["guild_id"]),
+                        guild["guild_id"],
                         guild["prefix"],
                         guild["message_count"],
                         False,
-                        str(guild["log_channel_id"])
+                        guild["log_channel_id"]
                     )
             }
         )
@@ -111,6 +105,25 @@ class Bot(commands.Bot):
 
     async def on_command_error(self, ctx, exception):
         print(f'Context: {ctx} | Exception: {exception}')
+
+    async def get_prefix(self, message):
+        try:
+            if self.guild_list[message.guild.id]:
+                return self.guild_list[message.guild.id].prefix
+        except KeyError:
+            self.guild_list.update(
+                {
+                    message.guild.id: Guild(
+                        guild_id=message.guild.id,
+                        prefix="!",
+                        message_count=0,
+                        active=True,
+                        log_channel_id=None
+                    )
+                }
+            )
+            await self.update_guild_list()
+            return self.guild_list[message.guild.id].prefix
 
 
 bot = Bot()

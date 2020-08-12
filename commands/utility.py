@@ -61,20 +61,20 @@ async def find_in_site(search_url: str, xpath_location: str = '/'):
     return output_string.strip()
 
 
+def resolve_line(ranks_matrix: [[]], line_coordinates: [[]], winnings_table: [[]]):
+    output = ""
+    for [x, y] in line_coordinates:
+        output = f'{output}{ranks_matrix[y][x]}'
+    else:
+        try:
+            return winnings_table[int(output)]
+        except KeyError:
+            return 0
+
+
 class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.guild_list = bot.guild_list
-        self.eight_ball_responses = bot.eight_ball_responses
-
-    def update_guild_list(self):
-        output = []
-        for guild_id in self.guild_list.keys():
-            output.append(self.guild_list[guild_id].get_json())
-        else:
-            with open('storage/guild_list.py', mode='w+') as fp:
-                string_output = ", ".join(output)
-                fp.write(f'guild_list = [\r    {string_output}\r]\r')
 
     @commands.command(name='load', aliases=['reload'])
     @commands.has_permissions(administrator=True)
@@ -116,7 +116,7 @@ class Utility(commands.Cog):
             text="Why am I still doing this",
             icon_url="https://en.wikipedia.org/wiki/Flag_of_Japan#/media/File:Flag_of_Japan.svg"
         )
-        log_channel = self.bot.get_channel(self.guild_list[ctx.guild.id].log_channel)
+        log_channel = self.bot.get_channel(self.bot.guild_list[ctx.guild.id].log_channel)
         await log_channel.send(embed=embed)
         await ctx.message.add_reaction('✅')
         await self.bot.close()
@@ -125,8 +125,8 @@ class Utility(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def prefix(self, ctx, prefix):
         if prefix not in ["'", '"']:
-            self.guild_list[ctx.guild.id].prefix = prefix
-            self.update_guild_list()
+            self.bot.guild_list[ctx.guild.id].prefix = prefix
+            self.bot.update_guild_list()
             await ctx.send(f'The prefix has been changed to: {prefix}')
         else:
             await ctx.send('Invalid Prefix. Prefix has not changed.')
@@ -134,8 +134,8 @@ class Utility(commands.Cog):
     @commands.command(name='log', aliases=['log_channel', 'update_log'], help='Set your log_channel with this')
     @commands.has_permissions(administrator=True)
     async def log(self, ctx, log_channel_id):
-        self.guild_list[ctx.guild.id].log_channel_id = log_channel_id
-        self.update_guild_list()
+        self.bot.guild_list[ctx.guild.id].log_channel_id = log_channel_id
+        self.bot.update_guild_list()
         await ctx.send(f'The log_channel has been changed to this channel id: {log_channel_id}')
 
     @commands.command(name='eight_ball', aliases=['8ball', 'eightball', '8_ball', '8'])
