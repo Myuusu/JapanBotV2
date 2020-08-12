@@ -31,18 +31,18 @@ class Bot(commands.Bot):
         for guild_id in self.guild_list.keys():
             output.append(self.guild_list[guild_id].get_json())
         else:
-            output_string = ",\n\t".join(output)
+            output_string = ",\n    ".join(output)
             with open('storage/guild_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
-                fp.write(f'from classes import Guild\n\nguild_list = {{\n\t{output_string}]')
+                fp.write(f'from classes import Guild\n\nguild_list = {{\n    {output_string}\n}}')
 
     async def update_account_list(self):
         output = []
         for account_id in self.account_list.keys():
             output.append(self.account_list[account_id].get_json())
         else:
-            output_string = ",\n\t".join(output)
+            output_string = ",\n    ".join(output)
             with open('storage/account_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
-                fp.write(f'from classes import Account\n\naccount_list = {{\n\t{output_string}\n}}')
+                fp.write(f'from classes import Account\n\naccount_list = {{\n    {output_string}\n}}')
 
     async def update_slot_machines(self):
         output = []
@@ -109,6 +109,8 @@ class Bot(commands.Bot):
     async def get_prefix(self, message):
         try:
             if self.guild_list[message.guild.id]:
+                self.guild_list[message.guild.id].message_count += 1
+                await self.update_guild_list()
                 return self.guild_list[message.guild.id].prefix
         except KeyError:
             self.guild_list.update(

@@ -7,9 +7,9 @@ slot_machines = {
         rows=3,
         reels=3,
         machine_type="slot",
-        play_count=60,
-        winnings=311,
-        profit=-131, 
+        play_count=61,
+        winnings=316,
+        profit=-133, 
         emojis=[
             Emoji(emoji=u'<:bar:740308928398622822>', rank=0, weights=[4.347826086, 4.347826086, 4.347826086]),
             Emoji(emoji=u'<:SlotmachineSeven:743190741920251994>', rank=1, weights=[13.04347826, 4.347826086, 4.347826086]),
@@ -137,7 +137,7 @@ slot_machines = {
         winnings=0,
         profit=0, 
         emojis=[
-            Emoji(emoji=u'\U0001f9d9\u200d', rank=0, weights=[2.22]),
+            Emoji(emoji=u'\u200d', rank=0, weights=[2.22]),
             Emoji(emoji=u'\U0001f9b9', rank=1, weights=[5.31]),
             Emoji(emoji=u'\U0001f9b8', rank=2, weights=[7.94]),
             Emoji(emoji=u'\U0001f9db', rank=3, weights=[17.1]),

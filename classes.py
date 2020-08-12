@@ -161,10 +161,10 @@ class Account:
 
     def get_json(self):
         return f'{self.user_id}: Account(' \
-               f'\n\t\tuser_id={self.user_id},' \
-               f'\n\t\tbalance={self.balance},' \
-               f'\n\t\tjackpot_winner={self.jackpot_winner}' \
-               f'\n\t)'
+               f'\n        user_id={self.user_id},' \
+               f'\n        balance={self.balance},' \
+               f'\n        jackpot_winner={self.jackpot_winner}' \
+               f'\n    )'
 
 
 class Level:
@@ -255,5 +255,10 @@ class Guild:
         self.log_channel_id = log_channel_id
 
     def get_json(self):
-        return f'{self.guild_id}: Guild(guild_id={self.guild_id}, prefix="{self.prefix}", ' \
-               f'message_count={self.message_count}, active={self.active}, log_channel_id={self.log_channel_id}'
+        return f'{self.guild_id}: Guild(' \
+               f'\n        guild_id={self.guild_id},' \
+               f'\n        prefix="{self.prefix}",' \
+               f'\n        message_count={self.message_count},' \
+               f'\n        active={self.active},' \
+               f'\n        log_channel_id={self.log_channel_id}' \
+               f'\n   )'
