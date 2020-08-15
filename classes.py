@@ -1,5 +1,4 @@
 import random
-import json
 import asyncio
 from selenium.common.exceptions import NoSuchElementException
 from storage.winnings_table import \
