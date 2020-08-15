@@ -33,7 +33,7 @@ class Bot(commands.Bot):
         else:
             output_string = ",\n    ".join(output)
             with open('storage/guild_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
-                fp.write(f'from classes import Guild\n\nguild_list = {{\n    {output_string}\n}}')
+                fp.write(f'from classes import Guild\n\nguild_list = {{\n    {output_string}\n}}\n')
 
     async def update_account_list(self):
         output = []
@@ -42,7 +42,7 @@ class Bot(commands.Bot):
         else:
             output_string = ",\n    ".join(output)
             with open('storage/account_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
-                fp.write(f'from classes import Account\n\naccount_list = {{\n    {output_string}\n}}')
+                fp.write(f'from classes import Account\n\naccount_list = {{\n    {output_string}\n}}\n')
 
     async def update_slot_machines(self):
         output = []
@@ -51,7 +51,7 @@ class Bot(commands.Bot):
         else:
             output_string = ",\n    ".join(output)
             with open('storage/slot_machines.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
-                fp.write(f'from classes import SlotMachine, Emoji\n\nslot_machines = {{\n    {output_string}\n}}')
+                fp.write(f'from classes import SlotMachine, Emoji\n\nslot_machines = {{\n    {output_string}\n}}\n')
 
     async def on_ready(self):
         await self.change_presence(

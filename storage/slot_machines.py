@@ -47,12 +47,12 @@ slot_machines = {
         winnings=0,
         profit=0, 
         emojis=[
-            Emoji(emoji=u'\U0001f34e', rank=0, weights=[2.22]),
-            Emoji(emoji=u'\U0001f34a', rank=1, weights=[5.31]),
-            Emoji(emoji=u'\U0001f350', rank=2, weights=[7.94]),
-            Emoji(emoji=u'\U0001f34b', rank=3, weights=[17.1]),
-            Emoji(emoji=u'\U0001f349', rank=4, weights=[41.21]),
-            Emoji(emoji=u'[B]', rank=5, weights=[26.215])
+            Emoji(emoji=u'\U0001f34e', rank=0, weights=[2.22, 2.22, 2.22]),
+            Emoji(emoji=u'\U0001f34a', rank=1, weights=[5.31, 5.31, 5.31]),
+            Emoji(emoji=u'\U0001f350', rank=2, weights=[7.94, 7.94, 7.94]),
+            Emoji(emoji=u'\U0001f34b', rank=3, weights=[17.1, 17.1, 17.1]),
+            Emoji(emoji=u'\U0001f349', rank=4, weights=[41.21, 41.21, 41.21]),
+            Emoji(emoji=u'[B]', rank=5, weights=[26.215, 26.215, 26.215])
         ]
     ),
     "animals": SlotMachine(
@@ -65,12 +65,12 @@ slot_machines = {
         winnings=0,
         profit=0, 
         emojis=[
-            Emoji(emoji=u'\U0001f42b', rank=0, weights=[2.22]),
-            Emoji(emoji=u'\U0001f427', rank=1, weights=[5.31]),
-            Emoji(emoji=u'\U0001f420', rank=2, weights=[7.94]),
-            Emoji(emoji=u'\U0001f40d', rank=3, weights=[17.1]),
-            Emoji(emoji=u'\U0001f422', rank=4, weights=[41.21]),
-            Emoji(emoji=u'[B]', rank=5, weights=[26.215])
+            Emoji(emoji=u'\U0001f42b', rank=0, weights=[2.22, 2.22, 2.22]),
+            Emoji(emoji=u'\U0001f427', rank=1, weights=[5.31, 5.31, 5.31]),
+            Emoji(emoji=u'\U0001f420', rank=2, weights=[7.94, 7.94, 7.94]),
+            Emoji(emoji=u'\U0001f40d', rank=3, weights=[17.1, 17.1, 17.1]),
+            Emoji(emoji=u'\U0001f422', rank=4, weights=[41.21, 41.21, 41.21]),
+            Emoji(emoji=u'[B]', rank=5, weights=[26.215, 26.215, 26.215])
         ]
     ),
     "cats": SlotMachine(
@@ -83,12 +83,12 @@ slot_machines = {
         winnings=0,
         profit=0, 
         emojis=[
-            Emoji(emoji=u'\U0001f63a', rank=0, weights=[2.22]),
-            Emoji(emoji=u'\U0001f638', rank=1, weights=[5.31]),
-            Emoji(emoji=u'\U0001f639', rank=2, weights=[7.94]),
-            Emoji(emoji=u'\U0001f63b', rank=3, weights=[17.1]),
-            Emoji(emoji=u'\U0001f63c', rank=4, weights=[41.21]),
-            Emoji(emoji=u'[B]', rank=5, weights=[26.215])
+            Emoji(emoji=u'\U0001f63a', rank=0, weights=[2.22, 2.22, 2.22]),
+            Emoji(emoji=u'\U0001f638', rank=1, weights=[5.31, 5.31, 5.31]),
+            Emoji(emoji=u'\U0001f639', rank=2, weights=[7.94, 7.94, 7.94]),
+            Emoji(emoji=u'\U0001f63b', rank=3, weights=[17.1, 17.1, 17.1]),
+            Emoji(emoji=u'\U0001f63c', rank=4, weights=[41.21, 41.21, 41.21]),
+            Emoji(emoji=u'[B]', rank=5, weights=[26.215, 26.215, 26.215])
         ]
     ),
     "moons": SlotMachine(
@@ -101,12 +101,12 @@ slot_machines = {
         winnings=0,
         profit=0, 
         emojis=[
-            Emoji(emoji=u'\U0001f317', rank=0, weights=[2.22]),
-            Emoji(emoji=u'\U0001f318', rank=1, weights=[5.31]),
-            Emoji(emoji=u'\U0001f311', rank=2, weights=[7.94]),
-            Emoji(emoji=u'\U0001f312', rank=3, weights=[17.1]),
-            Emoji(emoji=u'\U0001f314', rank=4, weights=[41.21]),
-            Emoji(emoji=u'[B]', rank=5, weights=[26.215])
+            Emoji(emoji=u'\U0001f317', rank=0, weights=[2.22, 2.22, 2.22]),
+            Emoji(emoji=u'\U0001f318', rank=1, weights=[5.31, 5.31, 5.31]),
+            Emoji(emoji=u'\U0001f311', rank=2, weights=[7.94, 7.94, 7.94]),
+            Emoji(emoji=u'\U0001f312', rank=3, weights=[17.1, 17.1, 17.1]),
+            Emoji(emoji=u'\U0001f314', rank=4, weights=[41.21, 41.21, 41.21]),
+            Emoji(emoji=u'[B]', rank=5, weights=[26.215, 26.215, 26.215])
         ]
     ),
     "hearts": SlotMachine(
@@ -137,12 +137,12 @@ slot_machines = {
         winnings=0,
         profit=0, 
         emojis=[
-            Emoji(emoji=u'\u200d', rank=0, weights=[2.22]),
-            Emoji(emoji=u'\U0001f9b9', rank=1, weights=[5.31]),
-            Emoji(emoji=u'\U0001f9b8', rank=2, weights=[7.94]),
-            Emoji(emoji=u'\U0001f9db', rank=3, weights=[17.1]),
-            Emoji(emoji=u'\U0001f9dc', rank=4, weights=[41.21]),
-            Emoji(emoji=u'[B]', rank=5, weights=[26.215])
+            Emoji(emoji=u'\u200d', rank=0, weights=[2.22, 2.22, 2.22]),
+            Emoji(emoji=u'\U0001f9b9', rank=1, weights=[5.31, 5.31, 5.31]),
+            Emoji(emoji=u'\U0001f9b8', rank=2, weights=[7.94, 7.94, 7.94]),
+            Emoji(emoji=u'\U0001f9db', rank=3, weights=[17.1, 17.1, 17.1]),
+            Emoji(emoji=u'\U0001f9dc', rank=4, weights=[41.21, 41.21, 41.21]),
+            Emoji(emoji=u'[B]', rank=5, weights=[26.215, 26.215, 26.215])
         ]
     )
 }

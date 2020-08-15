@@ -31,8 +31,11 @@ class Emoji:
         self.weights = weights
 
     def get_json(self):
-        weights = json.dumps(self.weights)
-        return f"            Emoji(emoji=u'{self.emoji}', rank={self.rank}, weights={weights})"
+        return f"            Emoji(" \
+               f"\n                emoji=u'{self.emoji}'," \
+               f"\n                rank={self.rank}," \
+               f"\n                weights={self.weights}" \
+               f"\n            )"
 
 
 class Machine:
