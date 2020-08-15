@@ -18,7 +18,7 @@ guild_list = {
     710111046031114362: Guild(
         guild_id=710111046031114362,
         prefix="!",
-        message_count=121,
+        message_count=128,
         active=True,
         log_channel_id=732948310880550974
        ),
