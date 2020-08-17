@@ -2,13 +2,9 @@ import asyncio
 import discord
 from classes import WebTable
 from commands.utility import trim
-from commands.utility import url_encode, find_in_site
 from config import chrome_driver_path
 from discord.ext import commands
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.ui import WebDriverWait
 
 
 class Conjugation(commands.Cog):
@@ -20,7 +16,6 @@ class Conjugation(commands.Cog):
         options = webdriver.ChromeOptions()
         options.add_argument("headless")
         with webdriver.Chrome(executable_path=chrome_driver_path, options=options) as driver:
-#            wait = WebDriverWait(driver, 5)
             driver.get(f'https://tangorin.com/words?search={query}')
             page_link = driver.find_element_by_xpath('//*[@class="results-dl "]/*/a')
             page_link.click()

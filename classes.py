@@ -155,15 +155,37 @@ class Poker:
         self.deck = [Card(rank, suit) for rank in ranks for suit in suits]
 
 
-class Account:
-    def __init__(self, user_id, balance, jackpot_winner=False):
+class LolAccount:
+    def __init__(self, user_id, p_user_id, account_id, game_name, tag_line="NA1"):
         self.user_id = user_id
+        self.p_user_id = p_user_id
+        self.account_id = account_id
+        self.game_name = game_name
+        self.tag_line = tag_line
+
+    def get_json(self):
+        return f'\n            {self.user_id}: LolAccount(' \
+               f'\n                user_id={self.user_id},' \
+               f'\n                p_user_id={self.p_user_id},' \
+               f'\n                account_id={self.account_id},' \
+               f'\n                game_name={self.game_name},' \
+               f'\n                tag_line={self.tag_line}' \
+               f'\n            )'
+
+
+class Account:
+    def __init__(self, user_id, lol_account, balance, jackpot_winner=False):
+        self.user_id = user_id
+        self.lol_account = lol_account
         self.balance = balance
         self.jackpot_winner = jackpot_winner
 
     def get_json(self):
         return f'{self.user_id}: Account(' \
                f'\n        user_id={self.user_id},' \
+               f'\n        lol_account= {{' \
+               f'\n{self.lol_account.get_json()}' \
+               f'\n        }},' \
                f'\n        balance={self.balance},' \
                f'\n        jackpot_winner={self.jackpot_winner}' \
                f'\n    )'
@@ -171,7 +193,7 @@ class Account:
 
 class Level:
     def __init__(self, level, exp):
-        self.level = level,
+        self.level = level
         self.exp = exp
 
 

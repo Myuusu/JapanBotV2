@@ -1,6 +1,5 @@
-import math
 from discord.ext import commands
-from .utility import clean_int
+from .utility import clean_int, clean_float
 
 
 class Experience(commands.Cog):
@@ -16,13 +15,13 @@ class Experience(commands.Cog):
     )
     async def convert_lvl_to_xp(self, ctx, lvl, external=True):
         lvl = clean_int(lvl)
-        points = 0
-        for i in range(lvl):
-            points += math.floor(i + 300 * math.pow(2, i / 7))
-        if external:
-            await ctx.send(f'Level {lvl} is reached at: {math.floor(points / 4):,d} xp.')
-        else:
-            return math.floor(points / 4)
+        try:
+            if external:
+                return await ctx.send(f'Level {lvl} is reached at: {self.bot.level_list[lvl].exp} xp.')
+            else:
+                return self.bot.level_list[lvl].exp
+        except KeyError:
+            return await ctx.send('Level Not Recognized! Please reissue command.')
 
     @commands.command(
         name='convert_xp_to_lvl',
@@ -33,18 +32,19 @@ class Experience(commands.Cog):
     )
     async def convert_xp_to_lvl(self, ctx, xp, external=True):
         xp = clean_int(xp)
-        points = 0
-        for lvl in range(99):
-            points += math.floor(lvl + 300 * math.pow(2, lvl / 7))
-            if math.floor(points / 4) >= xp + 1:
+        for i in self.bot.level_list.keys():
+            if i == 99:
                 if external:
-                    await ctx.send(f'{xp} xp means that you are level: {lvl}.')
+                    await ctx.send(99)
+                    break
                 else:
-                    return lvl
-        if external:
-            await ctx.send(99)
-        else:
-            return 99
+                    return 99
+            elif self.bot.level_list[i].exp <= xp < self.bot.level_list[i+1].exp:
+                if external:
+                    await ctx.send(self.bot.level_list[i].level)
+                    break
+                else:
+                    return self.bot.level_list[i].level
 
     @commands.command(name='xp_to_99', aliases=['xpto99', 'expto99', 'exp_to_99'])
     async def xp_to_99(self, ctx, xp, external=True):
@@ -65,7 +65,7 @@ class Experience(commands.Cog):
     @commands.command(
         name='xp_to_lvl',
         aliases=[
-            'xptolvl', 'xptogoal', 'exptolvl', 'exptolevel',
+            'xptolvl', 'xptogoal', 'exptolvl', 'exptolevel', 'xp_to_level'
             'xptolevel', 'exptogoal', 'xp_to_goal', 'exp_to_lvl', 'exp_to_goal'
         ]
     )
@@ -74,7 +74,8 @@ class Experience(commands.Cog):
         goal_exp = await self.convert_lvl_to_xp(ctx=ctx, lvl=lvl, external=False)
         if external:
             await ctx.send(
-                f'{goal_exp - xp:,d} xp remaining till level {lvl}.\nYou are {xp/goal_exp*100:.2f}% to the goal!'
+                f'{goal_exp - xp:,d} xp remaining till level {lvl}.'
+                f'\nYou are {xp/goal_exp*100:.2f}% to the goal!'
             )
         else:
             return goal_exp - xp

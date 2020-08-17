@@ -8,7 +8,7 @@ from storage.level_list import level_list
 from storage.slot_machines import slot_machines
 from storage.station_list import station_list
 from storage.guild_list import guild_list
-from classes import Guild
+from classes import Guild, Account, LolAccount
 
 
 class Bot(commands.Bot):
@@ -56,7 +56,10 @@ class Bot(commands.Bot):
     async def on_ready(self):
         await self.change_presence(
             status=discord.Status.dnd,
-            activity=discord.Activity(type=discord.ActivityType.listening, name='[!s]')
+            activity=discord.Activity(
+                type=discord.ActivityType.listening,
+                name='[!s]'
+            )
         )
 #        embed = discord.Embed(
 #            title=f"{self.user.name} Online!",
@@ -72,32 +75,32 @@ class Bot(commands.Bot):
         print(f'Logged in as {self.user.name} | {self.user.id}')
 
     async def on_guild_join(self, guild):
+        current = self.guild_list[guild.id]
         self.guild_list.update(
             {
-                guild["guild_id"]:
-                    Guild(
-                        guild["guild_id"],
-                        "!",
-                        guild["message_count"],
-                        True,
-                        guild["log_channel_id"]
-                    )
+                current["guild_id"]: Guild(
+                    guild_id=current["guild_id"],
+                    prefix=current["prefix"],
+                    message_count=current["message_count"],
+                    active=True,
+                    log_channel_id=current["log_channel_id"]
+                )
             }
         )
         print(f'Reconnected To: {str(guild.id)}')
         await self.update_guild_list()
 
     async def on_guild_remove(self, guild):
+        current = self.guild_list[guild.id]
         self.guild_list.update(
             {
-                guild["guild_id"]:
-                    Guild(
-                        guild["guild_id"],
-                        guild["prefix"],
-                        guild["message_count"],
-                        False,
-                        guild["log_channel_id"]
-                    )
+                current["guild_id"]: Guild(
+                    guild_id=current["guild_id"],
+                    prefix=current["prefix"],
+                    message_count=current["message_count"],
+                    active=False,
+                    log_channel_id=current["log_channel_id"]
+                )
             }
         )
         print(f'Disconnected From: {str(guild.id)}')
@@ -108,24 +111,46 @@ class Bot(commands.Bot):
 
     async def get_prefix(self, message):
         try:
-            if self.guild_list[message.guild.id]:
-                self.guild_list[message.guild.id].message_count += 1
-                await self.update_guild_list()
-                return self.guild_list[message.guild.id].prefix
+            self.guild_list[message.guild.id].message_count += 1
         except KeyError:
-            self.guild_list.update(
-                {
-                    message.guild.id: Guild(
-                        guild_id=message.guild.id,
-                        prefix="!",
-                        message_count=0,
-                        active=True,
-                        log_channel_id=None
-                    )
-                }
-            )
+            await self.insert_guild(message.guild.id)
+        finally:
             await self.update_guild_list()
             return self.guild_list[message.guild.id].prefix
+
+    async def insert_account(self, author_id):
+        current = {
+                author_id: Account(
+                    user_id=author_id,
+                    lol_account={
+                        "abc123": LolAccount(
+                            user_id="abc123",
+                            p_user_id="abc123",
+                            account_id="abc123",
+                            game_name="abc123",
+                            tag_line="NA1"
+                        )
+                    },
+                    balance=1000,
+                    jackpot_winner=False
+                )
+            }
+        self.account_list.update(current)
+        await self.update_account_list()
+        return current
+
+    async def insert_guild(self, guild_id):
+        current = {
+                guild_id: Guild(
+                    guild_id=guild_id,
+                    prefix="!",
+                    message_count=0,
+                    active=True,
+                    log_channel_id=None
+                )
+            }
+        await self.guild_list.update(current)
+        return current
 
 
 bot = Bot()
@@ -154,7 +179,7 @@ Jisho:
 Fix encoding issue when use a space for ex. to go
 Possibly look into changing from jisho to the website conjugation uses
 
-Currencyexchanger:
+Currency Exchanger:
 Fix Key Error 'rates'
 
 Papago sentence translator:

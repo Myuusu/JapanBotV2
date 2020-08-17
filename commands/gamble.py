@@ -1,4 +1,4 @@
-from classes import Deck, Account
+from classes import Deck
 from discord import Embed
 from discord.ext import commands
 
@@ -16,8 +16,9 @@ class Gamble(commands.Cog):
             await self.bot.update_account_list()
             await ctx.send(f'Increased credits by 500!')
         except KeyError:
-            self.bot.account_list[ctx.author.id] = Account(ctx.author.id, 1500)
+            await self.bot.insert_account(ctx.author.id)
             await ctx.send("Welcome to the bot! We've given you 1500 credits!")
+            self.bot.account_list[ctx.author.id].balance += 500
             await self.bot.update_account_list()
 
     @commands.command(name='slot', aliases=['slots', 'bet'])
@@ -33,9 +34,7 @@ class Gamble(commands.Cog):
             try:
                 user = self.bot.account_list[ctx.author.id]
             except KeyError:
-                self.bot.account_list.update({ctx.author.id: Account(ctx.author.id, 1000)})
-                await self.bot.update_account_list()
-                user = self.bot.account_list[ctx.author.id]
+                user = await self.bot.insert_account(ctx.author.id)
                 await ctx.send("Welcome to the bot! We've given you 1000 credits to get started!")
             try:
                 machine = self.bot.slot_machines[input_string.lower()]
@@ -52,6 +51,7 @@ class Gamble(commands.Cog):
 
     @commands.command(name='points', aliases=['pts', 'check_points'])
     async def points(self, ctx):
+        assert self.bot.account_list[ctx.author.id], await ctx.send("Current user does not have an account yet.")
         points = self.bot.account_list[ctx.author.id].balance
         await ctx.send(f'{ctx.author.name} currently has {points} points!')
         return points
