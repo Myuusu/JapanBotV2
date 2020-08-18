@@ -112,20 +112,24 @@ class Bot(commands.Bot):
         await self.update_guild_list()
 
     async def on_guild_remove(self, guild):
-        current = self.guild_list[guild.id]
-        self.guild_list.update(
-            {
-                current["guild_id"]: Guild(
-                    guild_id=current["guild_id"],
-                    prefix=current["prefix"],
-                    message_count=current["message_count"],
-                    active=False,
-                    log_channel_id=current["log_channel_id"]
-                )
-            }
-        )
-        print(f'Disconnected From: {str(guild.id)}')
-        await self.update_guild_list()
+        try:
+            self.guild_list[guild.id].active = False
+            print(f'Disconnected From: {str(guild.id)}')
+            await self.update_guild_list()
+        except KeyError:
+            self.guild_list.update(
+                {
+                    guild.id: Guild(
+                        guild_id=guild.id,
+                        prefix=['!'],
+                        message_count=0,
+                        active=False,
+                        log_channel_id=None
+                    )
+                }
+            )
+            print(f'Disconnected From: {str(guild.id)}')
+            await self.update_guild_list()
 
     async def get_prefix(self, message):
         try:
