@@ -174,18 +174,16 @@ class LolAccount:
 
 
 class Account:
-    def __init__(self, user_id, lol_account, balance, jackpot_winner=False):
+    def __init__(self, user_id, lol_account_id, balance, jackpot_winner=False):
         self.user_id = user_id
-        self.lol_account = lol_account
+        self.lol_account_id = lol_account_id
         self.balance = balance
         self.jackpot_winner = jackpot_winner
 
     def get_json(self):
         return f'{self.user_id}: Account(' \
                f'\n        user_id={self.user_id},' \
-               f'\n        lol_account={{' \
-               f'\n{self.lol_account.get_json()}' \
-               f'\n        }},' \
+               f'\n        lol_account_id={self.lol_account_id},' \
                f'\n        balance={self.balance},' \
                f'\n        jackpot_winner={self.jackpot_winner}' \
                f'\n    )'
