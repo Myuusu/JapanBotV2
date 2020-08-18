@@ -146,7 +146,7 @@ class Utility(commands.Cog):
         await ctx.send(f'The log_channel has been changed to this channel id: {log_channel_id}')
 
     @commands.command(name='eight_ball', aliases=['8ball', 'eightball', '8_ball', '8'])
-    async def eight_ball(self, ctx, *, question):
+    async def eight_ball(self, ctx, question):
         await ctx.send(f'Question: {question}\nAnswer: {random.choice(self.bot.eight_ball_responses)}')
 
     @commands.command(name='ping', aliases=['ding'])
