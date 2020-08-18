@@ -84,18 +84,7 @@ class Bot(commands.Bot):
 
     async def on_guild_join(self, guild):
         try:
-            current = self.guild_list[guild.id]
-            self.guild_list.update(
-                {
-                    current["guild_id"]: Guild(
-                        guild_id=current["guild_id"],
-                        prefix=current["prefix"],
-                        message_count=current["message_count"],
-                        active=True,
-                        log_channel_id=current["log_channel_id"]
-                    )
-                }
-            )
+            self.guild_list[guild.id].active = True
         except KeyError:
             self.guild_list.update(
                 {
@@ -108,7 +97,7 @@ class Bot(commands.Bot):
                     )
                 }
             )
-        print(f'Reconnected To: {str(guild.id)}')
+        print(f'Connected To: {str(guild.id)}')
         await self.update_guild_list()
 
     async def on_guild_remove(self, guild):
