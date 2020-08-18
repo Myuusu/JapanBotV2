@@ -176,7 +176,7 @@ class LolAccount:
 
 
 class Account:
-    def __init__(self, user_id, lol_account_id, balance, jackpot_winner=False):
+    def __init__(self, user_id: int, lol_account_id: str, balance: int = 1000, jackpot_winner=False):
         self.user_id = user_id
         self.lol_account_id = lol_account_id
         self.balance = balance
