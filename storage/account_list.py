@@ -3,7 +3,7 @@ from classes import Account, LolAccount
 account_list = {
     236287545208602626: Account(
         user_id=236287545208602626,
-        lol_account= {
+        lol_account={
             "abc123": LolAccount(
                 user_id="abc123",
                 p_user_id="abc123",
@@ -17,7 +17,7 @@ account_list = {
     ),
     99620842677243904: Account(
         user_id=99620842677243904,
-        lol_account= {
+        lol_account={
             "abc123": LolAccount(
                 user_id="abc123",
                 p_user_id="abc123",
@@ -31,7 +31,7 @@ account_list = {
     ),
     228716653318373376: Account(
         user_id=228716653318373376,
-        lol_account= {
+        lol_account={
             "abc123": LolAccount(
                 user_id="abc123",
                 p_user_id="abc123",
@@ -45,7 +45,7 @@ account_list = {
     ),
     219659295648776203: Account(
         user_id=219659295648776203,
-        lol_account= {
+        lol_account={
             "PpmKzw_ZAVHHlthEAYlkuKlPP2qJdR8fvybgP2itiUGgqUc": LolAccount(
                 user_id="PpmKzw_ZAVHHlthEAYlkuKlPP2qJdR8fvybgP2itiUGgqUc",
                 p_user_id="Wtr20yS0GpFh8L1_5gvN1ISfDVE45kvccwKTWDFzOhH9-asdwOS1M5J4p-XI-LzgO7GChMp8CbQuPw",
@@ -59,7 +59,7 @@ account_list = {
     ),
     175457201765351425: Account(
         user_id=175457201765351425,
-        lol_account= {
+        lol_account={
             "ANtDEHDjQcnTHQ4jifoUmt-QuvRDVjU5PnjhNEPUDCjxnJU": LolAccount(
                 user_id="ANtDEHDjQcnTHQ4jifoUmt-QuvRDVjU5PnjhNEPUDCjxnJU",
                 p_user_id="rp4VEAw6bB92hjiyLhm3vDy82rXhfPAlp5INyEIF3PTkB0G4PA9yUziVjtWfb2LPhvol8AychOKQxQ",

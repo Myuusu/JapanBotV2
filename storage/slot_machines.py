@@ -9,7 +9,7 @@ slot_machines = {
         machine_type="slot",
         play_count=63,
         winnings=321,
-        profit=-132, 
+        profit=-132,
         emojis=[
             Emoji(emoji=u'<:bar:740308928398622822>', rank=0, weights=[4.347826086, 4.347826086, 4.347826086]),
             Emoji(emoji=u'<:SlotmachineSeven:743190741920251994>', rank=1, weights=[13.04347826, 4.347826086, 4.347826086]),
@@ -27,7 +27,7 @@ slot_machines = {
         machine_type="slot",
         play_count=0,
         winnings=0,
-        profit=0, 
+        profit=0,
         emojis=[
             Emoji(emoji=u'<:bar:740998677979725864>', rank=0, weights=[4.347826086, 4.347826086, 4.347826086]),
             Emoji(emoji=u':seven:', rank=1, weights=[13.04347826, 4.347826086, 4.347826086]),
@@ -45,7 +45,7 @@ slot_machines = {
         machine_type="slot",
         play_count=0,
         winnings=0,
-        profit=0, 
+        profit=0,
         emojis=[
             Emoji(emoji=u'\U0001f34e', rank=0, weights=[2.22, 2.22, 2.22]),
             Emoji(emoji=u'\U0001f34a', rank=1, weights=[5.31, 5.31, 5.31]),
@@ -63,7 +63,7 @@ slot_machines = {
         machine_type="slot",
         play_count=0,
         winnings=0,
-        profit=0, 
+        profit=0,
         emojis=[
             Emoji(emoji=u'\U0001f42b', rank=0, weights=[2.22, 2.22, 2.22]),
             Emoji(emoji=u'\U0001f427', rank=1, weights=[5.31, 5.31, 5.31]),
@@ -81,7 +81,7 @@ slot_machines = {
         machine_type="slot",
         play_count=0,
         winnings=0,
-        profit=0, 
+        profit=0,
         emojis=[
             Emoji(emoji=u'\U0001f63a', rank=0, weights=[2.22, 2.22, 2.22]),
             Emoji(emoji=u'\U0001f638', rank=1, weights=[5.31, 5.31, 5.31]),
@@ -99,7 +99,7 @@ slot_machines = {
         machine_type="slot",
         play_count=0,
         winnings=0,
-        profit=0, 
+        profit=0,
         emojis=[
             Emoji(emoji=u'\U0001f317', rank=0, weights=[2.22, 2.22, 2.22]),
             Emoji(emoji=u'\U0001f318', rank=1, weights=[5.31, 5.31, 5.31]),
@@ -117,7 +117,7 @@ slot_machines = {
         machine_type="slot",
         play_count=0,
         winnings=0,
-        profit=0, 
+        profit=0,
         emojis=[
             Emoji(emoji=u'\u2764', rank=0, weights=[4.347826086, 4.347826086, 4.347826086, 4.347826086, 4.347826086]),
             Emoji(emoji=u'\U0001f49b', rank=1, weights=[13.04347826, 4.347826086, 4.347826086, 4.347826086, 4.347826086]),
@@ -135,7 +135,7 @@ slot_machines = {
         machine_type="slot",
         play_count=0,
         winnings=0,
-        profit=0, 
+        profit=0,
         emojis=[
             Emoji(emoji=u'\u200d', rank=0, weights=[2.22, 2.22, 2.22]),
             Emoji(emoji=u'\U0001f9b9', rank=1, weights=[5.31, 5.31, 5.31]),
