@@ -130,7 +130,7 @@ class Utility(commands.Cog):
     async def prefix(self, ctx, prefix):
         if prefix not in ["'", '"']:
             if isinstance(prefix, str):
-                self.bot.guild_list[ctx.guild.id].prefix = f"['{prefix}']"
+                self.bot.guild_list[ctx.guild.id].prefix = [prefix]
             else:
                 self.bot.guild_list[ctx.guild.id].prefix = prefix
             await self.bot.update_guild_list()
