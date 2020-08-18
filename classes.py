@@ -138,7 +138,7 @@ class SlotMachine:
                f'\n        machine_type="slot",' \
                f'\n        play_count={self.play_count},' \
                f'\n        winnings={self.winnings},' \
-               f'\n        profit={self.profit}, ' \
+               f'\n        profit={self.profit},' \
                f'\n        emojis=[' \
                f'\n{emoji_output}' \
                f'\n        ]' \
@@ -183,7 +183,7 @@ class Account:
     def get_json(self):
         return f'{self.user_id}: Account(' \
                f'\n        user_id={self.user_id},' \
-               f'\n        lol_account= {{' \
+               f'\n        lol_account={{' \
                f'\n{self.lol_account.get_json()}' \
                f'\n        }},' \
                f'\n        balance={self.balance},' \
@@ -271,7 +271,7 @@ class WebTable:
 
 
 class Guild:
-    def __init__(self, guild_id, prefix, message_count=0, active=True, log_channel_id=None):
+    def __init__(self, guild_id, prefix, message_count=0, active=False, log_channel_id=None):
         self.guild_id = guild_id
         self.prefix = prefix
         self.message_count = message_count
@@ -281,7 +281,7 @@ class Guild:
     def get_json(self):
         return f'{self.guild_id}: Guild(' \
                f'\n        guild_id={self.guild_id},' \
-               f'\n        prefix="{self.prefix}",' \
+               f'\n        prefix={self.prefix},' \
                f'\n        message_count={self.message_count},' \
                f'\n        active={self.active},' \
                f'\n        log_channel_id={self.log_channel_id}' \

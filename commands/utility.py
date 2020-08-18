@@ -70,8 +70,9 @@ async def read_website(formatted_url: str):
 async def find_in_site(search_url: str, xpath_location: str = '/'):
     site_text = lxml.html.fromstring(await read_website(search_url)).xpath(xpath_location)
     output_string = ""
+
     for text in site_text:
-        output_string += text.text_content().replace('\n', '').replace('\t', '')
+        output_string += re.sub("[\n\t]", "", text.text_content())
     return output_string.strip()
 
 

@@ -125,8 +125,7 @@ class Bot(commands.Bot):
             return self.guild_list[message.guild.id].prefix
 
     async def insert_account(self, author_id):
-        current = {
-                author_id: Account(
+        current = {author_id: Account(
                     user_id=author_id,
                     lol_account={
                         "abc123": LolAccount(
@@ -149,7 +148,7 @@ class Bot(commands.Bot):
         current = {
                 guild_id: Guild(
                     guild_id=guild_id,
-                    prefix="!",
+                    prefix=['!'],
                     message_count=0,
                     active=True,
                     log_channel_id=None
