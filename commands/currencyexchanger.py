@@ -27,7 +27,7 @@ class CurrencyExchanger(commands.Cog):
                     params=params
             ) as resp:
                 output = await resp.json()
-                await session.close()
+        await session.close()
         des = [f'{input_amount} {base_currency} is:']
         for rate in output["rates"]:
             output_no_cleanup = float(input_amount) * float(output["rates"][rate])
