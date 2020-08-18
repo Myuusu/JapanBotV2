@@ -128,7 +128,7 @@ class Utility(commands.Cog):
     @commands.command(name='prefix', help='Set your prefix with this')
     @commands.has_permissions(administrator=True)
     async def prefix(self, ctx, prefix):
-        if prefix not in ["'", '"']:
+        if prefix not in ["'", '"', "#", "<", ">"]:
             if isinstance(prefix, str):
                 self.bot.guild_list[ctx.guild.id].prefix = [prefix]
             else:
