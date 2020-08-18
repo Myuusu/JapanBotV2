@@ -108,7 +108,7 @@ class Bot(commands.Bot):
     async def on_guild_remove(self, guild):
         try:
             self.guild_list[guild.id].active = False
-            print(f'Disconnected From: {str(guild.id)}')
+            print(f'Disconnected From: {str(guild.id)}.')
             await self.update_guild_list()
         except KeyError:
             self.guild_list.update(
