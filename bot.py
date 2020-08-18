@@ -87,7 +87,7 @@ class Bot(commands.Bot):
             self.guild_list[guild.id].active = True
             print(
                 f'Reconnected To: {str(guild.id)}.\n'
-                f'We have processed {str(self.guild_list[guild.id].messages_sent)} messages from this guild!'
+                f'We have processed {str(self.guild_list[guild.id].message_count)} messages from this guild!'
             )
             await self.update_guild_list()
         except KeyError:

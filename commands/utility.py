@@ -142,7 +142,7 @@ class Utility(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def log(self, ctx, log_channel_id):
         self.bot.guild_list[ctx.guild.id].log_channel_id = log_channel_id
-        self.bot.update_guild_list()
+        await self.bot.update_guild_list()
         await ctx.send(f'The log_channel has been changed to this channel id: {log_channel_id}')
 
     @commands.command(name='eight_ball', aliases=['8ball', 'eightball', '8_ball', '8'])
