@@ -1,4 +1,5 @@
 import discord
+from discord import HTTPException
 import os
 from discord.ext import commands
 from config import bot_token
@@ -8,6 +9,7 @@ from storage.level_list import level_list
 from storage.slot_machines import slot_machines
 from storage.station_list import station_list
 from storage.guild_list import guild_list
+from commands.utility import trim
 from classes import Guild, Account, LolAccount
 
 
@@ -107,7 +109,11 @@ class Bot(commands.Bot):
         await self.update_guild_list()
 
     async def on_command_error(self, ctx, exception):
-        print(f'Context: {ctx} | Exception: {exception}')
+        if isinstance(exception, commands.CommandNotFound):
+            await ctx.send('Invalid command used! Please try again.')
+        else:
+            await ctx.send(await trim(output=ctx.message.content, length=2000))
+        print(f'Context: {ctx}\nException: {exception}')
 
     async def get_prefix(self, message):
         try:
@@ -155,7 +161,6 @@ class Bot(commands.Bot):
 
 bot = Bot()
 bot.run(bot_token, reconnect=True)
-
 
 """
 To do list:

@@ -1,5 +1,5 @@
 from discord.ext import commands
-from .utility import clean_int
+from .utility import clean_float
 
 
 class Experience(commands.Cog):
@@ -14,7 +14,7 @@ class Experience(commands.Cog):
         ]
     )
     async def convert_lvl_to_xp(self, ctx, lvl, external=True):
-        lvl = clean_int(lvl)
+        lvl = clean_float(lvl)
         try:
             if external:
                 return await ctx.send(f'Level {lvl} is reached at: {self.bot.level_list[lvl].exp} xp.')
@@ -31,7 +31,7 @@ class Experience(commands.Cog):
         ]
     )
     async def convert_xp_to_lvl(self, ctx, xp, external=True):
-        xp = clean_int(xp)
+        xp = clean_float(xp)
         for i in self.bot.level_list.keys():
             if i == 99:
                 if external:
@@ -48,7 +48,7 @@ class Experience(commands.Cog):
 
     @commands.command(name='xp_to_99', aliases=['xpto99', 'expto99', 'exp_to_99'])
     async def xp_to_99(self, ctx, xp, external=True):
-        xp = clean_int(xp)
+        xp = clean_float(xp)
         if external:
             await ctx.send(f'{13034431 - xp:,d} xp remaining till Level 99.')
         else:
@@ -56,7 +56,7 @@ class Experience(commands.Cog):
 
     @commands.command(name='xp_to_max', aliases=['xptomax', 'exptomax', 'exp_to_max'])
     async def xp_to_max(self, ctx, xp, external=True):
-        xp = clean_int(xp)
+        xp = clean_float(xp)
         if external:
             await ctx.send(f'{200000000 - xp:,d} xp remaining till Max (200M xp).')
         else:
@@ -70,7 +70,7 @@ class Experience(commands.Cog):
         ]
     )
     async def xp_to_lvl(self, ctx, xp, lvl, external=True):
-        xp = clean_int(xp)
+        xp = clean_float(xp)
         goal_exp = await self.convert_lvl_to_xp(ctx=ctx, lvl=lvl, external=False)
         if external:
             await ctx.send(

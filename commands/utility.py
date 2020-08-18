@@ -12,27 +12,6 @@ from discord.ext import commands
 from urllib.parse import quote_plus
 
 
-def clean_int(string_to_process):
-    if isinstance(string_to_process, int) or isinstance(string_to_process, float):
-        return string_to_process
-    else:
-        string_to_process = string_to_process.replace(",", "").lower()
-        multiply_by_ten = 0
-        if "k" in string_to_process:
-            multiply_by_ten += 3
-        if "m" in string_to_process:
-            multiply_by_ten += 6
-        if "b" in string_to_process:
-            multiply_by_ten += 9
-        if "." in string_to_process:
-            [before_decimal, after_decimal] = string_to_process.split(".")
-            digits_after_decimal = re.sub("[kmb]", "", after_decimal)
-            multiply_by_ten -= len(digits_after_decimal)
-            return int(str(before_decimal)+str(digits_after_decimal)) * pow(10, multiply_by_ten)
-        else:
-            return int(re.sub("[kmb]", "", string_to_process)) * pow(10, multiply_by_ten)
-
-
 def clean_float(string_to_process):
     if isinstance(string_to_process, int) or isinstance(string_to_process, float):
         return string_to_process
@@ -69,7 +48,7 @@ def url_encode(query: str):
     return urllib.parse.quote_plus(query)
 
 
-async def trim(output: str = "", length: int = 2048):
+async def trim(output: str = "", length: int = 2000):
     if len(output) > length:
         return output[:length - len(output) - 3] + '...'
     return output
