@@ -129,8 +129,11 @@ class Utility(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def prefix(self, ctx, prefix):
         if prefix not in ["'", '"']:
-            self.bot.guild_list[ctx.guild.id].prefix = prefix
-            self.bot.update_guild_list()
+            if is_instance(prefix, string):
+                self.bot.guild_list[ctx.guild.id].prefix = f"['{prefix}']"
+            else:
+                self.bot.guild_list[ctx.guild.id].prefix = prefix
+            await self.bot.update_guild_list()
             await ctx.send(f'The prefix has been changed to: {prefix}')
         else:
             await ctx.send('Invalid Prefix. Prefix has not changed.')
