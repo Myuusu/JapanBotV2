@@ -13,6 +13,12 @@ from commands.utility import trim
 from classes import Guild, Account, LolAccount
 
 
+async def on_command_error(ctx, exception):
+    if isinstance(exception, commands.CommandNotFound):
+        await ctx.send('Invalid command used! Please try again.')
+    print(f'Context: {ctx}\nException: {exception}')
+
+
 class Bot(commands.Bot):
     def __init__(self):
         super(Bot, self).__init__(case_insensitive=True, command_prefix=self.get_prefix)
@@ -108,13 +114,6 @@ class Bot(commands.Bot):
         print(f'Disconnected From: {str(guild.id)}')
         await self.update_guild_list()
 
-    async def on_command_error(self, ctx, exception):
-        if isinstance(exception, commands.CommandNotFound):
-            await ctx.send('Invalid command used! Please try again.')
-        else:
-            await ctx.send(await trim(output=ctx.message.content, length=2000))
-        print(f'Context: {ctx}\nException: {exception}')
-
     async def get_prefix(self, message):
         try:
             self.guild_list[message.guild.id].message_count += 1
@@ -127,15 +126,7 @@ class Bot(commands.Bot):
     async def insert_account(self, author_id):
         current = {author_id: Account(
                     user_id=author_id,
-                    lol_account={
-                        "abc123": LolAccount(
-                            user_id="abc123",
-                            p_user_id="abc123",
-                            account_id="abc123",
-                            game_name="abc123",
-                            tag_line="NA1"
-                        )
-                    },
+                    lol_account="abc123",
                     balance=1000,
                     jackpot_winner=False
                 )
@@ -154,7 +145,8 @@ class Bot(commands.Bot):
                     log_channel_id=None
                 )
             }
-        await self.guild_list.update(current)
+        self.guild_list.update(current)
+        await self.update_guild_list()
         return current
 
 
@@ -166,11 +158,9 @@ To do list:
 
 Gambling:
 Bet / Winning Modifier
-Add a message everytime you win or lose
 Weighting modifications
 Jackpot announcements on Animal slot for lion
 Server admin right to toggle "Jackpot Winner" role
-Configure daily point dispenser
 
 Conjugation:
 Fix elements, unable to locate currently

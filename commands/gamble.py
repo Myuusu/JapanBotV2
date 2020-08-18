@@ -52,7 +52,7 @@ class Gamble(commands.Cog):
     @commands.command(name='points', aliases=['pts', 'check_points'])
     async def points(self, ctx):
         assert self.bot.account_list[ctx.author.id], await ctx.send("Current user does not have an account yet.")
-        points = self.bot.account_list[ctx.author.id].balance
+        points = str(self.bot.account_list[ctx.author.id].balance)
         await ctx.send(f'{ctx.author.name} currently has {points} points!')
         return points
 
