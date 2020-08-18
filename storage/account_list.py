@@ -1,4 +1,4 @@
-from classes import Account, LolAccount
+from classes import Account
 
 account_list = {
     236287545208602626: Account(
@@ -16,7 +16,7 @@ account_list = {
     228716653318373376: Account(
         user_id=228716653318373376,
         lol_account_id="abc123",
-        balance=1735,
+        balance=2337,
         jackpot_winner=False
     ),
     219659295648776203: Account(

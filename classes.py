@@ -61,15 +61,17 @@ class SlotMachine:
     def print(self):
         return f'Cost: {self.cost} | Emojis: {" ".join([self.emojis.emoji])} | Name: {self.name}'
 
-    def calculate_winnings(self, ranks_matrix: [[]], multiplier=1):
+    async def calculate_winnings(self, ranks_matrix: [[]], multiplier=1):
         winnings = 0
         if self.reels == 3:
             if self.rows == 1:
                 for line in three_by_one_lines:
-                    winnings = winnings + int(resolve_line(ranks_matrix, line, three_reel_winnings))
+                    current = await resolve_line(ranks_matrix, line, three_reel_winnings)
+                    winnings += int(current)
             if self.rows == 3:
                 for line in three_by_three_lines:
-                    winnings = winnings + int(resolve_line(ranks_matrix, line, three_reel_winnings))
+                    current = await resolve_line(ranks_matrix, line, three_reel_winnings)
+                    winnings += int(current)
         if self.reels == 5:
             if self.rows == 1:
                 for line in five_by_one_lines:
@@ -111,7 +113,7 @@ class SlotMachine:
                 output = '\n'.join(['|'.join([str(item) for item in row]) for row in emoji_matrix])
                 await msg.edit(content=f"Spinning! Good luck {ctx.author.name}!\n{output}")
             else:
-                output = self.calculate_winnings(ranks_matrix, multiplier)
+                output = await self.calculate_winnings(ranks_matrix, multiplier)
                 if output > (self.cost * multiplier * 3.5):
                     msg = await ctx.send(f'*HUGE WINNER!!* {str(output)}')
                     for i in range(10):
@@ -183,7 +185,7 @@ class Account:
     def get_json(self):
         return f'{self.user_id}: Account(' \
                f'\n        user_id={self.user_id},' \
-               f'\n        lol_account_id={self.lol_account_id},' \
+               f'\n        lol_account_id="{self.lol_account_id}",' \
                f'\n        balance={self.balance},' \
                f'\n        jackpot_winner={self.jackpot_winner}' \
                f'\n    )'

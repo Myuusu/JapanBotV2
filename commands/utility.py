@@ -33,10 +33,10 @@ def clean_float(string_to_process):
             return float(re.sub("[kmb]", "", string_to_process)) * pow(10, multiply_by_ten)
 
 
-def resolve_line(ranks_matrix: [[]], line_coordinates: [[]], winnings_table: [[]]):
+async def resolve_line(ranks_matrix: [[]], line_coordinates: [[]], winnings_table: [[]]):
     output = ""
     for [x, y] in line_coordinates:
-        output = f'{output}{ranks_matrix[y][x]}'
+        output = f'{output}{ranks_matrix[x][y]}'
     else:
         try:
             return winnings_table[int(output)]
