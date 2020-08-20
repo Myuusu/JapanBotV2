@@ -5,7 +5,7 @@ node_settings = dict(
     port=80,
     rest_uri="http://127.0.0.1:80",
     password="<Password>",
-    identifier="<UserName",
+    identifier="<UserName>",
     region="europe"
 )
 mongo_db_url = "mongodb+srv://<UserName>:<Password>@japanbot.abc8v.mongodb.net/test"
