@@ -46,16 +46,17 @@ class Machine:
 
 class SlotMachine:
     def __init__(self, name: str, cost: int, rows: int, reels: int, emojis: [Emoji],
-                 machine_type: str = "slot", play_count=0, winnings=0, profit=0
+                 machine_type: str = "slot", play_count=0, coins_in=0, coins_out=0, profit=0
                  ):
         self.name = name
         self.cost = cost
-        self.machine_type = machine_type
         self.rows = rows
         self.reels = reels
         self.emojis = emojis
+        self.machine_type = machine_type
         self.play_count = play_count
-        self.winnings = winnings
+        self.coins_in = coins_in
+        self.coins_out = coins_out
         self.profit = profit
 
     def print(self):
@@ -79,9 +80,10 @@ class SlotMachine:
             if self.rows == 3:
                 for line in five_by_three_lines:
                     winnings = winnings + int(resolve_line(ranks_matrix, line, five_reel_winnings))
-        self.winnings += multiplier * winnings
-        self.profit += multiplier * (self.cost - winnings)
+        self.coins_out += multiplier * winnings
         self.play_count += 1
+        self.coins_in += self.cost * multiplier
+        print(f'Coins In: {self.coins_in}\nCoins Out: {self.coins_out}\nProfit: {self.coins_in-self.coins_out}')
         return multiplier * winnings
 
     def get_reel_weight(self, reel_position: int):
@@ -90,42 +92,48 @@ class SlotMachine:
             weights_from_each_emoji.append(current_emoji.weights[reel_position])
         return weights_from_each_emoji
 
-    async def spin(self, ctx, multiplier: int = 1):
-        """ This is where the machine will "spin" each of its wheels """
-        spin_results = []
-        for i in range(self.reels):
-            spin_results.append(
-                random.choices(
-                    population=self.emojis,
-                    weights=self.get_reel_weight(i),
-                    k=self.rows
+    async def spin(self, ctx, multiplier: int = 1, spins: int = 1):
+        results = 0
+        for _ in range(spins):
+            """ This is where the machine will "spin" each of its wheels """
+            spin_results = []
+            for i in range(self.reels):
+                spin_results.append(
+                    random.choices(
+                        population=self.emojis,
+                        weights=self.get_reel_weight(i),
+                        k=self.rows
+                    )
                 )
-            )
-        else:
-            emoji_matrix = [["?" for _ in range(self.reels)] for _ in range(self.rows)]
-            ranks_matrix = [["#" for _ in range(self.reels)] for _ in range(self.rows)]
-            msg = await ctx.send(f"Spinning! Good luck {ctx.author.name}!")
-            for j in range(self.reels):
-                await asyncio.sleep(random.uniform(1, 4))
-                for i in range(self.rows):
-                    ranks_matrix[i][j] = spin_results[j][i].rank
-                    emoji_matrix[i][j] = spin_results[j][i].emoji
-                output = '\n'.join(['|'.join([str(item) for item in row]) for row in emoji_matrix])
-                await msg.edit(content=f"Spinning! Good luck {ctx.author.name}!\n{output}")
             else:
-                output = await self.calculate_winnings(ranks_matrix, multiplier)
-                if output > (self.cost * multiplier * 3.5):
-                    msg = await ctx.send(f'*HUGE WINNER!!* {str(output)}')
-                    for i in range(10):
-                        await asyncio.sleep(1)
-                        await msg.edit(content=f'***HUGE WINNER!!*** {str(output)}')
-                        await asyncio.sleep(.5)
-                        await msg.edit(content=f'*HUGE WINNER!!* {str(output)}')
-                elif output > (self.cost * multiplier):
-                    await ctx.send(f'*Winner!* {str(output)}')
+                emoji_matrix = [["?" for _ in range(self.reels)] for _ in range(self.rows)]
+                ranks_matrix = [["#" for _ in range(self.reels)] for _ in range(self.rows)]
+                msg = await ctx.send(f"{discord_message}Spinning! Good luck {ctx.author.name}!")
+                for j in range(self.reels):
+                    if spins == 1:
+                        await asyncio.sleep(random.uniform(1, 4))
+                    for i in range(self.rows):
+                        ranks_matrix[i][j] = spin_results[j][i].rank
+                        emoji_matrix[i][j] = spin_results[j][i].emoji
+                    output = '\n'.join(['|'.join([str(item) for item in row]) for row in emoji_matrix])
+                    await msg.edit(content=f"{discord_message}Spinning! Good luck {ctx.author.name}!\n{output}")
                 else:
-                    await ctx.send(f"Don't Give Up, Try Again! {str(output)}")
-                return output
+                    output = await self.calculate_winnings(ranks_matrix, multiplier)
+                    if output > (self.cost * multiplier * 3.5):
+                        msg = await ctx.send(f'*HUGE WINNER!!* {str(output)}')
+                        if spins == 1:
+                            for _ in range(10):
+                                await asyncio.sleep(1)
+                                await msg.edit(content=f'***HUGE WINNER!!*** {str(output)}')
+                                await asyncio.sleep(.5)
+                                await msg.edit(content=f'*HUGE WINNER!!* {str(output)}')
+                    elif output > (self.cost * multiplier):
+                        await ctx.send(f'*Winner!* {str(output)}')
+                    else:
+                        await ctx.send(f"Don't Give Up, Try Again! {str(output)}")
+                results += output
+        else:
+            return results
 
     def get_json(self):
         emoji_output = []
@@ -139,8 +147,8 @@ class SlotMachine:
                f'\n        reels={self.reels},' \
                f'\n        machine_type="slot",' \
                f'\n        play_count={self.play_count},' \
-               f'\n        winnings={self.winnings},' \
-               f'\n        profit={self.profit},' \
+               f'\n        coins_out={self.coins_out},' \
+               f'\n        coins_in={self.coins_in},' \
                f'\n        emojis=[' \
                f'\n{emoji_output}' \
                f'\n        ]' \

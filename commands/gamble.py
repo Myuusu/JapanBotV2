@@ -23,7 +23,7 @@ class Gamble(commands.Cog):
 
     @commands.command(name='slot', aliases=['slots', 'bet'])
     @commands.cooldown(rate=1, per=10, type=commands.BucketType.user)
-    async def slot(self, ctx, input_string: str = "help", multiplier: int = 1):
+    async def slot(self, ctx, input_string: str = "help", multiplier: int = 1, spins: int = 1):
         if input_string == "help":
             des = []
             for machine in self.bot.slot_machines.keys():
@@ -42,7 +42,7 @@ class Gamble(commands.Cog):
                 return await ctx.send('Machine Not Recognized! Please reissue command.')
 
             if machine.cost <= user.balance:
-                user.balance += await machine.spin(ctx, multiplier)
+                user.balance += await machine.spin(ctx, multiplier, spins)
                 await self.bot.update_slot_machines()
                 await self.bot.update_account_list()
             else:
