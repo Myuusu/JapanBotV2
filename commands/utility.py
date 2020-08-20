@@ -82,6 +82,7 @@ class Utility(commands.Cog):
     @commands.command(name='load', aliases=['reload'])
     @commands.has_permissions(administrator=True)
     async def load(self, ctx):
+        msg = await ctx.send('Reloading Command Files!')
         with os.scandir('./commands') as active_directory:
             for current_file in active_directory:
                 if current_file.name.endswith('.py') and current_file.is_file():
@@ -90,7 +91,12 @@ class Utility(commands.Cog):
                     except (AttributeError, ImportError) as err:
                         await ctx.say("```py\n{}: {}\n```".format(type(err).__name__, str(err)))
                         pass
-        await ctx.send('Reloaded Commands With Changes.')
+        await msg.edit(content='Reloaded Command Files!')
+        msg = await ctx.send('Reloading Storage Files!')
+        await self.bot.update_guild_list()
+        await self.bot.update_account_list()
+        await self.bot.update_slot_machines()
+        await msg.edit(content='Reloaded Storage Files!')
 
     @commands.command(name='clear', aliases=['cls', 'empty'])
     @commands.has_permissions(manage_messages=True)
@@ -100,7 +106,7 @@ class Utility(commands.Cog):
     @commands.command(name='ban', aliases=['banned'])
     @commands.has_permissions(administrator=True)
     async def ban(self, ctx, member: discord.Member, *, reason=None):
-        await member.ban(reason=reason)
+        await member.ban(demonstrate_reason=reason)
         await ctx.send(f'Banned {member.mention}')
 
     @commands.command(name='shutdown', help="Shut down the bot")

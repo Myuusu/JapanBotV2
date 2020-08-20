@@ -135,7 +135,8 @@ class Bot(commands.Bot):
             return self.guild_list[message.guild.id].prefix
 
     async def insert_account(self, author_id):
-        current = {author_id: Account(
+        current = {
+            author_id: Account(
                     user_id=author_id,
                     lol_account="abc123",
                     balance=1000,
