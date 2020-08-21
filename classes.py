@@ -4,7 +4,6 @@ from selenium.common.exceptions import NoSuchElementException
 from storage.winnings_table import \
     three_by_three_lines, three_by_one_lines, three_reel_winnings, \
     five_by_one_lines, five_by_three_lines, five_reel_winnings
-from commands.utility import resolve_line
 
 
 class Card:
@@ -46,7 +45,7 @@ class Machine:
 
 class SlotMachine:
     def __init__(self, name: str, cost: int, rows: int, reels: int, emojis: [Emoji],
-                 machine_type: str = "slot", play_count=0, coins_in=0, coins_out=0, profit=0
+                 machine_type: str = "slot", jackpots=0, play_count=0, coins_out=0, coins_in=0
                  ):
         self.name = name
         self.cost = cost
@@ -54,36 +53,48 @@ class SlotMachine:
         self.reels = reels
         self.emojis = emojis
         self.machine_type = machine_type
+        self.jackpots = jackpots
         self.play_count = play_count
-        self.coins_in = coins_in
         self.coins_out = coins_out
-        self.profit = profit
+        self.coins_in = coins_in
 
     def print(self):
         return f'Cost: {self.cost} | Emojis: {" ".join([self.emojis.emoji])} | Name: {self.name}'
 
+    async def resolve_line(self, ranks_matrix: [[]], line_coordinates: [[]], winnings_table: [[]]):
+        output = ""
+        for [row, reel] in line_coordinates:
+            output += str(ranks_matrix[row][reel])
+        else:
+            try:
+                line = int(output)
+                if line == 0:
+                    self.jackpots += 1
+                return winnings_table[line]
+            except KeyError:
+                return 0
+
     async def calculate_winnings(self, ranks_matrix: [[]], multiplier=1):
+        # print(ranks_matrix)
         winnings = 0
         if self.reels == 3:
             if self.rows == 1:
                 for line in three_by_one_lines:
-                    current = await resolve_line(ranks_matrix, line, three_reel_winnings)
-                    winnings += int(current)
+                    winnings += await self.resolve_line(ranks_matrix, line, three_reel_winnings)
             if self.rows == 3:
                 for line in three_by_three_lines:
-                    current = await resolve_line(ranks_matrix, line, three_reel_winnings)
-                    winnings += int(current)
+                    winnings += await self.resolve_line(ranks_matrix, line, three_reel_winnings)
         if self.reels == 5:
             if self.rows == 1:
                 for line in five_by_one_lines:
-                    winnings = winnings + int(resolve_line(ranks_matrix, line, five_reel_winnings))
+                    winnings += await self.resolve_line(ranks_matrix, line, five_reel_winnings)
             if self.rows == 3:
                 for line in five_by_three_lines:
-                    winnings = winnings + int(resolve_line(ranks_matrix, line, five_reel_winnings))
+                    winnings += await self.resolve_line(ranks_matrix, line, five_reel_winnings)
         self.coins_out += multiplier * winnings
         self.play_count += 1
         self.coins_in += self.cost * multiplier
-        print(f'Coins In: {self.coins_in}\nCoins Out: {self.coins_out}\nProfit: {self.coins_in-self.coins_out}')
+        # print(f'Coins In: {self.coins_in}\nCoins Out: {self.coins_out}\nProfit: {self.coins_in - self.coins_out}')
         return multiplier * winnings
 
     def get_reel_weight(self, reel_position: int):
@@ -92,7 +103,7 @@ class SlotMachine:
             weights_from_each_emoji.append(current_emoji.weights[reel_position])
         return weights_from_each_emoji
 
-    async def spin(self, ctx, multiplier: int = 1, spins: int = 1):
+    async def spin(self, ctx, spins: int = 1, multiplier: int = 1, testing: bool = False):
         results = 0
         for _ in range(spins):
             """ This is where the machine will "spin" each of its wheels """
@@ -108,32 +119,47 @@ class SlotMachine:
             else:
                 emoji_matrix = [["?" for _ in range(self.reels)] for _ in range(self.rows)]
                 ranks_matrix = [["#" for _ in range(self.reels)] for _ in range(self.rows)]
-                msg = await ctx.send(f"{discord_message}Spinning! Good luck {ctx.author.name}!")
-                for j in range(self.reels):
-                    if spins == 1:
+                if not testing:
+                    msg = await ctx.send(f"Spinning! Good luck {ctx.author.name}!")
+                    for j in range(self.reels):
                         await asyncio.sleep(random.uniform(1, 4))
-                    for i in range(self.rows):
-                        ranks_matrix[i][j] = spin_results[j][i].rank
-                        emoji_matrix[i][j] = spin_results[j][i].emoji
-                    output = '\n'.join(['|'.join([str(item) for item in row]) for row in emoji_matrix])
-                    await msg.edit(content=f"{discord_message}Spinning! Good luck {ctx.author.name}!\n{output}")
-                else:
-                    output = await self.calculate_winnings(ranks_matrix, multiplier)
-                    if output > (self.cost * multiplier * 3.5):
-                        msg = await ctx.send(f'*HUGE WINNER!!* {str(output)}')
-                        if spins == 1:
+                        for i in range(self.rows):
+                            ranks_matrix[i][j] = spin_results[j][i].rank
+                            emoji_matrix[i][j] = spin_results[j][i].emoji
+                            output = '\n'.join(['|'.join([str(item) for item in row]) for row in emoji_matrix])
+                            await msg.edit(content=f"Spinning! Good luck {ctx.author.name}!\n{output}")
+                    else:
+                        current_jackpots = self.jackpots
+                        output = await self.calculate_winnings(ranks_matrix, multiplier)
+                        if self.jackpots > current_jackpots:
+                            user.jackpot_winner = true
+                            msg = await ctx.send(f'*JACKPOT WINNER!!* {str(output)}')
                             for _ in range(10):
                                 await asyncio.sleep(1)
-                                await msg.edit(content=f'***HUGE WINNER!!*** {str(output)}')
+                                await msg.edit(content=f'***JACKPOT WINNER!!*** {str(output)}')
                                 await asyncio.sleep(.5)
-                                await msg.edit(content=f'*HUGE WINNER!!* {str(output)}')
-                    elif output > (self.cost * multiplier):
-                        await ctx.send(f'*Winner!* {str(output)}')
+                                await msg.edit(content=f'*JACKPOT WINNER!!* {str(output)}')
+                        elif output > (self.cost * multiplier):
+                            await ctx.send(f'*Winner!* {str(output)}')
+                        else:
+                            await ctx.send(f"Don't Give Up, Try Again! {str(output)}")
+                        results += output
+                else:
+                    for reel in range(self.reels):
+                        await asyncio.sleep(random.uniform(1, 4))
+                        for row in range(self.rows):
+                            ranks_matrix[row][reel] = spin_results[reel][row].rank
+                            emoji_matrix[row][reel] = spin_results[reel][row].emoji
                     else:
-                        await ctx.send(f"Don't Give Up, Try Again! {str(output)}")
-                results += output
+                        results += await self.calculate_winnings(ranks_matrix, multiplier)
         else:
             return results
+
+    async def reset(self):
+        self.coins_out = 0
+        self.coins_in = 0
+        self.play_count = 0
+        self.jackpots = 0
 
     def get_json(self):
         emoji_output = []
@@ -146,6 +172,7 @@ class SlotMachine:
                f'\n        rows={self.rows},' \
                f'\n        reels={self.reels},' \
                f'\n        machine_type="slot",' \
+               f'\n        jackpots={self.jackpots},' \
                f'\n        play_count={self.play_count},' \
                f'\n        coins_out={self.coins_out},' \
                f'\n        coins_in={self.coins_in},' \

@@ -13,36 +13,21 @@ from urllib.parse import quote_plus
 
 
 def clean_float(string_to_process):
-    if isinstance(string_to_process, int) or isinstance(string_to_process, float):
-        return string_to_process
+    string_to_process = string_to_process.replace(",", "").lower()
+    multiply_by_ten = 0
+    if "k" in string_to_process:
+        multiply_by_ten += 3
+    if "m" in string_to_process:
+        multiply_by_ten += 6
+    if "b" in string_to_process:
+        multiply_by_ten += 9
+    if "." in string_to_process:
+        [before_decimal, after_decimal] = string_to_process.split(".")
+        return int(re.sub("[.,kmb]", "", string_to_process)) * pow(
+                10, multiply_by_ten - len(after_decimal)
+            )
     else:
-        string_to_process = string_to_process.replace(",", "").lower()
-        multiply_by_ten = 0
-        if "k" in string_to_process:
-            multiply_by_ten += 3
-        if "m" in string_to_process:
-            multiply_by_ten += 6
-        if "b" in string_to_process:
-            multiply_by_ten += 9
-        if "." in string_to_process:
-            [before_decimal, after_decimal] = string_to_process.split(".")
-            digits_after_decimal = re.sub("[kmb]", "", after_decimal)
-            return float(str(before_decimal) + str(digits_after_decimal)) * pow(
-                    10, multiply_by_ten - len(digits_after_decimal)
-                )
-        else:
-            return float(re.sub("[kmb]", "", string_to_process)) * pow(10, multiply_by_ten)
-
-
-async def resolve_line(ranks_matrix: [[]], line_coordinates: [[]], winnings_table: [[]]):
-    output = ""
-    for [x, y] in line_coordinates:
-        output = f'{output}{ranks_matrix[x][y]}'
-    else:
-        try:
-            return winnings_table[int(output)]
-        except KeyError:
-            return 0
+        return int(re.sub("[,kmb]", "", string_to_process)) * pow(10, multiply_by_ten)
 
 
 def url_encode(query: str):

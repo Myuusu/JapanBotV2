@@ -16,7 +16,7 @@ account_list = {
     228716653318373376: Account(
         user_id=228716653318373376,
         lol_account_id="abc123",
-        balance=2566,
+        balance=142046237,
         jackpot_winner=False
     ),
     219659295648776203: Account(

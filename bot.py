@@ -13,12 +13,6 @@ from commands.utility import trim
 from classes import Guild, Account, LolAccount
 
 
-async def on_command_error(ctx, exception):
-    if isinstance(exception, commands.CommandNotFound):
-        await ctx.send('Invalid command used! Please try again.')
-    print(f'Context: {ctx}\nException: {exception}')
-
-
 class Bot(commands.Bot):
     def __init__(self):
         super(Bot, self).__init__(case_insensitive=True, command_prefix=self.get_prefix)
@@ -60,6 +54,42 @@ class Bot(commands.Bot):
             output_string = ",\n    ".join(output)
             with open('storage/slot_machines.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
                 fp.write(f'from classes import SlotMachine, Emoji\n\nslot_machines = {{\n    {output_string}\n}}\n')
+
+    async def get_prefix(self, message):
+        try:
+            self.guild_list[message.guild.id].message_count += 1
+        except KeyError:
+            await self.insert_guild(message.guild.id)
+        finally:
+            await self.update_guild_list()
+            return self.guild_list[message.guild.id].prefix
+
+    async def insert_account(self, author_id):
+        current = {
+            author_id: Account(
+                    user_id=author_id,
+                    lol_account="abc123",
+                    balance=1000,
+                    jackpot_winner=False
+                )
+            }
+        self.account_list.update(current)
+        await self.update_account_list()
+        return current
+
+    async def insert_guild(self, guild_id):
+        current = {
+                guild_id: Guild(
+                    guild_id=guild_id,
+                    prefix=['!'],
+                    message_count=0,
+                    active=True,
+                    log_channel_id=None
+                )
+            }
+        self.guild_list.update(current)
+        await self.update_guild_list()
+        return current
 
     async def on_ready(self):
         await self.change_presence(
@@ -125,41 +155,14 @@ class Bot(commands.Bot):
             print(f'Disconnected From: {str(guild.id)}')
             await self.update_guild_list()
 
-    async def get_prefix(self, message):
-        try:
-            self.guild_list[message.guild.id].message_count += 1
-        except KeyError:
-            await self.insert_guild(message.guild.id)
-        finally:
-            await self.update_guild_list()
-            return self.guild_list[message.guild.id].prefix
-
-    async def insert_account(self, author_id):
-        current = {
-            author_id: Account(
-                    user_id=author_id,
-                    lol_account="abc123",
-                    balance=1000,
-                    jackpot_winner=False
-                )
-            }
-        self.account_list.update(current)
-        await self.update_account_list()
-        return current
-
-    async def insert_guild(self, guild_id):
-        current = {
-                guild_id: Guild(
-                    guild_id=guild_id,
-                    prefix=['!'],
-                    message_count=0,
-                    active=True,
-                    log_channel_id=None
-                )
-            }
-        self.guild_list.update(current)
-        await self.update_guild_list()
-        return current
+    @staticmethod
+    async def on_command_error(ctx, exception):
+        if isinstance(exception, commands.CommandNotFound):
+            await ctx.send('Invalid command used! Please try again.')
+        elif isinstance(exception, commands.CommandOnCooldown):
+            await ctx.send(exception)
+        else:
+            print(f'Context: {ctx}\nException: {exception}')
 
 
 bot = Bot()
