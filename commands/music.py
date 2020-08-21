@@ -250,13 +250,13 @@ class Music(commands.Cog):
                 return ctx.channel == m.channel and ctx.author == m.author
             try:
                 response = await self.bot.wait_for('message', check=test, timeout=10)
-                if response in self.bot.station_list:
+                try:
                     player = self.bot.wavelink.get_player(ctx.guild.id)
                     if player.is_connected:
                         await player.stop()
-                    await self.play_station(ctx, self.bot.station_list[response.content].url)
-                else:
-                    await ctx.send('Please make sure that your entry is a valid station number.')
+                    await self.play_station(ctx, self.bot.station_list[int(response.content)].url)
+                except KeyError:
+                    await ctx.send(f'Please make sure that your entry is a valid station number.')
             except asyncio.TimeoutError:
                 await ctx.send('Timed Out. Please reissue command.')
         else:

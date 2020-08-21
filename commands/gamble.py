@@ -1,7 +1,8 @@
+import asyncio
 from classes import Deck
+from commands.utility import clean_float
 from discord import Embed
 from discord.ext import commands
-from commands.utility import clean_float
 
 
 class Gamble(commands.Cog):
@@ -14,12 +15,12 @@ class Gamble(commands.Cog):
     async def daily(self, ctx):
         try:
             self.bot.account_list[ctx.author.id].balance += 500
-            await self.bot.update_account_list()
             await ctx.send(f'Increased credits by 500!')
         except KeyError:
             await self.bot.insert_account(ctx.author.id)
             await ctx.send("Welcome to the bot! We've given you 1500 credits!")
             self.bot.account_list[ctx.author.id].balance += 500
+        finally:
             await self.bot.update_account_list()
 
     @commands.command(name='slot', aliases=['slots', 'bet'])
@@ -69,14 +70,30 @@ class Gamble(commands.Cog):
 
     @commands.command(name='reset_slot', aliases=['rm', 'rs', 'reset_machine', 'reset_slot_machine'])
     @commands.has_permissions(administrator=True)
-    async def reset_slot(self, ctx, machine_name: str = "classic"):
+    async def reset_slot(self, ctx, machine_name: str = "classic", confirm: str = ""):
         try:
-            await self.bot.slot_machines[machine_name.lower()].reset()
+            current = self.bot.slot_machines[machine_name.lower()]
+        except KeyError:
+            return await ctx.send('Slot Machine Not Found!')
+
+        if confirm in ["confirm", "cf", "--cf", "--confirm"]:
+            await current.reset()
             await ctx.send(f"Reset the following for the {machine_name} Slot Machine:"
                            f"\nCoins In, Coins Out, Play Count, Jackpots")
             await self.bot.update_slot_machines()
-        except KeyError:
-            await ctx.send('Machine Not Recognized! Please reissue command.')
+        else:
+            def test(m):
+                return ctx.channel == m.channel and ctx.author == m.author and "confirm" == m.content
+            await ctx.send(f'Please type "confirm" to reset the {machine_name}!')
+            try:
+                response = await self.bot.wait_for('message', check=test, timeout=10)
+                if response.content.lower() == "confirm":
+                    await current.reset()
+                    await ctx.send(f"Reset the following for the {machine_name} Slot Machine:"
+                                   f"\nCoins In, Coins Out, Play Count, Jackpots")
+                    await self.bot.update_slot_machines()
+            except asyncio.TimeoutError:
+                return await ctx.send('Timed Out. Please reissue command.')
 
 
 def setup(bot):
