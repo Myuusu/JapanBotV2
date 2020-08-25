@@ -40,22 +40,24 @@ async def trim(output: str = "", length: int = 2000):
     return output
 
 
-async def read_website(url: str, params={}, format: str = "text"):
-    async with aiohttp.ClientSession() as session:
-        if format == "json":
-            if params:
-                async with session.get(url=url, params=params) as resp:
+async def read_website(url: str, format: str = "text", params={}, headers={}, payload={}):
+    async with aiohttp.ClientSession(headers=headers) as session:
+        if payload:
+            async with session.post(url=url, params=params) as resp:
+                if format == "json":
                     output = await resp.json()
-            else:
-                async with session.get(url) as resp:
+                if format == "text":
+                    output = await resp.text()
+                if format == "read":
+                    output = await resp.read()
+        else:
+            async with session.get(url=url, params=params) as resp:
+                if format == "json":
                     output = await resp.json()
-        if format == "text":
-            if params:
-                async with session.get(url=url, params=params) as resp:
+                if format == "text":
                     output = await resp.text()
-            else:
-                async with session.get(url) as resp:
-                    output = await resp.text()
+                if format == "read":
+                    output = await resp.read()
     await session.close()
     return output
 

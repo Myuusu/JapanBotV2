@@ -1,8 +1,8 @@
 import asyncio
-from commands.utility import url_encode, find_in_site_text, read_website
+from commands.utility import url_encode, find_in_site_text, read_website, trim
 from discord import Embed
 from discord.ext import commands
-from config import chrome_driver_path
+from config import chrome_driver_path, x_naver_client_id, x_naver_client_secret
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
@@ -53,6 +53,23 @@ class Translate(commands.Cog):
                     output.append(f'mp4 Kanji Could Not Be Found For {term}, So No Page Was Loaded.')
         else:
             await ctx.send("\n".join(output))
+
+    @commands.command(name="translate", aliases=['trans', 'convert'])
+    async def translate(self, ctx, *, query: str):
+        url = f'https://openapi.naver.com/v1/papago/n2mt?source=ja&target=en&text={query}'
+        headers = {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-NCP-APIGW-API-KEY-ID": x_naver_client_id,
+            "X-NCP-APIGW-API-KEY": x_naver_client_secret
+        }
+        await ctx.send(
+            await trim(
+                await read_website(
+                    url=url,
+                    headers=headers
+                )
+            )
+        )
 
 
 def setup(bot):
