@@ -1,6 +1,7 @@
 import aiohttp
 import discord
 from discord.ext import commands
+from commands.utility import read_website
 
 
 class CurrencyExchanger(commands.Cog):
@@ -20,14 +21,9 @@ class CurrencyExchanger(commands.Cog):
             output_currency = ['EUR', 'JPY', 'GBP']
         else:
             output_currency = ['EUR', 'JPY', 'GBP', 'USD']
-        async with aiohttp.ClientSession() as session:
-            params = {'base': base_currency, 'symbols': ",".join(output_currency)}
-            async with session.get(
-                    'https://api.exchangeratesapi.io/latest',
-                    params=params
-            ) as resp:
-                output = await resp.json()
-        await session.close()
+        url = 'https://api.exchangeratesapi.io/latest'
+        params = {'base': base_currency, 'symbols': ",".join(output_currency)}
+        output = await read_website(url=url, params=params, format="json")
         des = [f'{input_amount} {base_currency} is:']
         for rate in output["rates"]:
             output_no_cleanup = float(input_amount) * float(output["rates"][rate])

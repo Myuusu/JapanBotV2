@@ -22,9 +22,9 @@ def clean_float(string_to_process):
     if "b" in string_to_process:
         multiply_by_ten += 9
     if "." in string_to_process:
-        [before_decimal, after_decimal] = string_to_process.split(".")
+        output_string = string_to_process.split(".")
         return int(re.sub("[.,kmb]", "", string_to_process)) * pow(
-                10, multiply_by_ten - len(after_decimal)
+                10, multiply_by_ten - len(output_string[1])
             )
     else:
         return int(re.sub("[,kmb]", "", string_to_process)) * pow(10, multiply_by_ten)
@@ -40,24 +40,58 @@ async def trim(output: str = "", length: int = 2000):
     return output
 
 
-async def fetch(formatted_url: str, session):
-    async with session.get(formatted_url) as resp:
-        assert resp.status == 200
-        return await resp.text()
-
-
-async def read_website(formatted_url: str):
+async def read_website(url: str, params={}, format: str = "text"):
     async with aiohttp.ClientSession() as session:
-        text = await fetch(formatted_url=formatted_url, session=session)
+        if format == "json":
+            if params:
+                async with session.get(url=url, params=params) as resp:
+                    output = await resp.json()
+            else:
+                async with session.get(url) as resp:
+                    output = await resp.json()
+        if format == "text":
+            if params:
+                async with session.get(url=url, params=params) as resp:
+                    output = await resp.text()
+            else:
+                async with session.get(url) as resp:
+                    output = await resp.text()
     await session.close()
-    return text
+    return output
 
 
-async def find_in_site(search_url: str, xpath_location: str = '/'):
+async def find_in_site(url: str, params={}, format: str = "text", xpath_location: str = '/'):
+    site_text = await read_website(url=url, params=params, format=format)
+    tree_element_to_locate = lxml.html.fromstring(site_text).xpath(xpath_location)
     output_string = ""
-    for text in lxml.html.fromstring(await read_website(search_url)).xpath(xpath_location):
-        output_string += re.sub("[\n\t]", "", text.text_content())
-    return output_string.strip()
+    for child in tree_element_to_locate:
+        try:
+            if child.get('href'):
+                output_string += child.get('href')
+            elif child.get('src'):
+                output_string += child.get('src')
+            else:
+                output_string += child.text_content()
+        except AttributeError:
+            output_string += " ".join(child)
+    else:
+        return re.sub("[\r\n\t]", "", output_string)
+
+
+async def find_in_site_text(html_element, xpath_location=['/']):
+    output_string = ""
+    for child in html_element.xpath(xpath_location):
+        try:
+            if child.get('href'):
+                output_string += child.get('href')
+            elif child.get('src'):
+                output_string += child.get('src')
+            else:
+                output_string += child.text_content()
+        except AttributeError:
+            output_string += " ".join(child)
+    else:
+        return re.sub("[\r\n\t]", "", output_string)
 
 
 class Utility(commands.Cog):
