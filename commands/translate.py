@@ -10,7 +10,7 @@ import cssselect
 import lxml.html
 
 
-class Jisho(commands.Cog):
+class Translate(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -56,4 +56,4 @@ class Jisho(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Jisho(bot))
+    bot.add_cog(Translate(bot))
