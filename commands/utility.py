@@ -60,24 +60,6 @@ async def read_website(url: str, params={}, format: str = "text"):
     return output
 
 
-async def find_in_site(url: str, params={}, format: str = "text", xpath_location: str = '/'):
-    site_text = await read_website(url=url, params=params, format=format)
-    tree_element_to_locate = lxml.html.fromstring(site_text).xpath(xpath_location)
-    output_string = ""
-    for child in tree_element_to_locate:
-        try:
-            if child.get('href'):
-                output_string += child.get('href')
-            elif child.get('src'):
-                output_string += child.get('src')
-            else:
-                output_string += child.text_content()
-        except AttributeError:
-            output_string += " ".join(child)
-    else:
-        return re.sub("[\r\n\t]", "", output_string)
-
-
 async def find_in_site_text(html_element, xpath_location=['/']):
     output_string = ""
     for child in html_element.xpath(xpath_location):
