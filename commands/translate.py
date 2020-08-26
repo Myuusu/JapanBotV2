@@ -41,35 +41,31 @@ class Translate(commands.Cog):
                 url=f'https://app.kanjialive.com/api/kanji/{url_encode(query=term)}',
                 format="json"
             )
-            if format == "webm":
-                if site_text['webm_video_source']:
+            try:
+                if format == "webm":
                     output.append(site_text['webm_video_source'])
                 else:
-                    output.append(f'Webm Kanji Could Not Be Found For {term}, So No Page Was Loaded.')
-            else:
-                if site_text['mp4_video_source']:
                     output.append(site_text['mp4_video_source'])
-                else:
-                    output.append(f'mp4 Kanji Could Not Be Found For {term}, So No Page Was Loaded.')
+            except KeyError:
+                output.append(f'{term}: Kanji Could Not Be Found For {term}, So No Page Was Loaded.')
         else:
             await ctx.send("\n".join(output))
 
     @commands.command(name="translate", aliases=['trans', 'convert'])
-    async def translate(self, ctx, *, query: str):
-        url = f'https://openapi.naver.com/v1/papago/n2mt?source=ja&target=en&text={query}'
+    async def translate(self, ctx, *, query):
+        url = f'https://naveropenapi.apigw.ntruss.com/n2mt/v1/translation'
+        params = {
+            "source": "en",
+            "target": "ja",
+            "text": query
+        }
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
             "X-NCP-APIGW-API-KEY-ID": x_naver_client_id,
             "X-NCP-APIGW-API-KEY": x_naver_client_secret
         }
-        await ctx.send(
-            await trim(
-                await read_website(
-                    url=url,
-                    headers=headers
-                )
-            )
-        )
+        results = await read_website(url=url, format="read", headers=headers, params=params, payload={""})
+        await ctx.send(await trim(results))
 
 
 def setup(bot):

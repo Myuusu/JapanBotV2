@@ -40,24 +40,34 @@ async def trim(output: str = "", length: int = 2000):
     return output
 
 
-async def read_website(url: str, format: str = "text", params={}, headers={}, payload={}):
-    async with aiohttp.ClientSession(headers=headers) as session:
+async def read_website(url: str, format: str, params={}, headers={}, payload={}):
+    async with aiohttp.ClientSession() as session:
         if payload:
-            async with session.post(url=url, params=params) as resp:
-                if format == "json":
-                    output = await resp.json()
-                if format == "text":
-                    output = await resp.text()
-                if format == "read":
-                    output = await resp.read()
+            return await session_post(session=session, url=url, format=format, params=params, headers=headers)
         else:
-            async with session.get(url=url, params=params) as resp:
-                if format == "json":
-                    output = await resp.json()
-                if format == "text":
-                    output = await resp.text()
-                if format == "read":
-                    output = await resp.read()
+            return await session_get(session=session, url=url, format=format, params=params, headers=headers)
+
+
+async def session_get(session, url: str, format: str, params={}, headers={}):
+    async with session.get(url=url, params=params, headers=headers) as resp:
+        if format == "json":
+            output = await resp.json()
+        elif format == "read":
+            output = await resp.read()
+        else:
+            output = await resp.text()
+    await session.close()
+    return output
+
+
+async def session_post(session, url: str, format: str, params={}, headers={}):
+    async with session.post(url=url, params=params, headers=headers) as resp:
+        if format == "json":
+            output = await resp.json()
+        elif format == "read":
+            output = await resp.read()
+        else:
+            output = await resp.text()
     await session.close()
     return output
 

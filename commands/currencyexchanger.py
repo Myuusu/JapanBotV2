@@ -21,15 +21,17 @@ class CurrencyExchanger(commands.Cog):
             input_amount = temp
 
         output_currency.remove(base_currency)
+
         url = "https://api.exchangeratesapi.io/latest"
         params = {"base": base_currency, "symbols": ",".join(output_currency)}
         output = await read_website(url=url, params=params, format="json")
+
         if base_currency == "JPY":
             des = [f'{input_amount:,} {base_currency} is:']
         else:
             des = [f'{input_amount:,.2f} {base_currency} is:']
         for rate in output["rates"]:
-            output_no_cleanup = float(input_amount) * float(output["rates"][rate])
+            output_no_cleanup = input_amount * output["rates"][rate]
             if rate == 'JPY':
                 des.append(f'{round(output_no_cleanup):,} {rate}')
             else:
