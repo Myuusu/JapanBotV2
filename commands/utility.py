@@ -255,6 +255,13 @@ class Utility(commands.Cog):
         temp = round((output - 32) * 5 / 9, 2)
         await ctx.send(f"{output} °F is {temp} °C")
 
+    @commands.command(name='update_trivia', aliases=['update_trivia_answer'])
+    async def update_trivia_answer(self, ctx, question):
+        try:
+            current = self.trivia_list[question]
+        except KeyError:
+            ctx.send("I could not locate that question. Please try again.")
+
 
 def setup(bot):
     bot.add_cog(Utility(bot))
