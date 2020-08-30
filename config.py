@@ -1,11 +1,19 @@
-bot_token = "<token>"
-chrome_driver_path = "C:\\Users\\<User>\\PycharmProjects\\JapanBotV2\\Lavalink\\chromedriver.exe"
+bot_token = "<Token>"
+chrome_driver_path = "<Path>"
 node_settings = dict(
     host="127.0.0.1",
     port=80,
     rest_uri="http://127.0.0.1:80",
     password="<Password>",
-    identifier="<UserName>",
+    identifier="<Identifier>",
     region="europe"
 )
-mongo_db_url = "mongodb+srv://<UserName>:<Password>@japanbot.abc8v.mongodb.net/test"
+mongo_db_url = "mongodb+srv://<UserName>:<Password>@<Url>"
+x_naver_client_id = "EkeYVe4Z2tysn1mmO57l"
+x_naver_client_secret = "UoAJ6SRQ_m"
+t_bot_ids = ["<BotID>"]
+t_channel_ids = ["<ChannelQuestionID"]
+t_guild_answers_id = "<GuildAnswerID>"
+t_channel_answers_id = ["<ChannelAnswerID>"]
+t_q_header_string = "<QuestionHeaderString>"
+t_a_header_strings = ["<AnswerStrings>"]

@@ -134,7 +134,6 @@ config.py
 config
 
 */__pycache__/*
-.vs/*
+.vs/
 Lavalink/
-
 .idea/

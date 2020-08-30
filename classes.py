@@ -1,5 +1,5 @@
-import random
 import asyncio
+import random
 from selenium.common.exceptions import NoSuchElementException
 from storage.winnings_table import \
     three_by_three_lines, three_by_one_lines, three_reel_winnings, \
@@ -211,7 +211,7 @@ class LolAccount:
 
 
 class Account:
-    def __init__(self, user_id: int, lol_account_id: str, balance: int = 1000, jackpot_winner=False):
+    def __init__(self, user_id: int, lol_account_id: str = "abc123", balance: int = 1000, jackpot_winner=False):
         self.user_id = user_id
         self.lol_account_id = lol_account_id
         self.balance = balance
@@ -306,7 +306,7 @@ class WebTable:
 
 
 class Guild:
-    def __init__(self, guild_id, prefix, message_count=0, active=False, log_channel_id=None):
+    def __init__(self, guild_id, prefix=["!"], message_count=0, active=True, log_channel_id=None):
         self.guild_id = guild_id
         self.prefix = prefix
         self.message_count = message_count
@@ -321,3 +321,15 @@ class Guild:
                f'\n        active={self.active},' \
                f'\n        log_channel_id={self.log_channel_id}' \
                f'\n       )'
+
+
+class Trivia:
+    def __init__(self, question, answer: str = ""):
+        self.question = question
+        self.answer = answer
+
+    def get_json(self):
+        return f'"{self.question}": Trivia(' \
+               f'\n        question="{self.question}",' \
+               f'\n        answer="{self.answer}"' \
+               f'\n    )'

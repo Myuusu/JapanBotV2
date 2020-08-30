@@ -1,16 +1,21 @@
 import discord
+import asyncio
+from random import randrange
 from discord import HTTPException
 import os
 from discord.ext import commands
-from config import bot_token
+from config import \
+    bot_token, t_bot_ids, t_channel_ids, t_q_header_string, \
+    t_a_header_strings, t_channel_answers_id, t_guild_answers_id
 from storage.account_list import account_list
 from storage.eight_ball_responses import eight_ball_responses
 from storage.level_list import level_list
 from storage.slot_machines import slot_machines
 from storage.station_list import station_list
 from storage.guild_list import guild_list
+from storage.trivia_list import trivia_list
 from commands.utility import trim
-from classes import Guild, Account, LolAccount
+from classes import Guild, Account, LolAccount, Trivia
 
 
 class Bot(commands.Bot):
@@ -23,10 +28,20 @@ class Bot(commands.Bot):
         self.eight_ball_responses = eight_ball_responses
         self.slot_machines = slot_machines
         self.station_list = station_list
+        self.trivia_list = trivia_list
 
         for filename in os.listdir('./commands'):
             if filename.endswith('.py'):
                 self.load_extension(f'commands.{filename[:-3]}')
+
+    async def update_trivia_list(self):
+        output = []
+        for trivia_question in self.trivia_list.keys():
+            output.append(self.trivia_list[trivia_question].get_json())
+        else:
+            output_string = ",\n    ".join(output)
+            with open('storage/trivia_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
+                fp.write(f'from classes import Trivia\n\ntrivia_list = {{\n    {output_string}\n}}\n')
 
     async def update_guild_list(self):
         output = []
@@ -65,51 +80,22 @@ class Bot(commands.Bot):
             return self.guild_list[message.guild.id].prefix
 
     async def insert_account(self, author_id):
-        current = {
-            author_id: Account(
-                    user_id=author_id,
-                    lol_account="abc123",
-                    balance=1000,
-                    jackpot_winner=False
-                )
-            }
-        self.account_list.update(current)
+        self.account_list.update({author_id: Account(user_id=author_id)})
         await self.update_account_list()
-        return current
+
+    async def insert_trivia(self, question):
+        self.trivia_list.update({question: Trivia(question=question)})
+        await self.update_trivia_list()
 
     async def insert_guild(self, guild_id):
-        current = {
-                guild_id: Guild(
-                    guild_id=guild_id,
-                    prefix=['!'],
-                    message_count=0,
-                    active=True,
-                    log_channel_id=None
-                )
-            }
-        self.guild_list.update(current)
+        self.guild_list.update({guild_id: Guild(guild_id=guild_id)})
         await self.update_guild_list()
-        return current
 
     async def on_ready(self):
         await self.change_presence(
             status=discord.Status.dnd,
-            activity=discord.Activity(
-                type=discord.ActivityType.listening,
-                name='[!s]'
-            )
+            activity=discord.Activity(type=discord.ActivityType.listening, name='[!s]')
         )
-#        embed = discord.Embed(
-#            title=f"{self.user.name} Online!",
-#            color=discord.Color.from_rgb(0, 0, 0),
-#            timestamp=datetime.datetime.now(datetime.timezone.utc)
-#        )
-#        embed.set_footer(
-#            text="Why am I still doing this",
-#            icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Flag_of_Japan.svg/120px-Flag_of_Japan.svg.png"
-#        )
-#        log_channel_id = 730995381177024532
-#        await self.get_channel(log_channel_id).send(embed=embed, delete_after=10)
         print(f'Logged in as {self.user.name} | {self.user.id}')
 
     async def on_guild_join(self, guild):
@@ -119,41 +105,45 @@ class Bot(commands.Bot):
                 f'Reconnected To: {str(guild.id)}.\n'
                 f'We have processed {str(self.guild_list[guild.id].message_count)} messages from this guild!'
             )
-            await self.update_guild_list()
         except KeyError:
-            self.guild_list.update(
-                {
-                    guild.id: Guild(
-                        guild_id=guild.id,
-                        prefix=['!'],
-                        message_count=0,
-                        active=True,
-                        log_channel_id=None
-                    )
-                }
-            )
+            self.guild_list.update({guild.id: Guild(guild_id=guild.id)})
             print(f'Connected To: {str(guild.id)}')
+        finally:
             await self.update_guild_list()
 
     async def on_guild_remove(self, guild):
         try:
             self.guild_list[guild.id].active = False
-            print(f'Disconnected From: {str(guild.id)}.')
-            await self.update_guild_list()
         except KeyError:
-            self.guild_list.update(
-                {
-                    guild.id: Guild(
-                        guild_id=guild.id,
-                        prefix=['!'],
-                        message_count=0,
-                        active=False,
-                        log_channel_id=None
-                    )
-                }
-            )
+            self.guild_list.update({guild.id: Guild(guild_id=guild.id, active=False)})
+        finally:
             print(f'Disconnected From: {str(guild.id)}')
             await self.update_guild_list()
+
+    async def on_message(self, message):
+        if await self.determine_trivia_question(message=message):
+            await self.process_trivia_question(message=message)
+        else:
+            await self.process_commands(message)
+
+    async def process_trivia_question(self, message):
+        if t_q_header_string in message.content:
+            question = message.content.split("... ")
+            question = question[1]
+        else:
+            question = message.content
+            await asyncio.sleep(randrange(10))
+        try:
+            current = self.trivia_list[question].answer
+            trivia_channel = discord.utils.get(
+                self.get_all_channels(),
+                guild__id=t_guild_answers_id,
+                id=t_channel_answers_id
+            )
+            await trivia_channel.send(f'**{question}**\n```{current}```')
+        except KeyError:
+            await self.insert_trivia(question)
+            await message.channel.send("No Solution Found. Added to list for needing update.")
 
     @staticmethod
     async def on_command_error(ctx, exception):
@@ -163,6 +153,18 @@ class Bot(commands.Bot):
             await ctx.send(exception)
         else:
             print(f'Context: {ctx}\nException: {exception}')
+
+    @staticmethod
+    async def determine_trivia_question(message):
+        if message.author.id in t_bot_ids and message.channel.id in t_channel_ids and message.content != "":
+            question_format_found = True
+            for string in t_a_header_strings:
+                if string in message.content:
+                    question_format_found = False
+            else:
+                return question_format_found
+        else:
+            return False
 
 
 bot = Bot()
