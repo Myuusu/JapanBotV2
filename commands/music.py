@@ -101,8 +101,8 @@ class Music(commands.Cog):
 
         return controller
 
-    @commands.command(name='connect')
-    async def connect_(self, ctx, channel: discord.VoiceChannel = None):
+    @commands.command(name='connect', aliases=['join_channel'])
+    async def connect(self, ctx, channel: discord.VoiceChannel = None):
         if channel:
             player = self.bot.wavelink.get_player(ctx.guild.id)
             await ctx.send(f'Connecting to **`{channel.name}`**', delete_after=15)
@@ -122,7 +122,7 @@ class Music(commands.Cog):
             controller = self.get_controller(ctx)
             controller.channel = ctx.channel
 
-    @commands.command()
+    @commands.command(name='play', aliases=['play_track', 'play_song'])
     async def play(self, ctx, *, query: str):
         if not re.compile('https?://.+').match(query):
             query = f'ytsearch:{query}'
@@ -131,23 +131,23 @@ class Music(commands.Cog):
             return await ctx.send('Could not find any songs with that query.')
         player = self.bot.wavelink.get_player(ctx.guild.id)
         if not player.is_connected:
-            await ctx.invoke(self.connect_)
+            await ctx.invoke(self.connect)
         track = tracks[0]
         controller = self.get_controller(ctx)
         await controller.queue.put(track)
         await ctx.send(f'Added {str(track)} to the queue.', delete_after=15)
 
-    @commands.command()
+    @commands.command(name='play_station', aliases=['playstation'])
     async def play_station(self, ctx, url: str):
         station = await self.bot.wavelink.get_tracks(url)
         player = self.bot.wavelink.get_player(ctx.guild.id)
         if not player.is_connected:
-            await ctx.invoke(self.connect_)
+            await ctx.invoke(self.connect)
         stream = station[0]
         controller = self.get_controller(ctx)
         await controller.queue.put(stream)
 
-    @commands.command()
+    @commands.command(name='pause', aliases=['pause_song'])
     async def pause(self, ctx):
         player = self.bot.wavelink.get_player(ctx.guild.id)
         if not player.is_playing:
@@ -155,7 +155,7 @@ class Music(commands.Cog):
         await ctx.send('Pausing the song!', delete_after=15)
         await player.set_pause(True)
 
-    @commands.command()
+    @commands.command(name='resume', aliases=['continue'])
     async def resume(self, ctx):
         player = self.bot.wavelink.get_player(ctx.guild.id)
         if not player.paused:
@@ -163,7 +163,7 @@ class Music(commands.Cog):
         await ctx.send('Resuming the player!', delete_after=15)
         await player.set_pause(False)
 
-    @commands.command(aliases=['next'])
+    @commands.command(name='skip', aliases=['next'])
     async def skip(self, ctx):
         player = self.bot.wavelink.get_player(ctx.guild.id)
         if not player.is_playing:
@@ -171,7 +171,7 @@ class Music(commands.Cog):
         await ctx.send('Skipping the song!', delete_after=15)
         await player.stop()
 
-    @commands.command()
+    @commands.command(name='volume', aliases=['vol'])
     async def volume(self, ctx, *, vol: int):
         player = self.bot.wavelink.get_player(ctx.guild.id)
         controller = self.get_controller(ctx)
@@ -180,7 +180,7 @@ class Music(commands.Cog):
         await ctx.send(f'Setting the player volume to `{vol}`')
         await player.set_volume(vol)
 
-    @commands.command(aliases=['np', 'current', 'nowplaying'])
+    @commands.command(name='now_playing', aliases=['np', 'current', 'nowplaying'])
     async def now_playing(self, ctx):
         player = self.bot.wavelink.get_player(guild_id=ctx.guild.id, context=ctx)
         if not player.is_connected:
@@ -213,7 +213,7 @@ class Music(commands.Cog):
         await player.disconnect()
         await ctx.send('Disconnected player and killed controller.', delete_after=20)
 
-    @commands.command()
+    @commands.command(name='info', aliases=['song_info'])
     async def info(self, ctx):
         player = self.bot.wavelink.get_player(ctx.guild.id)
         node = player.node
@@ -265,7 +265,6 @@ class Music(commands.Cog):
                 await player.stop()
             await self.play_station(ctx, self.bot.station_list[station_id].url)
 
-    @commands.command()
     async def get_station_descriptions(self):
         des = []
         for i in self.bot.station_list:

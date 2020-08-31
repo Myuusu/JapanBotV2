@@ -1,27 +1,26 @@
-import discord
 import asyncio
-from random import randrange
-from discord import HTTPException
+import discord
 import os
-from discord.ext import commands
+import re
+from classes import Guild, Account, LolAccount, Trivia
+from commands.utility import trim
 from config import \
     bot_token, t_bot_ids, t_channel_ids, t_q_header_string, \
     t_a_header_strings, t_channel_answers_id, t_guild_answers_id
+from discord.ext import commands
+from random import randrange
 from storage.account_list import account_list
 from storage.eight_ball_responses import eight_ball_responses
+from storage.guild_list import guild_list
 from storage.level_list import level_list
 from storage.slot_machines import slot_machines
 from storage.station_list import station_list
-from storage.guild_list import guild_list
 from storage.trivia_list import trivia_list
-from commands.utility import trim
-from classes import Guild, Account, LolAccount, Trivia
 
 
 class Bot(commands.Bot):
     def __init__(self):
         super(Bot, self).__init__(case_insensitive=True, command_prefix=self.get_prefix)
-
         self.account_list = account_list
         self.guild_list = guild_list
         self.level_list = level_list
@@ -29,6 +28,7 @@ class Bot(commands.Bot):
         self.slot_machines = slot_machines
         self.station_list = station_list
         self.trivia_list = trivia_list
+        self.trivia_channel_answers = ''
 
         for filename in os.listdir('./commands'):
             if filename.endswith('.py'):
@@ -97,6 +97,11 @@ class Bot(commands.Bot):
             activity=discord.Activity(type=discord.ActivityType.listening, name='[!s]')
         )
         print(f'Logged in as {self.user.name} | {self.user.id}')
+        self.trivia_channel_answers = discord.utils.get(
+            self.get_all_channels(),
+            guild__id=t_guild_answers_id,
+            id=t_channel_answers_id
+        )
 
     async def on_guild_join(self, guild):
         try:
@@ -121,29 +126,33 @@ class Bot(commands.Bot):
             await self.update_guild_list()
 
     async def on_message(self, message):
-        if await self.determine_trivia_question(message=message):
-            await self.process_trivia_question(message=message)
+        if self.trivia_channel_answers is not None:
+            if await self.determine_trivia_question(message=message):
+                await self.process_trivia_question(message=message)
+            else:
+                await self.process_commands(message)
         else:
             await self.process_commands(message)
 
     async def process_trivia_question(self, message):
-        if t_q_header_string in message.content:
-            question = message.content.split("... ")
-            question = question[1]
-        else:
-            question = message.content
-            await asyncio.sleep(randrange(10))
+        question = re.sub(r'^.*\.\.\.\*\* ', '', message.content)
+        await asyncio.sleep(randrange(3))
         try:
             current = self.trivia_list[question].answer
-            trivia_channel = discord.utils.get(
-                self.get_all_channels(),
-                guild__id=t_guild_answers_id,
-                id=t_channel_answers_id
-            )
-            await trivia_channel.send(f'**{question}**\n```{current}```')
+            if current == '':
+                await message.channel.send("No Solution Found. Question Located; Please Update.")
+            if not await self.determine_if_in_channel(question):
+                await self.trivia_channel_answers.send(f'**{question}**\n```{current}```')
         except KeyError:
             await self.insert_trivia(question)
-            await message.channel.send("No Solution Found. Added to list for needing update.")
+            await message.channel.send("Question Not Located. Inserted, But Needs Solution.")
+
+    async def determine_if_in_channel(self, test_message):
+        async for message in self.trivia_channel_answers.history():
+            if test_message in message.content:
+                return True
+        else:
+            return False
 
     @staticmethod
     async def on_command_error(ctx, exception):
@@ -156,7 +165,7 @@ class Bot(commands.Bot):
 
     @staticmethod
     async def determine_trivia_question(message):
-        if message.author.id in t_bot_ids and message.channel.id in t_channel_ids and message.content != "":
+        if message.author.id in t_bot_ids and message.channel.id in t_channel_ids and message.content != '':
             question_format_found = True
             for string in t_a_header_strings:
                 if string in message.content:
