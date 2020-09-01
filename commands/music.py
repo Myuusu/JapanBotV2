@@ -246,10 +246,10 @@ class Music(commands.Cog):
                 delete_after=30
             )
 
-            def test(m):
+            def check(m):
                 return ctx.channel == m.channel and ctx.author == m.author
             try:
-                response = await self.bot.wait_for('message', check=test, timeout=10)
+                response = await self.bot.wait_for('message', check=check, timeout=10)
                 try:
                     player = self.bot.wavelink.get_player(ctx.guild.id)
                     if player.is_connected:

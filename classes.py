@@ -320,11 +320,11 @@ class Guild:
                f'\n        message_count={self.message_count},' \
                f'\n        active={self.active},' \
                f'\n        log_channel_id={self.log_channel_id}' \
-               f'\n       )'
+               f'\n    )'
 
 
 class Trivia:
-    def __init__(self, question, answer: str = ""):
+    def __init__(self, question, answer):
         self.question = question
         self.answer = answer
 
