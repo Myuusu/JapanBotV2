@@ -40,15 +40,22 @@ async def trim(output: str = "", length: int = 2000):
     return output
 
 
-async def read_website(url: str, format: str, params={}, headers={}, payload={}):
-    async with aiohttp.ClientSession() as session:
-        if payload:
-            return await session_post(session=session, url=url, format=format, params=params, headers=headers)
-        else:
-            return await session_get(session=session, url=url, format=format, params=params, headers=headers)
+async def read_website(url: str, format: str, method: str = "GET", params={}, headers={}, data={}):
+    if headers != {}:
+        async with aiohttp.ClientSession(headers=headers) as session:
+            if method == "POST":
+                return await session_post(session=session, url=url, format=format, data=data)
+            else:
+                return await session_get(session=session, url=url, format=format, params=params)
+    else:
+        async with aiohttp.ClientSession() as session:
+            if method == "POST":
+                return await session_post(session=session, url=url, format=format, data=data)
+            else:
+                return await session_get(session=session, url=url, format=format, params=params)
 
 
-async def session_get(session, url: str, format: str, params={}, headers={}):
+async def session_get(session, url: str, format: str, params={}):
     async with session.get(url=url, params=params, headers=headers) as resp:
         if format == "json":
             output = await resp.json()
@@ -60,8 +67,8 @@ async def session_get(session, url: str, format: str, params={}, headers={}):
     return output
 
 
-async def session_post(session, url: str, format: str, params={}, headers={}):
-    async with session.post(url=url, params=params, headers=headers) as resp:
+async def session_post(session, url: str, format: str, data={}):
+    async with session.post(url=url, data=data) as resp:
         if format == "json":
             output = await resp.json()
         elif format == "read":

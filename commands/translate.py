@@ -51,21 +51,36 @@ class Translate(commands.Cog):
         else:
             await ctx.send("\n".join(output))
 
-    @commands.command(name="translate", aliases=['trans', 'convert'])
-    async def translate(self, ctx, *, query):
-        url = f'https://naveropenapi.apigw.ntruss.com/n2mt/v1/translation'
-        params = {
-            "source": "en",
-            "target": "ja",
-            "text": query
-        }
+    @commands.command(name="translate", aliases=['ja', 'en', 'convert'])
+    @commands.cooldown(rate=1, per=10, type=commands.BucketType.user)
+    async def translate(self, ctx, *, query: str):
+        if len(query) > 280:
+            await ctx.send("Error: Character Count Exceeded. Please Use Fewer Characters!")
+            return
+        prefix_length = len(await self.bot.get_prefix(ctx.message))
+        if ctx.message.content[prefix_length:prefix_length + 2].lower() == "ja":
+            data = {
+                "source": "ja",
+                "target": "en",
+                "text": query
+            }
+        else:
+            data = {
+                "source": "en",
+                "target": "ja",
+                "text": query
+            }
+        url = 'https://openapi.naver.com/v1/papago/n2mt'
         headers = {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "X-NCP-APIGW-API-KEY-ID": x_naver_client_id,
-            "X-NCP-APIGW-API-KEY": x_naver_client_secret
+            "X-Naver-Client-Id": x_naver_client_id,
+            "X-Naver-Client-Secret": x_naver_client_secret,
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
         }
-        results = await read_website(url=url, format="read", headers=headers, params=params, payload={""})
-        await ctx.send(await trim(results))
+        results = await read_website(url=url, method="POST", format="json", headers=headers, data=data)
+        try:
+            await ctx.send(f'/tts {results["message"]["result"]["translatedText"]}')
+        except KeyError:
+            await ctx.send("Translation Was Not Able To Be Found")
 
 
 def setup(bot):
