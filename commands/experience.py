@@ -1,4 +1,5 @@
 from discord.ext import commands
+from math import ceil
 from .utility import clean_float
 
 
@@ -14,7 +15,7 @@ class Experience(commands.Cog):
         ]
     )
     async def convert_lvl_to_xp(self, ctx, lvl, external=True):
-        lvl = clean_float(lvl)
+        lvl = ceil(await clean_float(lvl))
         try:
             if external:
                 return await ctx.send(f'Level {lvl} is reached at: {self.bot.level_list[lvl].exp} xp.')
@@ -31,7 +32,7 @@ class Experience(commands.Cog):
         ]
     )
     async def convert_xp_to_lvl(self, ctx, xp, external=True):
-        xp = clean_float(xp)
+        xp = ceil(await clean_float(xp))
         for i in self.bot.level_list.keys():
             if i == 99:
                 if external:
@@ -48,17 +49,17 @@ class Experience(commands.Cog):
 
     @commands.command(name='xp_to_99', aliases=['xpto99', 'expto99', 'exp_to_99'])
     async def xp_to_99(self, ctx, xp, external=True):
-        xp = clean_float(xp)
+        xp = ceil(await clean_float(xp))
         if external:
-            await ctx.send(f'{13034431 - xp:,d} xp remaining till Level 99.')
+            await ctx.send(f'{13034431 - xp:,} xp remaining till Level 99.')
         else:
             return 13034431 - xp
 
     @commands.command(name='xp_to_max', aliases=['xptomax', 'exptomax', 'exp_to_max'])
     async def xp_to_max(self, ctx, xp, external=True):
-        xp = clean_float(xp)
+        xp = ceil(await clean_float(xp))
         if external:
-            await ctx.send(f'{200000000 - xp:,d} xp remaining till Max (200M xp).')
+            await ctx.send(f'{200000000 - xp:,} xp remaining till Max (200M xp).')
         else:
             return 200000000 - xp
 
@@ -70,7 +71,7 @@ class Experience(commands.Cog):
         ]
     )
     async def xp_to_lvl(self, ctx, xp, lvl, external=True):
-        xp = clean_float(xp)
+        xp = ceil(await clean_float(xp))
         goal_exp = await self.convert_lvl_to_xp(ctx=ctx, lvl=lvl, external=False)
         if external:
             await ctx.send(

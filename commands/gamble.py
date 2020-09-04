@@ -20,12 +20,10 @@ class Gamble(commands.Cog):
             await self.bot.insert_account(ctx.author.id)
             await ctx.send("Welcome to the bot! We've given you 1500 credits!")
             self.bot.account_list[ctx.author.id].balance += 500
-        finally:
-            await self.bot.update_account_list()
 
     @commands.command(name='slot', aliases=['slots', 'bet'])
     @commands.cooldown(rate=1, per=10, type=commands.BucketType.user)
-    async def slot(self, ctx, input_string: str = "help", spins: str = "1", multiplier: int = 1, testing: bool = False):
+    async def slot(self, ctx, input_string="help", spins="1", multiplier="1", testing="False"):
         if input_string == "help":
             des = []
             for machine in self.bot.slot_machines.keys():
@@ -33,7 +31,8 @@ class Gamble(commands.Cog):
             des.append("Enter the slot command, followed by the name of the slot machine you'd like to play!")
             await ctx.send(embed=Embed(title="Slot Machine List", description="\n".join(des), color=0x00ff00))
         else:
-            spins = clean_float(spins)
+            spins = await clean_float(spins)
+            multiplier = await clean_float(multiplier)
             try:
                 user = self.bot.account_list[ctx.author.id]
             except KeyError:
@@ -44,11 +43,10 @@ class Gamble(commands.Cog):
             except KeyError:
                 return await ctx.send('Machine Not Recognized! Please reissue command.')
 
-            if machine.cost * multiplier * spins <= user.balance:
-                user.balance -= machine.cost * multiplier * spins
+            cost_to_play = machine.cost * multiplier * spins
+            if cost_to_play <= user.balance:
+                user.balance -= cost_to_play
                 user.balance += await machine.spin(ctx, spins, multiplier, testing)
-                await self.bot.update_slot_machines()
-                await self.bot.update_account_list()
                 output = f'Spun {spins} times at {machine.cost * multiplier} per spin.' \
                          f'\nCoins In: {machine.coins_in:,}' \
                          f'\nCoins Out: {machine.coins_out:,}' \
@@ -58,7 +56,7 @@ class Gamble(commands.Cog):
                     output += "\n:redAlarm: :redAlarm: :redAlarm: :redAlarm:"
                 await ctx.send(output)
             else:
-                await ctx.send('You do not have enough points!\nMaybe try to get some charity.')
+                await ctx.send('You do not have enough points!\nMaybe try to use the daily command!')
             return
 
     @commands.command(name='points', aliases=['pts', 'check_points'])
@@ -80,7 +78,6 @@ class Gamble(commands.Cog):
             await current.reset()
             await ctx.send(f"Reset the following for the {machine_name} Slot Machine:"
                            f"\nCoins In, Coins Out, Play Count, Jackpots")
-            await self.bot.update_slot_machines()
         else:
             def test(m):
                 return ctx.channel == m.channel and ctx.author == m.author and "confirm" == m.content
@@ -91,7 +88,6 @@ class Gamble(commands.Cog):
                     await current.reset()
                     await ctx.send(f"Reset the following for the {machine_name} Slot Machine:"
                                    f"\nCoins In, Coins Out, Play Count, Jackpots")
-                    await self.bot.update_slot_machines()
             except asyncio.TimeoutError:
                 return await ctx.send('Timed Out. Please reissue command.')
 

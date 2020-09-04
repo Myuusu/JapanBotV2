@@ -3,13 +3,15 @@ import datetime
 import discord
 import humanize
 import itertools
+import os
 import re
 import sys
 import traceback
 import wavelink
-from config import node_settings
+from config import node_settings, lavalink_exe_path
 from discord.ext import commands
 from typing import Union
+from commands.utility import check_process_running
 
 
 async def cog_check(ctx):
@@ -64,6 +66,8 @@ class Music(commands.Cog):
         self.bot = bot
         self.station_list = bot.station_list
         self.controllers = {}
+        if check_process_running('java'):
+            os.startfile(lavalink_exe_path)
         if not hasattr(bot, 'wavelink'):
             self.bot.wavelink = wavelink.Client(bot=self.bot)
         self.bot.loop.create_task(self.start_nodes())

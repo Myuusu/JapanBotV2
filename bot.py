@@ -32,6 +32,21 @@ class Bot(commands.Bot):
             if filename.endswith('.py'):
                 self.load_extension(f'commands.{filename[:-3]}')
 
+        self.bg_task = self.loop.create_task(self.update_files())
+
+    async def update_files(self):
+        await self.wait_until_ready()
+
+        while not self.is_closed():
+            await self.update()
+            await asyncio.sleep(60)
+
+    async def update(self):
+        await self.update_guild_list()
+        await self.update_account_list()
+        await self.update_slot_machines()
+        await self.update_trivia_list()
+
     async def update_guild_list(self):
         output = []
         for guild_id in self.guild_list.keys():
@@ -59,21 +74,7 @@ class Bot(commands.Bot):
             with open('storage/slot_machines.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
                 fp.write(f'from classes import SlotMachine, Emoji\n\nslot_machines = {{\n    {output_string}\n}}\n')
 
-    async def get_prefix(self, message):
-        try:
-            self.guild_list[message.guild.id].message_count += 1
-        except KeyError:
-            await self.insert_guild(message.guild.id)
-        finally:
-            await self.update_guild_list()
-            return self.guild_list[message.guild.id].prefix
-
-    async def insert_account(self, author_id):
-        self.account_list.update({author_id: Account(user_id=author_id)})
-        await self.update_account_list()
-
-    async def insert_trivia(self, question, answer: str = ""):
-        self.trivia_list.update({question: Trivia(question=question, answer=answer)})
+    async def update_trivia_list(self):
         output = []
         for trivia_question in self.trivia_list.keys():
             output.append(self.trivia_list[trivia_question].get_json())
@@ -82,9 +83,22 @@ class Bot(commands.Bot):
             with open('storage/trivia_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
                 fp.write(f'from classes import Trivia\n\ntrivia_list = {{\n    {output_string}\n}}\n')
 
+    async def get_prefix(self, message):
+        try:
+            self.guild_list[message.guild.id].message_count += 1
+        except KeyError:
+            await self.insert_guild(message.guild.id)
+        finally:
+            return self.guild_list[message.guild.id].prefix
+
+    async def insert_account(self, author_id):
+        self.account_list.update({author_id: Account(user_id=author_id)})
+
+    async def insert_trivia(self, question, answer: str = ""):
+        self.trivia_list.update({question: Trivia(question=question, answer=answer)})
+
     async def insert_guild(self, guild_id):
         self.guild_list.update({guild_id: Guild(guild_id=guild_id)})
-        await self.update_guild_list()
 
     async def on_ready(self):
         await self.change_presence(
@@ -104,8 +118,6 @@ class Bot(commands.Bot):
         except KeyError:
             self.guild_list.update({guild.id: Guild(guild_id=guild.id)})
             print(f'Connected To: {str(guild.id)}')
-        finally:
-            await self.update_guild_list()
 
     async def on_guild_remove(self, guild):
         try:
@@ -114,7 +126,6 @@ class Bot(commands.Bot):
             self.guild_list.update({guild.id: Guild(guild_id=guild.id, active=False)})
         finally:
             print(f'Disconnected From: {str(guild.id)}')
-            await self.update_guild_list()
 
     async def on_message(self, message):
         if self.trivia_channel_answers is None:

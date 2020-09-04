@@ -14,9 +14,9 @@ class CurrencyExchanger(commands.Cog):
         if base_currency == "":
             prefix_length = len(await self.bot.get_prefix(ctx.message))
             base_currency = ctx.message.content[prefix_length-1:prefix_length+2].upper()
-            input_amount = clean_float(input_amount)
+            input_amount = await clean_float(input_amount)
         elif input_amount.upper() in output_currency:
-            temp = clean_float(base_currency)
+            temp = await clean_float(base_currency)
             base_currency = input_amount.upper()
             input_amount = temp
 

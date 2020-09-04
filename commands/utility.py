@@ -1,19 +1,20 @@
 import aiohttp
 import asyncio
-import discord
 import datetime
+import discord
 import lxml.html
 import os
-import re
+import psutil
 import random
+import re
 import secrets
 import urllib
 from discord.ext import commands
 from urllib.parse import quote_plus
 
 
-def clean_float(string_to_process):
-    string_to_process = string_to_process.replace(",", "").lower()
+async def clean_float(string_to_process):
+    string_to_process = str(string_to_process).replace(",", "").lower()
     multiply_by_ten = 0
     if "k" in string_to_process:
         multiply_by_ten += 3
@@ -21,13 +22,22 @@ def clean_float(string_to_process):
         multiply_by_ten += 6
     if "b" in string_to_process:
         multiply_by_ten += 9
+    base = float(re.sub("[.,kmb]", "", string_to_process))
     if "." in string_to_process:
         output_string = string_to_process.split(".")
-        return int(re.sub("[.,kmb]", "", string_to_process)) * pow(
-                10, multiply_by_ten - len(output_string[1])
-            )
+        return base * pow(10, multiply_by_ten - len(output_string[1]))
     else:
-        return int(re.sub("[,kmb]", "", string_to_process)) * pow(10, multiply_by_ten)
+        return base * pow(10, multiply_by_ten)
+
+
+def check_process_running(process_name):
+    for proc in psutil.process_iter():
+        try:
+            if process_name.lower() in proc.name().lower():
+                return True
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    return False
 
 
 def url_encode(query: str):
@@ -99,6 +109,22 @@ class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(name='eval', aliases=['evaluate'])
+    async def eval(self, ctx, *, expression: str = ""):
+        if expression == "":
+            await ctx.send("Please Enter Your Expression.")
+
+            def check(m):
+                return ctx.channel == m.channel and ctx.author == m.author
+            try:
+                response = await self.bot.wait_for('message', check=check, timeout=10)
+                expression = response.content
+                await ctx.send(f'{expression} = {eval(expression)}')
+            except asyncio.TimeoutError:
+                await msg.edit(content='Timed Out. Please reissue command.')
+        else:
+            await ctx.send(f'{expression} = {await clean_float(eval(expression))}')
+
     @commands.command(name='load', aliases=['reload'])
     @commands.has_permissions(administrator=True)
     async def load(self, ctx):
@@ -113,9 +139,6 @@ class Utility(commands.Cog):
                         pass
         await msg.edit(content='Reloaded Command Files!')
         msg = await ctx.send('Reloading Storage Files!')
-        await self.bot.update_guild_list()
-        await self.bot.update_account_list()
-        await self.bot.update_slot_machines()
         await msg.edit(content='Reloaded Storage Files!')
 
     @commands.command(name='clear', aliases=['cls', 'empty'])
@@ -158,7 +181,6 @@ class Utility(commands.Cog):
                 self.bot.guild_list[ctx.guild.id].prefix = [prefix]
             else:
                 self.bot.guild_list[ctx.guild.id].prefix = prefix
-            await self.bot.update_guild_list()
             await ctx.send(f'The prefix has been changed to: {prefix}')
         else:
             await ctx.send('Invalid Prefix. Prefix has not changed.')
@@ -167,7 +189,6 @@ class Utility(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def log(self, ctx, log_channel_id):
         self.bot.guild_list[ctx.guild.id].log_channel_id = log_channel_id
-        await self.bot.update_guild_list()
         await ctx.send(f'The log_channel has been changed to this channel id: {log_channel_id}')
 
     @commands.command(name='eight_ball', aliases=['8ball', 'eightball', '8_ball', '8'])

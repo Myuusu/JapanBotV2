@@ -7,10 +7,10 @@ slot_machines = {
         rows=3,
         reels=3,
         machine_type="slot",
-        jackpots=0,
-        play_count=0,
-        coins_out=0,
-        coins_in=0,
+        jackpots=378,
+        play_count=1000201,
+        coins_out=5757130.6000000015,
+        coins_in=6000055.0,
         emojis=[
             Emoji(
                 emoji=u'<:bar:740308928398622822>',

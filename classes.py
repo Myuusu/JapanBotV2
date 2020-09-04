@@ -75,7 +75,7 @@ class SlotMachine:
                 return 0
 
     async def calculate_winnings(self, ranks_matrix: [[]], multiplier=1):
-        # print(ranks_matrix)
+        print(ranks_matrix)
         winnings = 0
         if self.reels == 3:
             if self.rows == 1:
@@ -94,7 +94,6 @@ class SlotMachine:
         self.coins_out += multiplier * winnings
         self.play_count += 1
         self.coins_in += self.cost * multiplier
-        # print(f'Coins In: {self.coins_in}\nCoins Out: {self.coins_out}\nProfit: {self.coins_in - self.coins_out}')
         return multiplier * winnings
 
     def get_reel_weight(self, reel_position: int):
@@ -103,7 +102,7 @@ class SlotMachine:
             weights_from_each_emoji.append(current_emoji.weights[reel_position])
         return weights_from_each_emoji
 
-    async def spin(self, ctx, spins: int = 1, multiplier: int = 1, testing: bool = False):
+    async def spin(self, ctx, spins: int = 1, multiplier: int = 1, testing: str = "False"):
         results = 0
         for _ in range(spins):
             """ This is where the machine will "spin" each of its wheels """
@@ -119,7 +118,7 @@ class SlotMachine:
             else:
                 emoji_matrix = [["?" for _ in range(self.reels)] for _ in range(self.rows)]
                 ranks_matrix = [["#" for _ in range(self.reels)] for _ in range(self.rows)]
-                if not testing:
+                if testing == "False":
                     msg = await ctx.send(f"Spinning! Good luck {ctx.author.name}!")
                     for j in range(self.reels):
                         await asyncio.sleep(random.uniform(1, 4))
@@ -146,7 +145,6 @@ class SlotMachine:
                         results += output
                 else:
                     for reel in range(self.reels):
-                        await asyncio.sleep(random.uniform(1, 4))
                         for row in range(self.rows):
                             ranks_matrix[row][reel] = spin_results[reel][row].rank
                             emoji_matrix[row][reel] = spin_results[reel][row].emoji
