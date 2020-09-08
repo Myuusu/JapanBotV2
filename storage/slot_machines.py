@@ -7,18 +7,18 @@ slot_machines = {
         rows=3,
         reels=3,
         machine_type="slot",
-        jackpots=378,
-        play_count=1000201,
-        coins_out=5757130.6000000015,
-        coins_in=6000055.0,
+        jackpots=405,
+        play_count=1000000,
+        coins_out=4719425.0,
+        coins_in=5000000.0,
         emojis=[
             Emoji(
-                emoji=u'<:bar:740308928398622822>',
+                emoji=u'<:Bar:740998677979725864>',
                 rank=0,
                 weights=[4.347826086, 4.347826086, 4.347826086]
             ),
             Emoji(
-                emoji=u'<:SlotmachineSeven:743190741920251994>',
+                emoji=u'<:SlotMachineSeven:752965704663433325>',
                 rank=1,
                 weights=[13.04347826, 4.347826086, 4.347826086]
             ),
@@ -56,12 +56,12 @@ slot_machines = {
         coins_in=0,
         emojis=[
             Emoji(
-                emoji=u'<:bar:740998677979725864>',
+                emoji=u'<:Bar:740998677979725864>',
                 rank=0,
                 weights=[4.347826086, 4.347826086, 4.347826086]
             ),
             Emoji(
-                emoji=u':seven:',
+                emoji=u'<:SlotMachineSeven:752965704663433325>',
                 rank=1,
                 weights=[13.04347826, 4.347826086, 4.347826086]
             ),

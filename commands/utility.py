@@ -9,8 +9,13 @@ import random
 import re
 import secrets
 import urllib
+from classes import Trivia
 from discord.ext import commands
 from urllib.parse import quote_plus
+
+
+async def roll_die(sides=6):
+    return random.randint(1, sides)
 
 
 async def clean_float(string_to_process):
@@ -143,7 +148,7 @@ class Utility(commands.Cog):
 
     @commands.command(name='clear', aliases=['cls', 'empty'])
     @commands.has_permissions(manage_messages=True)
-    async def clear(self, ctx, amount: int):
+    async def clear(self, ctx, amount: int = 50):
         await ctx.channel.purge(limit=amount)
 
     @commands.command(name='ban', aliases=['banned'])
@@ -188,8 +193,12 @@ class Utility(commands.Cog):
     @commands.command(name='log', aliases=['log_channel', 'update_log'], help='Set your log_channel with this')
     @commands.has_permissions(administrator=True)
     async def log(self, ctx, log_channel_id):
-        self.bot.guild_list[ctx.guild.id].log_channel_id = log_channel_id
-        await ctx.send(f'The log_channel has been changed to this channel id: {log_channel_id}')
+        try:
+            self.bot.guild_list[ctx.guild.id].log_channel_id = log_channel_id
+        except KeyError:
+            self.guild_list.update({guild.id: Guild(guild_id=ctx.guild.id, log_channel_id=log_channel_id)})
+        finally:
+            await ctx.send(f'The log_channel has been changed to this channel id: {log_channel_id}')
 
     @commands.command(name='eight_ball', aliases=['8ball', 'eightball', '8_ball', '8'])
     async def eight_ball(self, ctx, question):
@@ -198,16 +207,6 @@ class Utility(commands.Cog):
     @commands.command(name='ping', aliases=['ding'])
     async def ping(self, ctx):
         await ctx.send(f'Pong! {round(self.bot.latency * 1000)}ms')
-
-    @commands.command(name='test_emojis', aliases=['test_emoji'])
-    async def test_emojis(self, ctx):
-        await ctx.send(
-            f'<:Tangleroot:740607927257399347> '
-            f'<:RiftGuardian:740607758780596334> '
-            f'<:GiantSquirrel:740607823280603166> '
-            f'<:BlackRocky:740607984916496475> '
-            f'<:Beaver:740607855685533787>'
-        )
 
     @commands.command(name='hack', aliases=['code', 'initiate_hack'])
     async def hack(self, ctx, user: discord.Member):
@@ -244,46 +243,54 @@ class Utility(commands.Cog):
         await ctx.author.send(f"🎁 **Here is your password:**\n{secrets.token_urlsafe(num_bytes)}")
 
     @commands.command(name="kg")
-    async def kg(self, ctx, output: int = ""):
+    async def kg(self, ctx, output):
+        output = await clean_float(output)
         converted_weight_lbs = round(output / 0.45, 2)
         await ctx.send(f"{output} kg is {converted_weight_lbs} pounds")
 
     @commands.command(name="lbs")
-    async def lbs(self, ctx, output: int = ""):
+    async def lbs(self, ctx, output):
+        output = await clean_float(output)
         converted_weight_kg = round(output * 0.45, 2)
         await ctx.send(f"{output} lbs is {converted_weight_kg} kg")
 
     @commands.command(name="cm")
-    async def cm(self, ctx, output: int = ""):
+    async def cm(self, ctx, output):
+        output = await clean_float(output)
         converted_length_inch = round(output / 2.54, 2)
         await ctx.send(f"{output} cm is {converted_length_inch} inches")
 
     @commands.command(name="inch", aliases=["inches"])
-    async def inch(self, ctx, output: int = ""):
+    async def inch(self, ctx, output):
+        output = await clean_float(output)
         converted_length_cm = round(output * 2.54, 2)
         await ctx.send(f"{output} inches is {converted_length_cm} cm")
 
     @commands.command(name="km")
-    async def km(self, ctx, output: int = ""):
+    async def km(self, ctx, output):
+        output = await clean_float(output)
         converted_distance = round(output * 0.621371, 2)
         await ctx.send(f"{output} km is {converted_distance} miles")
 
     @commands.command(name="miles")
-    async def miles(self, ctx, output: int = ""):
+    async def miles(self, ctx, output):
+        output = await clean_float(output)
         converted_distance = round(output / 0.621371, 2)
         await ctx.send(f"{output} km is {converted_distance} km")
 
     @commands.command(name="celsius", aliases=['cel', 'cels'])
-    async def celsius(self, ctx, output: float = ""):
+    async def celsius(self, ctx, output):
+        output = await clean_float(output)
         temp = round(output / 5 * 9 + 32, 2)
         await ctx.send(f"{output} °C is {temp} °F")
 
     @commands.command(name="fahrenheit", aliases=['fah', 'fahr'])
-    async def fahrenheit(self, ctx, output: float = ""):
+    async def fahrenheit(self, ctx, output):
+        output = await clean_float(output)
         temp = round((output - 32) * 5 / 9, 2)
         await ctx.send(f"{output} °F is {temp} °C")
 
-    @commands.command(name='update_trivia', aliases=['update_trivia_answer'])
+    @commands.command(name='update_trivia', aliases=['update_trivia_answer', 'trivia_update'])
     async def update_trivia_answer(self, ctx, *, question):
         msg = await ctx.send("Please enter the answer to the question.")
 
@@ -291,7 +298,7 @@ class Utility(commands.Cog):
             return ctx.channel == m.channel and ctx.author == m.author
         try:
             response = await self.bot.wait_for('message', check=check, timeout=10)
-            await self.bot.insert_trivia(question=question, answer=response.content)
+            self.bot.trivia_list.update({question: Trivia(question=question, answer=response.content)})
             await msg.edit(content=f'Updated Successfully.```Question: {question}\nAnswer: {response.content}```')
             not_in_channel = True
             async for message in self.bot.trivia_channel_answers.history():

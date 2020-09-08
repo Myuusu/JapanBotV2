@@ -75,7 +75,6 @@ class SlotMachine:
                 return 0
 
     async def calculate_winnings(self, ranks_matrix: [[]], multiplier=1):
-        print(ranks_matrix)
         winnings = 0
         if self.reels == 3:
             if self.rows == 1:
@@ -108,17 +107,16 @@ class SlotMachine:
             """ This is where the machine will "spin" each of its wheels """
             spin_results = []
             for i in range(self.reels):
-                spin_results.append(
-                    random.choices(
-                        population=self.emojis,
-                        weights=self.get_reel_weight(i),
-                        k=self.rows
-                    )
+                reel_result = random.choices(
+                    population=self.emojis,
+                    weights=self.get_reel_weight(i),
+                    k=self.rows
                 )
+                spin_results.append(reel_result)
             else:
-                emoji_matrix = [["?" for _ in range(self.reels)] for _ in range(self.rows)]
-                ranks_matrix = [["#" for _ in range(self.reels)] for _ in range(self.rows)]
                 if testing == "False":
+                    emoji_matrix = [["?" for _ in range(self.reels)] for _ in range(self.rows)]
+                    ranks_matrix = [["#" for _ in range(self.reels)] for _ in range(self.rows)]
                     msg = await ctx.send(f"Spinning! Good luck {ctx.author.name}!")
                     for j in range(self.reels):
                         await asyncio.sleep(random.uniform(1, 4))
@@ -144,10 +142,10 @@ class SlotMachine:
                             await ctx.send(f"Don't Give Up, Try Again! {str(output)}")
                         results += output
                 else:
+                    ranks_matrix = [["#" for _ in range(self.reels)] for _ in range(self.rows)]
                     for reel in range(self.reels):
                         for row in range(self.rows):
                             ranks_matrix[row][reel] = spin_results[reel][row].rank
-                            emoji_matrix[row][reel] = spin_results[reel][row].emoji
                     else:
                         results += await self.calculate_winnings(ranks_matrix, multiplier)
         else:
@@ -322,7 +320,7 @@ class Guild:
 
 
 class Trivia:
-    def __init__(self, question, answer):
+    def __init__(self, question, answer: str = ""):
         self.question = question
         self.answer = answer
 
