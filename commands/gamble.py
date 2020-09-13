@@ -1,6 +1,6 @@
 import asyncio
 from classes import Deck
-from commands.utility import clean_float, roll_die
+from commands.utility import clean_float, one_in
 from discord import Embed
 from discord.ext import commands
 
@@ -17,7 +17,7 @@ class Gamble(commands.Cog):
             self.bot.account_list[ctx.author.id].balance += 500
             await ctx.send(f'Increased credits by 500!')
         except KeyError:
-            self.account_list.update({author_id: Account(user_id=ctx.author.id)})
+            self.bot.account_list.update({author_id: Account(user_id=ctx.author.id)})
             await ctx.send("Welcome to the bot! We've given you 1500 credits!")
             self.bot.account_list[ctx.author.id].balance += 500
 
@@ -36,7 +36,7 @@ class Gamble(commands.Cog):
             try:
                 user = self.bot.account_list[ctx.author.id]
             except KeyError:
-                self.account_list.update({author_id: Account(user_id=ctx.author.id)})
+                self.bot.account_list.update({author_id: Account(user_id=ctx.author.id)})
                 user = self.bot.account_list[ctx.author.id]
                 await ctx.send("Welcome to the bot! We've given you 1000 credits to get started!")
             try:
@@ -67,12 +67,17 @@ class Gamble(commands.Cog):
                 await ctx.send('You do not have enough points!\nMaybe try to use the daily command!')
             return
 
-    @commands.command(name='points', aliases=['pts', 'check_points'])
+    @commands.command(name='points', aliases=['pts', 'check_points', 'balance'])
     async def points(self, ctx):
-        assert self.bot.account_list[ctx.author.id], await ctx.send("Current user does not have an account yet.")
-        points = str(self.bot.account_list[ctx.author.id].balance)
-        await ctx.send(f'{ctx.author.name} currently has {points} points!')
-        return points
+        try:
+            points = self.bot.account_list[ctx.author.id].balance
+            await ctx.send(f'{ctx.author.name} currently has {str(points)} points!')
+            return points
+        except KeyError:
+            self.bot.account_list.update({author_id: Account(user_id=ctx.author.id)})
+            points = self.bot.account_list[ctx.author.id].balance
+            await ctx.send(f'{ctx.author.name} currently has {str(points)} points!')
+            return points
 
     @commands.command(name='reset_slot', aliases=['rm', 'rs', 'reset_machine', 'reset_slot_machine'])
     @commands.has_permissions(administrator=True)
@@ -107,9 +112,9 @@ class Gamble(commands.Cog):
             dice_arr_to_string = []
             dice_sum = 0
             for _ in range(int(qty)):
-                current = await roll_die(int(sides))
-                dice_arr_to_string.append(str(current))
+                current = await one_in(int(sides))
                 dice_sum += current
+                dice_arr_to_string.append(str(current))
             else:
                 output.append(f'{i}: {dice_sum} [{",".join(dice_arr_to_string)}]')
         else:

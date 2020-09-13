@@ -329,3 +329,17 @@ class Trivia:
                f'\n        question="{self.question}",' \
                f'\n        answer="{self.answer}"' \
                f'\n    )'
+
+
+class Timer:
+    def __init__(self, end_time, user_id, name):
+        self.end_time = end_time
+        self.user_id = user_id
+        self.name = name
+
+    def get_json(self):
+        return f'"{self.user_id|self.name}": Timer(' \
+               f'\n        end_time="{self.end_time}",' \
+               f'\n        user_id={self.user_id},' \
+               f'\n        name="{self.name}"' \
+               f'\n    )'

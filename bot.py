@@ -6,6 +6,8 @@ import traceback
 from classes import Guild, Account, LolAccount, Trivia
 from commands.utility import trim
 from config import bot_token, t_b, t_c, t_c_a, t_q_h, t_a_h
+from datetime import datetime
+from dateutil.parser import parse
 from discord.ext import commands, tasks
 from random import randrange
 from storage.account_list import account_list
@@ -14,6 +16,7 @@ from storage.guild_list import guild_list
 from storage.level_list import level_list
 from storage.slot_machines import slot_machines
 from storage.station_list import station_list
+from storage.timer_list import timer_list
 from storage.trivia_list import trivia_list
 
 
@@ -28,18 +31,50 @@ class Bot(commands.Bot):
         self.slot_machines = slot_machines
         self.station_list = station_list
         self.trivia_list = trivia_list
+        self.timer_list = timer_list
 
         for filename in os.listdir('./commands'):
             if filename.endswith('.py'):
                 self.load_extension(f'commands.{filename[:-3]}')
 
-    @tasks.loop(seconds=60)
+    @tasks.loop(seconds=30, count=None, reconnect=True)
     async def update(self):
-        await self.wait_until_ready()
         await self.update_guild_list()
         await self.update_account_list()
         await self.update_slot_machines()
         await self.update_trivia_list()
+        items_to_remove = await self.update_timer_list()
+        await self.remove_timers(items_to_remove)
+
+    async def remove_timers(self, indices_to_remove=[]):
+        if indices_to_remove:
+            for iter in indices_to_remove:
+                self.timer_list[iter].pop()
+
+    async def update_timer_list(self):
+        output = []
+        remove = []
+        for iter in self.timer_list.keys():
+            current = self.timer_list[iter]
+            if current.end_time < datetime.now():
+                remove.append(iter)
+                user = self.get_user(current.user_id)
+                if user is not None:
+                    await user.send(f'{current.name} timer expired at {current.end_time}')
+                else:
+                    print(
+                        f'{current.name} timer expired at {current.end_time},'
+                        f' but user with id {current.user_id} could not be found.'
+                    )
+            else:
+                output.append(current.get_json())
+        else:
+            output_string = ",\n    ".join(output)
+            with open('storage/timer_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
+                fp.write(f'from classes import Timer\n\ntimer_list = {{\n    {output_string}\n}}\n')
+            fp.close()
+        return remove
+
 
     async def update_guild_list(self):
         output = []
@@ -49,6 +84,7 @@ class Bot(commands.Bot):
             output_string = ",\n    ".join(output)
             with open('storage/guild_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
                 fp.write(f'from classes import Guild\n\nguild_list = {{\n    {output_string}\n}}\n')
+            fp.close()
 
     async def update_account_list(self):
         output = []
@@ -58,6 +94,7 @@ class Bot(commands.Bot):
             output_string = ",\n    ".join(output)
             with open('storage/account_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
                 fp.write(f'from classes import Account\n\naccount_list = {{\n    {output_string}\n}}\n')
+            fp.close()
 
     async def update_slot_machines(self):
         output = []
@@ -67,6 +104,7 @@ class Bot(commands.Bot):
             output_string = ",\n    ".join(output)
             with open('storage/slot_machines.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
                 fp.write(f'from classes import SlotMachine, Emoji\n\nslot_machines = {{\n    {output_string}\n}}\n')
+            fp.close()
 
     async def update_trivia_list(self):
         output = []
@@ -76,6 +114,7 @@ class Bot(commands.Bot):
             output_string = ",\n    ".join(output)
             with open('storage/trivia_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
                 fp.write(f'from classes import Trivia\n\ntrivia_list = {{\n    {output_string}\n}}\n')
+            fp.close()
 
     async def get_prefix(self, message):
         try:
@@ -86,9 +125,10 @@ class Bot(commands.Bot):
             return self.guild_list[message.guild.id].prefix
 
     async def on_ready(self):
+        print("Ready")
         self.update.start()
         self.trivia_channel_answers = self.get_channel(t_c_a)
-        if self.trivia_channel_answers:
+        if self.trivia_channel_answers is not None:
             output = []
             for iter in self.trivia_list.keys():
                 if self.trivia_list[iter].answer is None:
@@ -97,18 +137,14 @@ class Bot(commands.Bot):
                 if output:
                     output_string = "\n".join(output)
                     print(f'Needs Answers: \n{output_string}')
+        else:
+            print("Error: No Trivia Channel Found! Result: Trivia answers will NOT be sent.")
 
     async def on_guild_join(self, guild):
-        try:
-            self.guild_list[guild.id].active = True
-        except KeyError:
-            self.guild_list.update({guild.id: Guild(guild_id=guild.id)})
+        self.guild_list.update({guild.id: Guild(guild_id=guild.id, active=True)})
 
     async def on_guild_remove(self, guild):
-        try:
-            self.guild_list[guild.id].active = False
-        except KeyError:
-            self.guild_list.update({guild.id: Guild(guild_id=guild.id, active=False)})
+        self.guild_list.update({guild.id: Guild(guild_id=guild.id, active=False)})
 
     async def on_message(self, message):
         if self.trivia_channel_answers is None:

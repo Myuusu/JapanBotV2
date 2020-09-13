@@ -1,6 +1,5 @@
 import aiohttp
 import asyncio
-import datetime
 import discord
 import lxml.html
 import os
@@ -9,12 +8,13 @@ import random
 import re
 import secrets
 import urllib
-from classes import Trivia
+from datetime import datetime
+from dateutil.parser import parse
 from discord.ext import commands
 from urllib.parse import quote_plus
 
 
-async def roll_die(sides=6):
+async def one_in(sides: int = 6):
     return random.randint(1, sides)
 
 
@@ -241,76 +241,6 @@ class Utility(commands.Cog):
         if hasattr(ctx, 'guild') and ctx.guild is not None:
             await ctx.send(f"Sending you a private message with your random generated password **{ctx.author.name}**")
         await ctx.author.send(f"🎁 **Here is your password:**\n{secrets.token_urlsafe(num_bytes)}")
-
-    @commands.command(name="kg")
-    async def kg(self, ctx, output):
-        output = await clean_float(output)
-        converted_weight_lbs = round(output / 0.45, 2)
-        await ctx.send(f"{output} kg is {converted_weight_lbs} pounds")
-
-    @commands.command(name="lbs")
-    async def lbs(self, ctx, output):
-        output = await clean_float(output)
-        converted_weight_kg = round(output * 0.45, 2)
-        await ctx.send(f"{output} lbs is {converted_weight_kg} kg")
-
-    @commands.command(name="cm")
-    async def cm(self, ctx, output):
-        output = await clean_float(output)
-        converted_length_inch = round(output / 2.54, 2)
-        await ctx.send(f"{output} cm is {converted_length_inch} inches")
-
-    @commands.command(name="inch", aliases=["inches"])
-    async def inch(self, ctx, output):
-        output = await clean_float(output)
-        converted_length_cm = round(output * 2.54, 2)
-        await ctx.send(f"{output} inches is {converted_length_cm} cm")
-
-    @commands.command(name="km")
-    async def km(self, ctx, output):
-        output = await clean_float(output)
-        converted_distance = round(output * 0.621371, 2)
-        await ctx.send(f"{output} km is {converted_distance} miles")
-
-    @commands.command(name="miles")
-    async def miles(self, ctx, output):
-        output = await clean_float(output)
-        converted_distance = round(output / 0.621371, 2)
-        await ctx.send(f"{output} km is {converted_distance} km")
-
-    @commands.command(name="celsius", aliases=['cel', 'cels'])
-    async def celsius(self, ctx, output):
-        output = await clean_float(output)
-        temp = round(output / 5 * 9 + 32, 2)
-        await ctx.send(f"{output} °C is {temp} °F")
-
-    @commands.command(name="fahrenheit", aliases=['fah', 'fahr'])
-    async def fahrenheit(self, ctx, output):
-        output = await clean_float(output)
-        temp = round((output - 32) * 5 / 9, 2)
-        await ctx.send(f"{output} °F is {temp} °C")
-
-    @commands.command(name='update_trivia', aliases=['update_trivia_answer', 'trivia_update'])
-    async def update_trivia_answer(self, ctx, *, question):
-        msg = await ctx.send("Please enter the answer to the question.")
-
-        def check(m):
-            return ctx.channel == m.channel and ctx.author == m.author
-        try:
-            response = await self.bot.wait_for('message', check=check, timeout=10)
-            self.bot.trivia_list.update({question: Trivia(question=question, answer=response.content)})
-            await msg.edit(content=f'Updated Successfully.```Question: {question}\nAnswer: {response.content}```')
-            not_in_channel = True
-            async for message in self.bot.trivia_channel_answers.history():
-                if question in message.content:
-                    await message.edit(content=f'**{question}**\n```{response.content}```')
-                    not_in_channel = False
-            else:
-                if not_in_channel:
-                    await self.bot.trivia_channel_answers.send(f'**{question}**\n```{response.content}```')
-
-        except asyncio.TimeoutError:
-            await msg.edit(content='Timed Out. Please reissue command.')
 
 
 def setup(bot):
