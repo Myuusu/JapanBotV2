@@ -1,6 +1,5 @@
 import aiohttp
 import asyncio
-from datetime import datetime, timedelta
 import discord
 import lxml.html
 import os
@@ -10,6 +9,7 @@ import re
 import secrets
 import urllib
 from classes import Trivia, Timer
+from datetime import datetime, timedelta
 from discord.ext import commands
 
 

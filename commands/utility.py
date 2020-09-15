@@ -42,7 +42,8 @@ def check_process_running(process_name):
                 return True
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
-    return False
+        finally:
+            return False
 
 
 def url_encode(query: str):
@@ -128,7 +129,7 @@ class Utility(commands.Cog):
             except asyncio.TimeoutError:
                 await msg.edit(content='Timed Out. Please reissue command.')
         else:
-            await ctx.send(f'{expression} = {await clean_float(eval(expression))}')
+            await ctx.send(f'{expression} = {await clean_float(eval(expression)):,}')
 
     @commands.command(name='load', aliases=['reload'])
     @commands.has_permissions(administrator=True)

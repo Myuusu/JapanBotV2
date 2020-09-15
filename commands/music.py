@@ -8,10 +8,10 @@ import re
 import sys
 import traceback
 import wavelink
+from commands.utility import check_process_running
 from config import node_settings, lavalink_exe_path
 from discord.ext import commands
 from typing import Union
-from commands.utility import check_process_running
 
 
 async def cog_check(ctx):
