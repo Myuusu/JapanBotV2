@@ -5,7 +5,7 @@ import re
 import traceback
 from classes import Guild, Account, LolAccount, Trivia
 from commands.utility import trim
-from config import bot_token, t_b, t_c, t_c_a, t_q_h, t_a_h
+from config import bot_token, t_b, t_c, t_c_a, t_q_h, t_a_h, t_r_q, t_r_r
 from datetime import datetime
 from dateutil.parser import parse
 from discord.ext import commands, tasks
@@ -18,6 +18,44 @@ from storage.slot_machines import slot_machines
 from storage.station_list import station_list
 from storage.timer_list import timer_list
 from storage.trivia_list import trivia_list
+
+
+async def find_duplicate_messages(channel):
+    if channel is None:
+        print('Channel Is Not Found In find_duplicate_messages Function')
+        return None
+    found = []
+    duplicates = []
+
+    def transform(message):
+        return {message.content, message.id}
+    async for content, id in channel.history(limit=None).map(transform):
+        if content in found:
+            print(f"Duplicate Found: {content}")
+            duplicates.append(id)
+        else:
+            found.append(content)
+    else:
+        return duplicates
+
+
+async def remove_duplicate_messages_in_channel(channel):
+    if channel is None:
+        print('Channel Is Not Found In remove_duplicate_messages_in_channel Function')
+    duplicate_messages = await find_duplicate_messages(channel)
+    if duplicate_messages is not None:
+        for iter in duplicate_messages:
+            msg = await channel.fetch_message(id=iter)
+            if msg is not None:
+                await msg.delete()
+
+
+async def find_message_in_channel(message, channel):
+    async for iter in channel.history(limit=None):
+        if message == iter:
+            return True
+    else:
+        return False
 
 
 class Bot(commands.Bot):
@@ -53,11 +91,11 @@ class Bot(commands.Bot):
 
     async def update_timer_list(self):
         output = []
-        remove = []
+        items_to_remove = []
         for iter in self.timer_list.keys():
             current = self.timer_list[iter]
             if current.end_time < datetime.now():
-                remove.append(iter)
+                items_to_remove.append(iter)
                 user = self.get_user(current.user_id)
                 if user is not None:
                     await user.send(f'{current.name} timer expired at {current.end_time}')
@@ -73,8 +111,7 @@ class Bot(commands.Bot):
             with open('storage/timer_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
                 fp.write(f'from classes import Timer\n\ntimer_list = {{\n    {output_string}\n}}\n')
             fp.close()
-        return remove
-
+        return items_to_remove
 
     async def update_guild_list(self):
         output = []
@@ -128,17 +165,23 @@ class Bot(commands.Bot):
         print("Ready")
         self.update.start()
         self.trivia_channel_answers = self.get_channel(t_c_a)
-        if self.trivia_channel_answers is not None:
+        if self.trivia_channel_answers is None:
+            print("Error: No Trivia Channel Found! Result: Trivia answers will NOT be sent.")
+        else:
+            await self.trivia_channel_answers.purge(limit=None)
             output = []
             for iter in self.trivia_list.keys():
                 if self.trivia_list[iter].answer is None:
                     output.append(self.trivia_list[iter].question)
+                else:
+                    await self.trivia_channel_answers.send(
+                        f'**{self.trivia_list[iter].question}** ```{self.trivia_list[iter].answer}```'
+                    )
             else:
                 if output:
                     output_string = "\n".join(output)
                     print(f'Needs Answers: \n{output_string}')
-        else:
-            print("Error: No Trivia Channel Found! Result: Trivia answers will NOT be sent.")
+            # await remove_duplicate_messages_in_channel(self.trivia_channel_answers)
 
     async def on_guild_join(self, guild):
         self.guild_list.update({guild.id: Guild(guild_id=guild.id, active=True)})
@@ -172,18 +215,11 @@ class Bot(commands.Bot):
             if t_q_h in message.content:
                 await asyncio.sleep(randrange(3))
                 await message.channel.send(current)
-            if await self.not_found_in_channel(question):
+            if not await find_message_in_channel(message=message, channel=self.trivia_channel_answers):
                 await self.trivia_channel_answers.send(f'**{question}**\n```{current}```')
         except KeyError:
             self.trivia_list.update({question: Trivia(question=question)})
             await message.channel.send("Question Not Located. Inserted, But Needs Solution.")
-
-    async def not_found_in_channel(self, test_message):
-        async for message in self.trivia_channel_answers.history():
-            if test_message in message.content:
-                return False
-        else:
-            return True
 
     @staticmethod
     async def on_command_error(ctx, exception):
@@ -208,7 +244,6 @@ bot.run(bot_token, reconnect=True)
 To do list:
 
 Gambling:
-Bet / Winning Modifier
 Weighting modifications
 Jackpot announcements on Animal slot for lion
 Server admin right to toggle "Jackpot Winner" role
@@ -224,8 +259,6 @@ Jisho:
 Fix encoding issue when use a space for ex. to go
 Possibly look into changing from jisho to the website conjugation uses
 
-Currency Exchanger:
-Fix Key Error 'rates'
 
 Papago sentence translator:
 Add the API we talked bout of https://papago.naver.com/ to translate entire sentences
