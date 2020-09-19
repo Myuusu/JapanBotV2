@@ -58,6 +58,14 @@ async def find_message_in_channel(message, channel):
         return False
 
 
+async def find_string_in_channel_content(content, channel):
+    async for i in channel.history(limit=None):
+        if content in i.content:
+            return True
+    else:
+        return False
+
+
 class Bot(commands.Bot):
     def __init__(self):
         super(Bot, self).__init__(case_insensitive=True, command_prefix=self.get_prefix)
@@ -161,27 +169,29 @@ class Bot(commands.Bot):
         finally:
             return self.guild_list[message.guild.id].prefix
 
+    async def purge_channel(self, channel):
+        await channel.purge(limit=None)
+        output = []
+        for i in self.trivia_list.keys():
+            if self.trivia_list[i].answer is None:
+                output.append(self.trivia_list[i].question)
+            else:
+                if not await find_string_in_channel_content(i, channel):
+                    await channel.send(
+                        f'**{self.trivia_list[i].question}** ```{self.trivia_list[i].answer}```'
+                    )
+        else:
+            if output:
+                output_string = "\n".join(output)
+                print(f'Needs Answers: \n{output_string}')
+
     async def on_ready(self):
         print("Ready")
         self.update.start()
         self.trivia_channel_answers = self.get_channel(t_c_a)
-        if self.trivia_channel_answers is None:
-            print("Error: No Trivia Channel Found! Result: Trivia answers will NOT be sent.")
-        else:
-            # await self.trivia_channel_answers.purge(limit=None)
-            output = []
-            for i in self.trivia_list.keys():
-                if self.trivia_list[i].answer is None:
-                    output.append(self.trivia_list[i].question)
-                else:
-                    await self.trivia_channel_answers.send(
-                        f'**{self.trivia_list[i].question}** ```{self.trivia_list[i].answer}```'
-                    )
-            else:
-                if output:
-                    output_string = "\n".join(output)
-                    print(f'Needs Answers: \n{output_string}')
-            # await remove_duplicate_messages_in_channel(self.trivia_channel_answers)
+        if self.trivia_channel_answers is not None:
+            await self.purge_channel(self.trivia_channel_answers)
+            print("Finished Purging Channel.", end="\r")
 
     async def on_guild_join(self, guild):
         self.guild_list.update({guild.id: Guild(guild_id=guild.id, active=True)})
@@ -190,25 +200,18 @@ class Bot(commands.Bot):
         self.guild_list.update({guild.id: Guild(guild_id=guild.id, active=False)})
 
     async def on_message(self, message):
-        if self.trivia_channel_answers is None:
-            await self.process_commands(message)
-        else:
-            if message.author.id in t_b and message.channel.id in t_c and message.content != '':
-                question_format_found = True
-                for string in t_a_h:
-                    if string in message.content:
-                        question_format_found = False
-                else:
-                    if question_format_found:
-                        await self.process_trivia_question(message=message)
-                    else:
-                        await self.process_commands(message)
-            else:
-                await self.process_commands(message)
+        if self.trivia_channel_answers is not None \
+                and message.author.id in t_b \
+                and message.channel.id in t_c \
+                and message.content != '':
+            for string in t_a_h:
+                if string in message.content:
+                    return await self.process_trivia_question(message=message)
+        return await self.process_commands(message)
 
     async def process_trivia_question(self, message):
-        if not isinstance(self.trivia_channel_answers, discord.GroupChannel):
-            return
+        if self.trivia_channel_answers is None:
+            self.trivia_channel_answers = self.get_channel(t_c_a)
         question = re.sub(r'^.*\.\.\.\*\* ', '', message.content)
         try:
             current = self.trivia_list[question].answer

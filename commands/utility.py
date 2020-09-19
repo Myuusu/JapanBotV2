@@ -57,7 +57,14 @@ async def trim(output: str = "", length: int = 2000):
     return output
 
 
-async def read_website(url: str, format: str = "text", method: str = "GET", params=None, headers=None, data=None):
+async def read_website(
+        url: str,
+        process_format: str = "text",
+        method: str = "GET",
+        params=None,
+        headers=None,
+        data=None
+):
     if data is None:
         data = {}
     if headers is None:
@@ -67,24 +74,24 @@ async def read_website(url: str, format: str = "text", method: str = "GET", para
     if headers != {}:
         async with aiohttp.ClientSession(headers=headers) as session:
             if method == "POST":
-                return await session_post(session=session, url=url, format=format, data=data)
+                return await session_post(session=session, url=url, process_format=process_format, data=data)
             else:
-                return await session_get(session=session, url=url, format=format, params=params)
+                return await session_get(session=session, url=url, process_format=process_format, params=params)
     else:
         async with aiohttp.ClientSession() as session:
             if method == "POST":
-                return await session_post(session=session, url=url, format=format, data=data)
+                return await session_post(session=session, url=url, process_format=process_format, data=data)
             else:
-                return await session_get(session=session, url=url, format=format, params=params)
+                return await session_get(session=session, url=url, process_format=process_format, params=params)
 
 
-async def session_get(session, url: str, format: str = "text", params=None):
+async def session_get(session, url: str, process_format: str = "text", params=None):
     if params is None:
         params = {}
     async with session.get(url=url, params=params) as resp:
-        if format == "json":
+        if process_format == "json":
             output = await resp.json()
-        elif format == "read":
+        elif process_format == "read":
             output = await resp.read()
         else:
             output = await resp.text()
@@ -92,13 +99,13 @@ async def session_get(session, url: str, format: str = "text", params=None):
     return output
 
 
-async def session_post(session, url: str, format: str, data=None):
+async def session_post(session, url: str, process_format: str, data=None):
     if data is None:
         data = {}
     async with session.post(url=url, data=data) as resp:
-        if format == "json":
+        if process_format == "json":
             output = await resp.json()
-        elif format == "read":
+        elif process_format == "read":
             output = await resp.read()
         else:
             output = await resp.text()
