@@ -7,6 +7,10 @@ from discord.ext import commands
 from classes import Trivia, Timer
 
 
+async def create_timer(end_time, author_id, timer_name):
+    return Timer(end_time, author_id, timer_name)
+
+
 class Flashcard(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -62,7 +66,8 @@ class Flashcard(commands.Cog):
         [hours, minutes, seconds] = time.split(":")
         now = datetime.now()
         x = now + timedelta(seconds=int(hours) * 3600 + int(minutes) * 60 + int(seconds))
-        self.bot.timer_list.update({"f'{ctx.author.id}|{name}'": Timer(x, ctx.author.id, name)})
+        new_timer = await create_timer(x, ctx.author.id, name)
+        self.bot.timer_list.update({f'"{ctx.author.id}|{name}"': new_timer})
         await ctx.send(f'{name} timer has been set at {now.time()}. It will expire at {x.time()}')
 
     @commands.command(
@@ -101,6 +106,7 @@ class Flashcard(commands.Cog):
             await ctx.send("Error: This command requires the bot to have permission to send links.")
         else:
             print(f'Context: {ctx}\nException: {exception}')
+
 
 def setup(bot):
     bot.add_cog(Flashcard(bot))
