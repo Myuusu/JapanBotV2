@@ -1,17 +1,18 @@
-import aiohttp
 import asyncio
-import discord
-import lxml.html
 import os
-import psutil
 import random
 import re
 import secrets
 import urllib
-from datetime import datetime
-from dateutil.parser import parse
-from discord.ext import commands
+from datetime import datetime, timezone
 from urllib.parse import quote_plus
+
+import aiohttp
+import discord
+import psutil
+from discord.ext import commands
+
+from classes import Guild
 
 
 async def one_in(sides: int = 6):
@@ -56,7 +57,13 @@ async def trim(output: str = "", length: int = 2000):
     return output
 
 
-async def read_website(url: str, format: str, method: str = "GET", params={}, headers={}, data={}):
+async def read_website(url: str, format: str = "text", method: str = "GET", params=None, headers=None, data=None):
+    if data is None:
+        data = {}
+    if headers is None:
+        headers = {}
+    if params is None:
+        params = {}
     if headers != {}:
         async with aiohttp.ClientSession(headers=headers) as session:
             if method == "POST":
@@ -71,8 +78,10 @@ async def read_website(url: str, format: str, method: str = "GET", params={}, he
                 return await session_get(session=session, url=url, format=format, params=params)
 
 
-async def session_get(session, url: str, format: str, params={}):
-    async with session.get(url=url, params=params, headers=headers) as resp:
+async def session_get(session, url: str, format: str = "text", params=None):
+    if params is None:
+        params = {}
+    async with session.get(url=url, params=params) as resp:
         if format == "json":
             output = await resp.json()
         elif format == "read":
@@ -83,7 +92,9 @@ async def session_get(session, url: str, format: str, params={}):
     return output
 
 
-async def session_post(session, url: str, format: str, data={}):
+async def session_post(session, url: str, format: str, data=None):
+    if data is None:
+        data = {}
     async with session.post(url=url, data=data) as resp:
         if format == "json":
             output = await resp.json()
@@ -95,7 +106,9 @@ async def session_post(session, url: str, format: str, data={}):
     return output
 
 
-async def find_in_site_text(html_element, xpath_location=['/']):
+async def find_in_site_text(html_element, xpath_location=None):
+    if xpath_location is None:
+        xpath_location = ['/']
     output_string = ""
     for child in html_element.xpath(xpath_location):
         try:
@@ -118,7 +131,7 @@ class Utility(commands.Cog):
     @commands.command(name='eval', aliases=['evaluate'])
     async def eval(self, ctx, *, expression: str = ""):
         if expression == "":
-            await ctx.send("Please Enter Your Expression.")
+            msg = await ctx.send("Please Enter Your Expression.")
 
             def check(m):
                 return ctx.channel == m.channel and ctx.author == m.author
@@ -164,7 +177,7 @@ class Utility(commands.Cog):
         embed = discord.Embed(
             title=f"{self.bot.user.name} shutting down!",
             color=discord.Color.from_rgb(0, 0, 0),
-            timestamp=datetime.datetime.now(datetime.timezone.utc)
+            timestamp=datetime.now(timezone.utc)
         )
         embed.set_author(
             name=ctx.author.name,
@@ -197,7 +210,7 @@ class Utility(commands.Cog):
         try:
             self.bot.guild_list[ctx.guild.id].log_channel_id = log_channel_id
         except KeyError:
-            self.guild_list.update({guild.id: Guild(guild_id=ctx.guild.id, log_channel_id=log_channel_id)})
+            self.bot.guild_list.update({ctx.guild.id: Guild(guild_id=ctx.guild.id, log_channel_id=log_channel_id)})
         finally:
             await ctx.send(f'The log_channel has been changed to this channel id: {log_channel_id}')
 

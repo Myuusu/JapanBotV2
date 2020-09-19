@@ -1,5 +1,7 @@
 import math
+
 from discord.ext import commands
+
 from commands.utility import clean_float, trim
 
 
@@ -11,7 +13,7 @@ class Math(commands.Cog):
     async def ceil(self, ctx, term: str):
         if term:
             term = await clean_float(term)
-            await ctx.send(await trim(f'ceil({term}) = {math.ceil():,}'))
+            await ctx.send(await trim(f'ceil({term}) = {math.ceil(term):,}'))
         else:
             await ctx.send('Please specify one term to round up!')
 

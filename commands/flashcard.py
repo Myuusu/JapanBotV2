@@ -1,16 +1,10 @@
-import aiohttp
 import asyncio
-import discord
-import lxml.html
-import os
-import psutil
-import random
-import re
-import secrets
-import urllib
-from classes import Trivia, Timer
 from datetime import datetime, timedelta
+
+import discord
 from discord.ext import commands
+
+from classes import Trivia, Timer
 
 
 class Flashcard(commands.Cog):

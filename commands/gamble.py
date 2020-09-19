@@ -1,8 +1,10 @@
 import asyncio
-from classes import Deck
-from commands.utility import clean_float, one_in
+
 from discord import Embed
 from discord.ext import commands
+
+from classes import Account, Deck
+from commands.utility import clean_float, one_in
 
 
 class Gamble(commands.Cog):
@@ -17,7 +19,7 @@ class Gamble(commands.Cog):
             self.bot.account_list[ctx.author.id].balance += 500
             await ctx.send(f'Increased credits by 500!')
         except KeyError:
-            self.bot.account_list.update({author_id: Account(user_id=ctx.author.id)})
+            self.bot.account_list.update({ctx.author.id: Account(user_id=ctx.author.id)})
             await ctx.send("Welcome to the bot! We've given you 1500 credits!")
             self.bot.account_list[ctx.author.id].balance += 500
 
@@ -36,7 +38,7 @@ class Gamble(commands.Cog):
             try:
                 user = self.bot.account_list[ctx.author.id]
             except KeyError:
-                self.bot.account_list.update({author_id: Account(user_id=ctx.author.id)})
+                self.bot.account_list.update({ctx.author.id: Account(user_id=ctx.author.id)})
                 user = self.bot.account_list[ctx.author.id]
                 await ctx.send("Welcome to the bot! We've given you 1000 credits to get started!")
             try:
@@ -74,7 +76,7 @@ class Gamble(commands.Cog):
             await ctx.send(f'{ctx.author.name} currently has {str(points)} points!')
             return points
         except KeyError:
-            self.bot.account_list.update({author_id: Account(user_id=ctx.author.id)})
+            self.bot.account_list.update({ctx.author.id: Account(user_id=ctx.author.id)})
             points = self.bot.account_list[ctx.author.id].balance
             await ctx.send(f'{ctx.author.name} currently has {str(points)} points!')
             return points

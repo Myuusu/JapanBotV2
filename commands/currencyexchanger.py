@@ -1,6 +1,6 @@
-import aiohttp
 import discord
 from discord.ext import commands
+
 from commands.utility import read_website, clean_float
 
 

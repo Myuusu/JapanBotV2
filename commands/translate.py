@@ -1,13 +1,9 @@
-import asyncio
-from commands.utility import url_encode, find_in_site_text, read_website, trim
+import lxml.html
 from discord import Embed
 from discord.ext import commands
-from config import chrome_driver_path, x_naver_client_id, x_naver_client_secret
-from selenium import webdriver
-from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.common.by import By
-import cssselect
-import lxml.html
+
+from commands.utility import url_encode, find_in_site_text, read_website
+from config import x_naver_client_id, x_naver_client_secret
 
 
 class Translate(commands.Cog):
