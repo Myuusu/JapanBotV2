@@ -24,7 +24,7 @@ class CurrencyExchanger(commands.Cog):
 
         url = "https://api.exchangeratesapi.io/latest"
         params = {"base": base_currency, "symbols": ",".join(output_currency)}
-        output = await read_website(url=url, params=params, format="json")
+        output = await read_website(url=url, params=params, process_format="json")
 
         if base_currency == "JPY":
             des = [f'{input_amount:,} {base_currency} is:']

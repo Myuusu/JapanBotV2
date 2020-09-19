@@ -35,7 +35,7 @@ class Translate(commands.Cog):
         for term in terms:
             site_text = await read_website(
                 url=f'https://app.kanjialive.com/api/kanji/{url_encode(query=term)}',
-                format="json"
+                process_format="json"
             )
             try:
                 if format == "webm":
@@ -72,7 +72,7 @@ class Translate(commands.Cog):
             "X-Naver-Client-Secret": x_naver_client_secret,
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
         }
-        results = await read_website(url=url, method="POST", format="json", headers=headers, data=data)
+        results = await read_website(url=url, method="POST", process_format="json", headers=headers, data=data)
         try:
             await ctx.send(f'/tts {results["message"]["result"]["translatedText"]}')
         except KeyError:
