@@ -5,10 +5,11 @@ from datetime import datetime
 from random import randrange
 
 import discord
+import psutil
 from discord.ext import commands, tasks
 
 from classes import Guild, Trivia
-from config import bot_token, t_b, t_c, t_c_a, t_q_h, t_a_h
+from config import bot_token, t_b, t_c, t_c_a, t_q_h, t_a_h, lavalink_exe_path
 from storage.account_list import account_list
 from storage.eight_ball_responses import eight_ball_responses
 from storage.guild_list import guild_list
@@ -78,6 +79,11 @@ class Bot(commands.Bot):
         self.station_list = station_list
         self.trivia_list = trivia_list
         self.timer_list = timer_list
+
+        try:
+            os.startfile(lavalink_exe_path)
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
 
         for filename in os.listdir('./commands'):
             if filename.endswith('.py'):
@@ -201,20 +207,26 @@ class Bot(commands.Bot):
 
     async def on_message(self, message):
         if message.channel.id in t_c and message.author.id in t_b and message.content != '':
-            for string in t_a_h:
-                if string in message.content:
-                    break
+            if t_q_h in message.content:
+                for string in t_a_h:
+                    if string in message.content:
+                        return await self.process_commands(message)
+                else:
+                    return await self.process_trivia_question(message=message, channel=self.trivia_channel_answers)
             else:
-                return await self.process_trivia_question(message=message, channel=self.trivia_channel_answers)
-        return await self.process_commands(message)
+                return await self.process_commands(message)
+        else:
+            return await self.process_commands(message)
 
-    async def process_trivia_question(self, message, channel):
+    async def process_trivia_question(self, message, channel=None):
+        if channel is None:
+            channel = message.channel
         question = re.sub(r'^.*\.\.\.\*\* ', '', message.content)
         try:
             current = self.trivia_list[question].answer
             if current == '':
                 await message.channel.send("Question Located But No Solution Found; Please Update.")
-            if t_q_h in message.content:
+            else:
                 await asyncio.sleep(randrange(3))
                 await message.channel.send(current)
             if not await find_message_in_channel(message=message, channel=channel):

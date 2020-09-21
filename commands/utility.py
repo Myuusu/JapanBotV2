@@ -9,7 +9,6 @@ from urllib.parse import quote_plus
 
 import aiohttp
 import discord
-import psutil
 from discord.ext import commands
 
 
@@ -32,17 +31,6 @@ async def clean_float(string_to_process):
         return base * pow(10, multiply_by_ten - len(output_string[1]))
     else:
         return base * pow(10, multiply_by_ten)
-
-
-def check_process_running(process_name):
-    for proc in psutil.process_iter():
-        try:
-            if process_name.lower() in proc.name().lower():
-                return True
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            pass
-        finally:
-            return False
 
 
 def url_encode(query: str):

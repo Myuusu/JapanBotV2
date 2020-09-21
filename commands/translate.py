@@ -30,7 +30,7 @@ class Translate(commands.Cog):
             await ctx.send(embed=Embed(title=f'Definition For - {params}', description="\n".join(output)))
 
     @commands.command(name='draw', aliases=['drawing', 'pen', 'mp4', 'd'])
-    async def draw(self, ctx, terms, format: str = "mp4"):
+    async def draw(self, ctx, terms, video_format: str = "mp4"):
         output = [f'Searching For: {terms}']
         for term in terms:
             site_text = await read_website(
@@ -38,7 +38,7 @@ class Translate(commands.Cog):
                 process_format="json"
             )
             try:
-                if format == "webm":
+                if video_format == "webm":
                     output.append(site_text['webm_video_source'])
                 else:
                     output.append(site_text['mp4_video_source'])
