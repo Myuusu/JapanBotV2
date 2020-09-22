@@ -116,16 +116,16 @@ class Utility(commands.Cog):
         self.bot = bot
 
     @commands.command(name='eval', aliases=['evaluate'])
-    async def eval(self, ctx, *, expression: str = ""):
-        if expression == "":
-            await ctx.send("Please Enter Your Expression.")
+    async def eval(self, ctx, *, expression: str = None):
+        if expression is None:
+            msg = await ctx.send("Please Enter Your Expression.")
 
             def check(m):
                 return ctx.channel == m.channel and ctx.author == m.author
             try:
                 response = await self.bot.wait_for('message', check=check, timeout=10)
                 expression = response.content
-                await ctx.send(f'{expression} = {eval(expression)}')
+                await msg.edit(content=f'{expression} = {await clean_float(eval(expression)):,}')
             except asyncio.TimeoutError:
                 await msg.edit(content='Timed Out. Please reissue command.')
         else:
