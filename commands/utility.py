@@ -1,17 +1,15 @@
-import aiohttp
 import asyncio
-import discord
-import lxml.html
 import os
-import psutil
 import random
 import re
 import secrets
 import urllib
-from datetime import datetime
-from dateutil.parser import parse
-from discord.ext import commands
+from datetime import datetime, timezone
 from urllib.parse import quote_plus
+
+import aiohttp
+import discord
+from discord.ext import commands
 
 
 async def one_in(sides: int = 6):
@@ -35,18 +33,7 @@ async def clean_float(string_to_process):
         return base * pow(10, multiply_by_ten)
 
 
-def check_process_running(process_name):
-    for proc in psutil.process_iter():
-        try:
-            if process_name.lower() in proc.name().lower():
-                return True
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            pass
-        finally:
-            return False
-
-
-def url_encode(query: str):
+def url_encode(query):
     return urllib.parse.quote_plus(query)
 
 
@@ -56,26 +43,41 @@ async def trim(output: str = "", length: int = 2000):
     return output
 
 
-async def read_website(url: str, format: str, method: str = "GET", params={}, headers={}, data={}):
+async def read_website(
+        url: str,
+        process_format: str = "text",
+        method: str = "GET",
+        params=None,
+        headers=None,
+        data=None
+):
+    if data is None:
+        data = {}
+    if headers is None:
+        headers = {}
+    if params is None:
+        params = {}
     if headers != {}:
         async with aiohttp.ClientSession(headers=headers) as session:
             if method == "POST":
-                return await session_post(session=session, url=url, format=format, data=data)
+                return await session_post(session=session, url=url, process_format=process_format, data=data)
             else:
-                return await session_get(session=session, url=url, format=format, params=params)
+                return await session_get(session=session, url=url, process_format=process_format, params=params)
     else:
         async with aiohttp.ClientSession() as session:
             if method == "POST":
-                return await session_post(session=session, url=url, format=format, data=data)
+                return await session_post(session=session, url=url, process_format=process_format, data=data)
             else:
-                return await session_get(session=session, url=url, format=format, params=params)
+                return await session_get(session=session, url=url, process_format=process_format, params=params)
 
 
-async def session_get(session, url: str, format: str, params={}):
-    async with session.get(url=url, params=params, headers=headers) as resp:
-        if format == "json":
+async def session_get(session, url: str, process_format: str = "text", params=None):
+    if params is None:
+        params = {}
+    async with session.get(url=url, params=params) as resp:
+        if process_format == "json":
             output = await resp.json()
-        elif format == "read":
+        elif process_format == "read":
             output = await resp.read()
         else:
             output = await resp.text()
@@ -83,11 +85,13 @@ async def session_get(session, url: str, format: str, params={}):
     return output
 
 
-async def session_post(session, url: str, format: str, data={}):
+async def session_post(session, url: str, process_format: str, data=None):
+    if data is None:
+        data = {}
     async with session.post(url=url, data=data) as resp:
-        if format == "json":
+        if process_format == "json":
             output = await resp.json()
-        elif format == "read":
+        elif process_format == "read":
             output = await resp.read()
         else:
             output = await resp.text()
@@ -95,7 +99,9 @@ async def session_post(session, url: str, format: str, data={}):
     return output
 
 
-async def find_in_site_text(html_element, xpath_location=['/']):
+async def find_in_site_text(html_element, xpath_location=None):
+    if xpath_location is None:
+        xpath_location = ['/']
     output_string = ""
     for child in html_element.xpath(xpath_location):
         try:
@@ -164,7 +170,7 @@ class Utility(commands.Cog):
         embed = discord.Embed(
             title=f"{self.bot.user.name} shutting down!",
             color=discord.Color.from_rgb(0, 0, 0),
-            timestamp=datetime.datetime.now(datetime.timezone.utc)
+            timestamp=datetime.now(timezone.utc)
         )
         embed.set_author(
             name=ctx.author.name,
@@ -194,12 +200,8 @@ class Utility(commands.Cog):
     @commands.command(name='log', aliases=['log_channel', 'update_log'], help='Set your log_channel with this')
     @commands.has_permissions(administrator=True)
     async def log(self, ctx, log_channel_id):
-        try:
-            self.bot.guild_list[ctx.guild.id].log_channel_id = log_channel_id
-        except KeyError:
-            self.guild_list.update({guild.id: Guild(guild_id=ctx.guild.id, log_channel_id=log_channel_id)})
-        finally:
-            await ctx.send(f'The log_channel has been changed to this channel id: {log_channel_id}')
+        self.bot.guild_list[ctx.guild.id].log_channel_id = log_channel_id
+        await ctx.send(f'The log_channel has been changed to this channel id: {log_channel_id}')
 
     @commands.command(name='eight_ball', aliases=['8ball', 'eightball', '8_ball', '8'])
     async def eight_ball(self, ctx, question):

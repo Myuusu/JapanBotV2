@@ -1,15 +1,14 @@
 import asyncio
-import discord
 import os
 import re
-import traceback
-from classes import Guild, Account, LolAccount, Trivia
-from commands.utility import trim
-from config import bot_token, t_b, t_c, t_c_a, t_q_h, t_a_h, t_r_q, t_r_r
 from datetime import datetime
-from dateutil.parser import parse
-from discord.ext import commands, tasks
 from random import randrange
+
+import discord
+from discord.ext import commands, tasks
+
+from classes import Guild, Trivia
+from config import bot_token, t_b, t_c, t_c_a, t_q_h, t_a_h
 from storage.account_list import account_list
 from storage.eight_ball_responses import eight_ball_responses
 from storage.guild_list import guild_list
@@ -29,10 +28,11 @@ async def find_duplicate_messages(channel):
 
     def transform(message):
         return {message.content, message.id}
-    async for content, id in channel.history(limit=None).map(transform):
+
+    async for content, message_id in channel.history(limit=None).map(transform):
         if content in found:
             print(f"Duplicate Found: {content}")
-            duplicates.append(id)
+            duplicates.append(message_id)
         else:
             found.append(content)
     else:
@@ -44,15 +44,23 @@ async def remove_duplicate_messages_in_channel(channel):
         print('Channel Is Not Found In remove_duplicate_messages_in_channel Function')
     duplicate_messages = await find_duplicate_messages(channel)
     if duplicate_messages is not None:
-        for iter in duplicate_messages:
-            msg = await channel.fetch_message(id=iter)
+        for i in duplicate_messages:
+            msg = await channel.fetch_message(id=i)
             if msg is not None:
                 await msg.delete()
 
 
 async def find_message_in_channel(message, channel):
-    async for iter in channel.history(limit=None):
-        if message == iter:
+    async for i in channel.history(limit=None):
+        if message == i:
+            return True
+    else:
+        return False
+
+
+async def find_string_in_channel_content(content, channel):
+    async for i in channel.history(limit=None):
+        if content in i.content:
             return True
     else:
         return False
@@ -81,42 +89,42 @@ class Bot(commands.Bot):
         await self.update_account_list()
         await self.update_slot_machines()
         await self.update_trivia_list()
-        items_to_remove = await self.update_timer_list()
-        await self.remove_timers(items_to_remove)
+        await self.update_timer_list()
 
-    async def remove_timers(self, indices_to_remove=[]):
-        if indices_to_remove:
-            for iter in indices_to_remove:
-                self.timer_list[iter].pop()
+    async def remove_timers(self, indices_to_remove):
+        if indices_to_remove is not None:
+            for i in indices_to_remove:
+                self.timer_list[i].pop()
 
     async def update_timer_list(self):
         output = []
         items_to_remove = []
-        for iter in self.timer_list.keys():
-            current = self.timer_list[iter]
-            if current.end_time < datetime.now():
-                items_to_remove.append(iter)
-                user = self.get_user(current.user_id)
-                if user is not None:
-                    await user.send(f'{current.name} timer expired at {current.end_time}')
-                else:
+        now = datetime.now()
+        for i in self.timer_list.keys():
+            item = self.timer_list[i]
+            if item.end_time < now:
+                items_to_remove.append(i)
+                user = self.get_user(item.user_id)
+                if user is None:
                     print(
-                        f'{current.name} timer expired at {current.end_time},'
-                        f' but user with id {current.user_id} could not be found.'
+                        f'{item.name} timer expired at {item.end_time}, '
+                        f'but user with id {item.user_id} could not be found.'
                     )
+                else:
+                    await user.send(f'{item.name} timer expired at {item.end_time}')
             else:
-                output.append(current.get_json())
+                output.append(item.get_json())
         else:
+            await self.remove_timers(items_to_remove)
             output_string = ",\n    ".join(output)
             with open('storage/timer_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
                 fp.write(f'from classes import Timer\n\ntimer_list = {{\n    {output_string}\n}}\n')
             fp.close()
-        return items_to_remove
 
     async def update_guild_list(self):
         output = []
-        for iter in self.guild_list.keys():
-            output.append(self.guild_list[iter].get_json())
+        for i in self.guild_list.keys():
+            output.append(self.guild_list[i].get_json())
         else:
             output_string = ",\n    ".join(output)
             with open('storage/guild_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
@@ -125,8 +133,8 @@ class Bot(commands.Bot):
 
     async def update_account_list(self):
         output = []
-        for iter in self.account_list.keys():
-            output.append(self.account_list[iter].get_json())
+        for i in self.account_list.keys():
+            output.append(self.account_list[i].get_json())
         else:
             output_string = ",\n    ".join(output)
             with open('storage/account_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
@@ -135,8 +143,8 @@ class Bot(commands.Bot):
 
     async def update_slot_machines(self):
         output = []
-        for iter in self.slot_machines.keys():
-            output.append(self.slot_machines[iter].get_json())
+        for i in self.slot_machines.keys():
+            output.append(self.slot_machines[i].get_json())
         else:
             output_string = ",\n    ".join(output)
             with open('storage/slot_machines.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
@@ -145,8 +153,8 @@ class Bot(commands.Bot):
 
     async def update_trivia_list(self):
         output = []
-        for iter in self.trivia_list.keys():
-            output.append(self.trivia_list[iter].get_json())
+        for i in self.trivia_list.keys():
+            output.append(self.trivia_list[i].get_json())
         else:
             output_string = ",\n    ".join(output)
             with open('storage/trivia_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
@@ -157,31 +165,33 @@ class Bot(commands.Bot):
         try:
             self.guild_list[message.guild.id].message_count += 1
         except KeyError:
-            self.guild_list.update({guild_id: Guild(guild_id=guild_id)})
+            self.guild_list.update({message.guild.id: Guild(guild_id=message.guild.id)})
         finally:
             return self.guild_list[message.guild.id].prefix
+
+    async def purge_channel(self, channel):
+        await channel.purge(limit=None)
+        output = []
+        for i in self.trivia_list.keys():
+            if self.trivia_list[i].answer is None:
+                output.append(self.trivia_list[i].question)
+            else:
+                if not await find_string_in_channel_content(i, channel):
+                    await channel.send(
+                        f'**{self.trivia_list[i].question}** ```{self.trivia_list[i].answer}```'
+                    )
+        else:
+            if output:
+                output_string = "\n".join(output)
+                print(f'Needs Answers: \n{output_string}')
 
     async def on_ready(self):
         print("Ready")
         self.update.start()
         self.trivia_channel_answers = self.get_channel(t_c_a)
-        if self.trivia_channel_answers is None:
-            print("Error: No Trivia Channel Found! Result: Trivia answers will NOT be sent.")
-        else:
-            await self.trivia_channel_answers.purge(limit=None)
-            output = []
-            for iter in self.trivia_list.keys():
-                if self.trivia_list[iter].answer is None:
-                    output.append(self.trivia_list[iter].question)
-                else:
-                    await self.trivia_channel_answers.send(
-                        f'**{self.trivia_list[iter].question}** ```{self.trivia_list[iter].answer}```'
-                    )
-            else:
-                if output:
-                    output_string = "\n".join(output)
-                    print(f'Needs Answers: \n{output_string}')
-            # await remove_duplicate_messages_in_channel(self.trivia_channel_answers)
+        if self.trivia_channel_answers is not None:
+            await self.purge_channel(self.trivia_channel_answers)
+            print("Finished Purging Channel.", end="\r")
 
     async def on_guild_join(self, guild):
         self.guild_list.update({guild.id: Guild(guild_id=guild.id, active=True)})
@@ -190,39 +200,36 @@ class Bot(commands.Bot):
         self.guild_list.update({guild.id: Guild(guild_id=guild.id, active=False)})
 
     async def on_message(self, message):
-        if self.trivia_channel_answers is None:
-            await self.process_commands(message)
-        else:
-            if message.author.id in t_b and message.channel.id in t_c and message.content != '':
-                question_format_found = True
+        if message.channel.id in t_c and message.author.id in t_b and message.content != '':
+            if t_q_h in message.content:
                 for string in t_a_h:
                     if string in message.content:
-                        question_format_found = False
+                        return await self.process_commands(message)
                 else:
-                    if question_format_found:
-                        await self.process_trivia_question(message=message)
-                    else:
-                        await self.process_commands(message)
+                    return await self.process_trivia_question(message=message, channel=self.trivia_channel_answers)
             else:
-                await self.process_commands(message)
+                return await self.process_commands(message)
+        else:
+            return await self.process_commands(message)
 
-    async def process_trivia_question(self, message):
+    async def process_trivia_question(self, message, channel=None):
+        if channel is None:
+            channel = message.channel
         question = re.sub(r'^.*\.\.\.\*\* ', '', message.content)
         try:
             current = self.trivia_list[question].answer
             if current == '':
                 await message.channel.send("Question Located But No Solution Found; Please Update.")
-            if t_q_h in message.content:
+            else:
                 await asyncio.sleep(randrange(3))
                 await message.channel.send(current)
-            if not await find_message_in_channel(message=message, channel=self.trivia_channel_answers):
-                await self.trivia_channel_answers.send(f'**{question}**\n```{current}```')
+            if not await find_message_in_channel(message=message, channel=channel):
+                await channel.send(f'**{question}**\n```{current}```')
         except KeyError:
             self.trivia_list.update({question: Trivia(question=question)})
             await message.channel.send("Question Not Located. Inserted, But Needs Solution.")
 
-    @staticmethod
-    async def on_command_error(ctx, exception):
+    async def on_command_error(self, ctx, exception):
         if isinstance(exception, commands.CommandNotFound):
             await ctx.send('Invalid command used! Please try again.')
         elif isinstance(exception, commands.CommandOnCooldown):
