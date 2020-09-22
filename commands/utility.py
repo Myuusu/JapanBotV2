@@ -33,7 +33,7 @@ async def clean_float(string_to_process):
         return base * pow(10, multiply_by_ten)
 
 
-def url_encode(query: str):
+def url_encode(query):
     return urllib.parse.quote_plus(query)
 
 

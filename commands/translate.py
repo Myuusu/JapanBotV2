@@ -1,8 +1,12 @@
+import re
+import urllib
+from urllib.parse import quote_plus
+
 import lxml.html
 from discord import Embed
 from discord.ext import commands
 
-from commands.utility import url_encode, find_in_site_text, read_website
+from commands.utility import find_in_site_text, read_website
 from config import x_naver_client_id, x_naver_client_secret
 
 
@@ -10,12 +14,15 @@ class Translate(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['jisho'])
-    async def j(self, ctx, *, params: str = "string"):
-        safe_params = url_encode(query=params)
+    @commands.command(name='j', aliases=['jisho'])
+    async def j(self, ctx, *, params):
+        if not isinstance(params, str):
+            safe_params = re.sub("[ +_]", "%20", urllib.parse.quote_plus(" ".join(params)))
+        else:
+            safe_params = re.sub("[ +_]", "%20", urllib.parse.quote_plus(params))
         url = f'https://jisho.org/search/{safe_params}'
         base = '//*[@id="primary"]/div[1]/div[1]'
-        site_text = lxml.html.fromstring(await read_website(url=url))
+        site_text = lxml.html.fromstring(await read_website(url=url, process_format="text"))
         output = [
             f"**{await find_in_site_text(site_text, f'{base}/div[1]/div[1]/div/span[2]')}**",
             await find_in_site_text(site_text, f'{base}/div[1]/div[2]/span[2]'),
@@ -27,14 +34,16 @@ class Translate(commands.Cog):
             if current_span1 and current_span2:
                 output.append(f'**{current_span1}** {current_span2}')
         else:
-            await ctx.send(embed=Embed(title=f'Definition For - {params}', description="\n".join(output)))
+            description = "\n".join(output)
+            discord_embed = Embed(title=f'Definition For - {params}', description=description)
+            await ctx.send(embed=discord_embed)
 
     @commands.command(name='draw', aliases=['drawing', 'pen', 'mp4', 'd'])
-    async def draw(self, ctx, terms, video_format: str = "mp4"):
+    async def draw(self, ctx, *, terms, video_format: str = "mp4"):
         output = [f'Searching For: {terms}']
         for term in terms:
             site_text = await read_website(
-                url=f'https://app.kanjialive.com/api/kanji/{url_encode(query=term)}',
+                url=f'https://app.kanjialive.com/api/kanji/{re.sub("[ +_]", "%20", urllib.parse.quote_plus(term))}',
                 process_format="json"
             )
             try:

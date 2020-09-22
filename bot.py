@@ -5,11 +5,10 @@ from datetime import datetime
 from random import randrange
 
 import discord
-import psutil
 from discord.ext import commands, tasks
 
 from classes import Guild, Trivia
-from config import bot_token, t_b, t_c, t_c_a, t_q_h, t_a_h, lavalink_exe_path
+from config import bot_token, t_b, t_c, t_c_a, t_q_h, t_a_h
 from storage.account_list import account_list
 from storage.eight_ball_responses import eight_ball_responses
 from storage.guild_list import guild_list
@@ -79,11 +78,6 @@ class Bot(commands.Bot):
         self.station_list = station_list
         self.trivia_list = trivia_list
         self.timer_list = timer_list
-
-        try:
-            os.startfile(lavalink_exe_path)
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            pass
 
         for filename in os.listdir('./commands'):
             if filename.endswith('.py'):
