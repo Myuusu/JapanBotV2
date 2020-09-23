@@ -17,6 +17,7 @@ from storage.slot_machines import slot_machines
 from storage.station_list import station_list
 from storage.timer_list import timer_list
 from storage.trivia_list import trivia_list
+from storage.character_list import character_list
 
 
 async def find_duplicate_messages(channel):
@@ -78,10 +79,13 @@ class Bot(commands.Bot):
         self.station_list = station_list
         self.trivia_list = trivia_list
         self.timer_list = timer_list
+        self.character_list = character_list
 
         for filename in os.listdir('./commands'):
             if filename.endswith('.py'):
                 self.load_extension(f'commands.{filename[:-3]}')
+
+        self.errors = []
 
     @tasks.loop(seconds=30, count=None, reconnect=True)
     async def update(self):
@@ -189,9 +193,8 @@ class Bot(commands.Bot):
         print("Ready")
         self.update.start()
         self.trivia_channel_answers = self.get_channel(t_c_a)
-        if self.trivia_channel_answers is not None:
-            await self.purge_channel(self.trivia_channel_answers)
-            print("Finished Purging Channel.", end="\r")
+        # if self.trivia_channel_answers is not None:
+        # await self.purge_channel(self.trivia_channel_answers)
 
     async def on_guild_join(self, guild):
         self.guild_list.update({guild.id: Guild(guild_id=guild.id, active=True)})
@@ -218,7 +221,7 @@ class Bot(commands.Bot):
         question = re.sub(r'^.*\.\.\.\*\* ', '', message.content)
         try:
             current = self.trivia_list[question].answer
-            if current == '':
+            if current is None:
                 await message.channel.send("Question Located But No Solution Found; Please Update.")
             else:
                 await asyncio.sleep(randrange(3))
@@ -242,6 +245,7 @@ class Bot(commands.Bot):
             await ctx.send("Error: This command requires the bot to have permission to send links.")
         else:
             print(f'Context: {ctx}\nException: {exception}')
+        self.errors.append(exception)
 
 
 bot = Bot()

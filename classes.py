@@ -1,4 +1,5 @@
 import asyncio
+import math
 import random
 from selenium.common.exceptions import NoSuchElementException
 from storage.winnings_table import \
@@ -338,8 +339,101 @@ class Timer:
         self.name = name
 
     def get_json(self):
-        return f'"{self.user_id|self.name}": Timer(' \
+        return f'"{self.user_id | self.name}": Timer(' \
                f'\n        end_time="{self.end_time}",' \
                f'\n        user_id={self.user_id},' \
                f'\n        name="{self.name}"' \
                f'\n    )'
+
+
+class Skill:
+    def __init__(
+            self,
+            name,
+            stat=0,
+            prof=False
+    ):
+        self.name = name
+        self.stat = stat
+        self.prof = prof
+
+
+class Attributes:
+    def __init__(
+            self,
+            strength: int = 10,
+            dexterity: int = 10,
+            constitution: int = 10,
+            intelligence: int = 10,
+            wisdom: int = 10,
+            charisma: int = 10
+    ):
+        self.strength = strength,
+        self.dexterity = dexterity,
+        self.constitution = constitution,
+        self.intelligence = intelligence,
+        self.wisdom = wisdom,
+        self.charisma = charisma
+
+        self.strength_mod = math.floor((strength - 10) / 2)
+        self.dexterity_mod = math.floor((dexterity - 10) / 2)
+        self.constitution_mod = math.floor((constitution - 10) / 2)
+        self.intelligence_mod = math.floor((intelligence - 10) / 2)
+        self.wisdom_mod = math.floor((wisdom - 10) / 2)
+        self.charisma_mod = math.floor((charisma - 10) / 2)
+
+
+class Character:
+    def __init__(
+            self,
+            user_id: int,
+            name: str = None,
+            class_type: str = None,
+            level: int = 1,
+            alignment: str = None,
+            exp: int = 0,
+            attributes: Attributes = Attributes(),
+            proficiencies: [] = None
+    ):
+        self.user_id = user_id
+        self.name = name
+        self.class_type = class_type
+        self.level = level
+        self.alignment = alignment
+        self.exp = exp
+        self.attributes = attributes
+        self.skills = {
+            "acrobatics": Skill("acrobatics", self.attributes.dexterity_mod),
+            "animal handling": Skill("animal handling", self.attributes.wisdom_mod),
+            "arcana": Skill("arcana", self.attributes.intelligence_mod),
+            "athletics": Skill("athletics", self.attributes.strength_mod),
+            "deception": Skill("deception", self.attributes.charisma_mod),
+            "history": Skill("history", self.attributes.intelligence_mod),
+            "insight": Skill("insight", self.attributes.wisdom_mod),
+            "intimidation": Skill("intimidation", self.attributes.charisma_mod),
+            "investigation": Skill("investigation", self.attributes.intelligence_mod),
+            "medicine": Skill("medicine", self.attributes.wisdom_mod),
+            "nature": Skill("nature", self.attributes.intelligence_mod),
+            "perception": Skill("perception", self.attributes.wisdom_mod),
+            "performance": Skill("performance", self.attributes.charisma_mod),
+            "persuasion": Skill("persuasion", self.attributes.charisma_mod),
+            "religion": Skill("religion", self.attributes.intelligence_mod),
+            "sleight of hand": Skill("sleight of hand", self.attributes.dexterity_mod),
+            "stealth": Skill("stealth", self.attributes.dexterity_mod),
+            "survival": Skill("survival", self.attributes.wisdom_mod)
+        }
+
+        # Bonus For 5e:
+        # Levels 01 - 04: 2
+        # Levels 05 - 08: 3
+        # Levels 09 - 12: 4
+        # Levels 13 - 16: 5
+        # Levels 17 - 20: 6
+        proficiency_bonus = (self.level - 1) // 4 + 2
+        if proficiencies is not None:
+            for i in proficiencies:
+                try:
+                    self.skills[i].prof = True
+                    self.skills[i].stat += proficiency_bonus
+                except KeyError:
+                    print(f'Item: {i} in self.proficiencies could not be set properly. Please Check This!')

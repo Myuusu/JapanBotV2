@@ -6,7 +6,7 @@ import lxml.html
 from discord import Embed
 from discord.ext import commands
 
-from commands.utility import find_in_site_text, read_website
+from commands.utility import find_in_site_text, read_website, trim
 from config import x_naver_client_id, x_naver_client_secret
 
 
