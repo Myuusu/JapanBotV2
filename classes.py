@@ -375,65 +375,124 @@ class Attributes:
         self.wisdom = wisdom,
         self.charisma = charisma
 
-        self.strength_mod = math.floor((strength - 10) / 2)
-        self.dexterity_mod = math.floor((dexterity - 10) / 2)
-        self.constitution_mod = math.floor((constitution - 10) / 2)
-        self.intelligence_mod = math.floor((intelligence - 10) / 2)
-        self.wisdom_mod = math.floor((wisdom - 10) / 2)
-        self.charisma_mod = math.floor((charisma - 10) / 2)
+        self.strength_mod = (strength - 10) // 2
+        self.dexterity_mod = (dexterity - 10) // 2
+        self.constitution_mod = (constitution - 10) // 2
+        self.intelligence_mod = (intelligence - 10) // 2
+        self.wisdom_mod = (wisdom - 10) // 2
+        self.charisma_mod = (charisma - 10) // 2
 
 
 class Character:
     def __init__(
             self,
-            user_id: int,
-            name: str = None,
-            class_type: str = None,
-            level: int = 1,
-            alignment: str = None,
-            exp: int = 0,
-            attributes: Attributes = Attributes(),
-            proficiencies: [] = None
+            user_id,
+            char_name=None,
+            class_type=None,
+            level=1,
+            alignment=None,
+            exp=0,
+            proficiencies=None,
+            attributes=None
     ):
+
         self.user_id = user_id
-        self.name = name
+        self.char_name = char_name
         self.class_type = class_type
         self.level = level
         self.alignment = alignment
         self.exp = exp
-        self.attributes = attributes
+        self.proficiency_bonus = (self.level - 1) // 4 + 2
+
+        if attributes is None:
+            self.attributes = Attributes()
+        else:
+            self.attributes = attributes
+
+        if proficiencies is None:
+            self.proficiencies = None
+        else:
+            self.proficiencies = proficiencies
+
+        str_mod = self.attributes.strength_mod
+        dex_mod = self.attributes.dexterity_mod
+        int_mod = self.attributes.intelligence_mod
+        wis_mod = self.attributes.wisdom_mod
+        cha_mod = self.attributes.charisma_mod
         self.skills = {
-            "acrobatics": Skill("acrobatics", self.attributes.dexterity_mod),
-            "animal handling": Skill("animal handling", self.attributes.wisdom_mod),
-            "arcana": Skill("arcana", self.attributes.intelligence_mod),
-            "athletics": Skill("athletics", self.attributes.strength_mod),
-            "deception": Skill("deception", self.attributes.charisma_mod),
-            "history": Skill("history", self.attributes.intelligence_mod),
-            "insight": Skill("insight", self.attributes.wisdom_mod),
-            "intimidation": Skill("intimidation", self.attributes.charisma_mod),
-            "investigation": Skill("investigation", self.attributes.intelligence_mod),
-            "medicine": Skill("medicine", self.attributes.wisdom_mod),
-            "nature": Skill("nature", self.attributes.intelligence_mod),
-            "perception": Skill("perception", self.attributes.wisdom_mod),
-            "performance": Skill("performance", self.attributes.charisma_mod),
-            "persuasion": Skill("persuasion", self.attributes.charisma_mod),
-            "religion": Skill("religion", self.attributes.intelligence_mod),
-            "sleight of hand": Skill("sleight of hand", self.attributes.dexterity_mod),
-            "stealth": Skill("stealth", self.attributes.dexterity_mod),
-            "survival": Skill("survival", self.attributes.wisdom_mod)
+            "athletics": Skill("athletics", str_mod),
+            "acrobatics": Skill("acrobatics", dex_mod),
+            "sleight of hand": Skill("sleight of hand", dex_mod),
+            "stealth": Skill("stealth", dex_mod),
+            "arcana": Skill("arcana", int_mod),
+            "history": Skill("history", int_mod),
+            "investigation": Skill("investigation", int_mod),
+            "nature": Skill("nature", int_mod),
+            "religion": Skill("religion", int_mod),
+            "animal handling": Skill("animal handling", wis_mod),
+            "insight": Skill("insight", wis_mod),
+            "medicine": Skill("medicine", wis_mod),
+            "perception": Skill("perception", wis_mod),
+            "survival": Skill("survival", wis_mod),
+            "deception": Skill("deception", cha_mod),
+            "intimidation": Skill("intimidation", cha_mod),
+            "performance": Skill("performance", cha_mod),
+            "persuasion": Skill("persuasion", cha_mod)
         }
 
-        # Bonus For 5e:
-        # Levels 01 - 04: 2
-        # Levels 05 - 08: 3
-        # Levels 09 - 12: 4
-        # Levels 13 - 16: 5
-        # Levels 17 - 20: 6
-        proficiency_bonus = (self.level - 1) // 4 + 2
-        if proficiencies is not None:
-            for i in proficiencies:
-                try:
-                    self.skills[i].prof = True
-                    self.skills[i].stat += proficiency_bonus
-                except KeyError:
-                    print(f'Item: {i} in self.proficiencies could not be set properly. Please Check This!')
+        for i in self.proficiencies:
+            self.skills[i].stat += self.proficiency_bonus
+
+    async def reload_skills(self):
+        str_mod = self.attributes.strength_mod
+        dex_mod = self.attributes.dexterity_mod
+        int_mod = self.attributes.intelligence_mod
+        wis_mod = self.attributes.wisdom_mod
+        cha_mod = self.attributes.charisma_mod
+        self.skills = {
+            "athletics": Skill("athletics", str_mod),
+            "acrobatics": Skill("acrobatics", dex_mod),
+            "sleight of hand": Skill("sleight of hand", dex_mod),
+            "stealth": Skill("stealth", dex_mod),
+            "arcana": Skill("arcana", int_mod),
+            "history": Skill("history", int_mod),
+            "investigation": Skill("investigation", int_mod),
+            "nature": Skill("nature", int_mod),
+            "religion": Skill("religion", int_mod),
+            "animal handling": Skill("animal handling", wis_mod),
+            "insight": Skill("insight", wis_mod),
+            "medicine": Skill("medicine", wis_mod),
+            "perception": Skill("perception", wis_mod),
+            "survival": Skill("survival", wis_mod),
+            "deception": Skill("deception", cha_mod),
+            "intimidation": Skill("intimidation", cha_mod),
+            "performance": Skill("performance", cha_mod),
+            "persuasion": Skill("persuasion", cha_mod)
+        }
+        for i in self.proficiencies:
+            self.skills[i].stat += self.proficiency_bonus
+
+    async def set_attribute(self, attribute, level):
+        stat_mod = (level - 10) // 2
+        if attribute == "strength":
+            self.attributes.strength = level
+            self.attributes.strength_mod = stat_mod
+        elif attribute == "dexterity":
+            self.attributes.dexterity = level
+            self.attributes.dexterity_mod = stat_mod
+        elif attribute == "constitution":
+            self.attributes.constitution = level
+            self.attributes.constitution_mod = stat_mod
+        elif attribute == "intelligence":
+            self.attributes.intelligence = level
+            self.attributes.intelligence_mod = stat_mod
+        elif attribute == "wisdom":
+            self.attributes.wisdom = level
+            self.attributes.wisdom_mod = stat_mod
+        elif attribute == "charisma":
+            self.attributes.charisma = level
+            self.attributes.charisma_mod = stat_mod
+        else:
+            return f"Could Not Set {attribute}!"
+        await self.reload_skills()
+        return f"Set {attribute}= {level}"

@@ -106,8 +106,8 @@ class Gamble(commands.Cog):
             except asyncio.TimeoutError:
                 return await ctx.send('Timed Out. Please reissue command.')
 
-    @commands.command(name='roll', aliases=['dice'])
-    async def roll(self, ctx, *, dice="1d6"):
+    @commands.command(name='roll_dice', aliases=['dice'])
+    async def roll_dice(self, ctx, *, dice="1d6"):
         output = []
         for i in dice.split(' '):
             [qty, sides] = i.split('d')
