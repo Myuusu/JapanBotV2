@@ -31,7 +31,7 @@ class Gamble(commands.Cog):
             for machine in self.bot.slot_machines.keys():
                 des.append(self.bot.slot_machines[machine].print())
             des.append("Enter the slot command, followed by the name of the slot machine you'd like to play!")
-            await ctx.send(embed=Embed(title="Slot Machine List", description="\n".join(des), color=0x00ff00))
+            await ctx.send(embed=Embed(title="Slot Machine List", description="\n".join(des)))
         else:
             spins = round(await clean_float(spins))
             multiplier = await clean_float(multiplier)
