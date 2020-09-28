@@ -5,11 +5,11 @@ character_list = {
         Character(
             user_id=228716653318373376,
             char_name="Vol",
-            class_type="Fighter",
+            class_type="fighter",
             level=3,
-            background="Soldier",
-            alignment="Chaotic Good",
-            race="Human",
+            background="soldier",
+            alignment="chaotic good",
+            race="human",
             exp=900,
             proficiencies=[
                 "athletics",
