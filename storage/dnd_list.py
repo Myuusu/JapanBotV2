@@ -1918,24 +1918,138 @@ class_list = {
 }
 
 skill_list = {
-    "athletics",
-    "acrobatics",
-    "sleight of hand",
-    "stealth",
-    "arcana",
-    "history",
-    "investigation",
-    "nature",
-    "religion",
-    "animal handling",
-    "insight",
-    "medicine",
-    "perception",
-    "survival",
-    "deception",
-    "intimidation",
-    "performance",
-    "persuasion"
+    "athletics": {
+        "name": "athletics",
+        "aliases": ["Athletics"]
+    },
+    "acrobatics": {
+        "name": "acrobatics",
+        "aliases": [
+            "Acrobatics"
+        ]
+    },
+    "sleight of hand": {
+        "name": "sleight of hand",
+        "aliases": [
+            "sleight_of_hand",
+            "Sleight of hand",
+            "Sleight of Hand",
+            "SOH",
+            "soh",
+            "SoH"
+        ]
+    },
+    "stealth": {
+        "name": "stealth",
+        "aliases": [
+            "Stealth",
+            "Sneaky",
+            "Sneak",
+            "sneak"
+        ]
+    },
+    "arcana": {
+        "name": "arcana",
+        "aliases": [
+            "Arcana"
+        ]
+    },
+    "history": {
+        "name": "history",
+        "aliases": [
+            "History"
+        ]
+    },
+    "investigation": {
+        "name": "investigation",
+        "aliases": [
+            "Investigation"
+        ]
+    },
+    "nature": {
+        "name": "nature",
+        "aliases": [
+            "Nature"
+        ]
+    },
+    "religion": {
+        "name": "religion",
+        "aliases": [
+            "Religion",
+            "Jesus",
+            "jesus"
+        ]
+    },
+    "animal handling": {
+        "name": "animal handling",
+        "aliases": [
+            "Animal handling",
+            "animal Handling",
+            "Animal Handling",
+            "animal_handling",
+            "Animal_handling",
+            "animal_Handling",
+            "Animal_Handling",
+            "ah",
+            "AH",
+            "a_h",
+            "A_h",
+            "a_H",
+            "A_H"
+        ]
+    },
+    "insight": {
+        "name": "insight",
+        "aliases": [
+            "Insight"
+        ]
+    },
+    "medicine": {
+        "name": "medicine",
+        "aliases": [
+            "Medicine"
+        ]
+    },
+    "perception": {
+        "name": "perception",
+        "aliases": [
+            "Perception"
+        ]
+    },
+    "survival": {
+        "name": "survival",
+        "aliases": [
+            "Survival"
+        ]
+    },
+    "deception": {
+        "name": "deception",
+        "aliases": [
+            "Deception"
+        ]
+    },
+    "intimidation": {
+        "name": "intimidation",
+        "aliases": [
+            "Intimidation",
+            "Rawr",
+            "rawr",
+            "Rawr XD",
+            "rawr xd"
+        ]
+    },
+    "performance": {
+        "name": "performance",
+        "aliases": [
+            "Performance"
+        ]
+    },
+    "persuasion": {
+        "name": "persuasion",
+        "aliases": [
+            "Persuasion"
+        ]
+    }
 }
 
 alignment_list = {
@@ -2015,7 +2129,7 @@ alignment_list = {
 
 # https://media.wizards.com/2014/downloads/dnd/MM_MonstersCR.pdf
 # https://api.open5e.com/monsters/
-challenge_list = {
+monster_list = {
     "0": {
         "awakened-shrub": {
             "slug": "awakened-shrub",

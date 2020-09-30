@@ -6,8 +6,8 @@ from random import randrange
 
 import discord
 from discord.ext import commands, tasks
-
 from classes import Guild, Trivia
+from commands.utility import find_message_in_channel, find_string_in_channel_content
 from config import bot_token, t_b, t_c, t_c_a, t_q_h, t_a_h
 from storage.account_list import account_list
 from storage.eight_ball_responses import eight_ball_responses
@@ -18,53 +18,6 @@ from storage.station_list import station_list
 from storage.timer_list import timer_list
 from storage.trivia_list import trivia_list
 from storage.character_list import character_list
-
-
-async def find_duplicate_messages(channel):
-    if channel is None:
-        print('Channel Is Not Found In find_duplicate_messages Function')
-        return None
-    found = []
-    duplicates = []
-
-    def transform(message):
-        return {message.content, message.id}
-
-    async for content, message_id in channel.history(limit=None).map(transform):
-        if content in found:
-            print(f"Duplicate Found: {content}")
-            duplicates.append(message_id)
-        else:
-            found.append(content)
-    else:
-        return duplicates
-
-
-async def remove_duplicate_messages_in_channel(channel):
-    if channel is None:
-        print('Channel Is Not Found In remove_duplicate_messages_in_channel Function')
-    duplicate_messages = await find_duplicate_messages(channel)
-    if duplicate_messages is not None:
-        for i in duplicate_messages:
-            msg = await channel.fetch_message(id=i)
-            if msg is not None:
-                await msg.delete()
-
-
-async def find_message_in_channel(message, channel):
-    async for i in channel.history(limit=None):
-        if message == i:
-            return True
-    else:
-        return False
-
-
-async def find_string_in_channel_content(content, channel):
-    async for i in channel.history(limit=None):
-        if content in i.content:
-            return True
-    else:
-        return False
 
 
 class Bot(commands.Bot):

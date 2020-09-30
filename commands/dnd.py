@@ -11,10 +11,10 @@ from storage.dnd_list import class_list, race_list, skill_list, alignment_list
 class DND(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.race_embed = Embed(title="Available Races", description="\n".join(race_list))
-        self.skill_embed = Embed(title="Available Skills", description="\n".join(skill_list))
-        self.class_type_embed = Embed(title="Available Classes", description="\n".join(class_list))
-        self.alignment_embed = Embed(title="Available Alignments", description="\n".join(alignment_list))
+        self.races = "\n".join(race_list)
+        self.skills = "\n".join(skill_list)
+        self.class_types = "\n".join(class_list)
+        self.alignments = "\n".join(alignment_list)
 
     @commands.command(name="create_character", aliases=['make_char', 'createcharacter'])
     async def create_character(
@@ -30,17 +30,24 @@ class DND(commands.Cog):
             proficiencies=None,
             attributes=None
     ):
-        if class_type in class_list:
+        if isinstance(class_type, Class):
+            class_type = class_type
+        elif class_type in class_list:
             class_type = class_list[class_type]
+        else:
+            class_type = None
         if proficiencies is not None:
-            proficiencies = proficiencies.split(',')
-        if attributes is None:
+            proficiencies = dict(proficiencies.split(','))
+        if attributes is None or len(attributes.split(',')) != 6:
             attributes = Attributes()
         else:
             att = attributes.split(',')
-            attributes = Attributes(
-                int(att[0]), int(att[1]), int(att[2]), int(att[3]), int(att[4]), int(att[5])
-            )
+            if len(att) == 6:
+                attributes = Attributes(
+                    int(att[0]), int(att[1]), int(att[2]), int(att[3]), int(att[4]), int(att[5])
+                )
+            else:
+                attributes = Attributes()
 
         current = Character(
             user_id=ctx.author.id,
@@ -63,14 +70,22 @@ class DND(commands.Cog):
         await ctx.send(await trim(results, 2000))
 
     @commands.command(name="roll", aliases=['roll_skill'])
-    async def roll(self, ctx, skill):
-        if await(self.character_found(ctx)):
-            if skill in self.bot.character_list[ctx.author.id].skills:
-                bonus = self.bot.character_list[ctx.author.id].skills[skill].stat
+    async def roll(self, ctx, *, skill):
+        character = await(self.character_found(ctx))
+        if character:
+            if skill in character.skills:
+                bonus = character.skills[skill].stat
                 roll = await one_in(20)
                 await ctx.send(f"**{roll + bonus}**\nRoll: {roll}\nBonus: {bonus}")
             else:
-                await ctx.send("Are you sure that's the name of the skill?", delete_after=10)
+                for i in character.skills:
+                    if skill in character.skills[i].aliases:
+                        bonus = character.skills[i].stat
+                        roll = await one_in(20)
+                        await ctx.send(f"**{roll + bonus}**\nRoll: {roll}\nBonus: {bonus}")
+                        return
+                else:
+                    await ctx.send("Are you sure that's the name of the skill?", delete_after=10)
 
     @commands.group()
     async def set(self, ctx):
@@ -79,214 +94,151 @@ class DND(commands.Cog):
 
     @set.command(aliases=['str'])
     async def strength(self, ctx, level=None):
+        attr = "strength"
         if level is None:
-            await ctx.send(embed='Enter New Attribute Level', delete_after=10)
-
-            def check(m):
-                return ctx.channel == m.channel and ctx.author == m.author
-
-            try:
-                response = await self.bot.wait_for('message', check=check, timeout=10)
-                await self.set_attribute(ctx, "strength", response.content)
-            except asyncio.TimeoutError:
-                await ctx.send('Timed Out. Please reissue command.', delete_after=10)
+            result = await self.prompt(ctx=ctx, question=f"Enter {attr} level", output="int")
+            if result is not False:
+                await self.set_attribute(ctx, attr, result)
         else:
-            await self.set_attribute(ctx, "strength", level)
+            await self.set_attribute(ctx, attr, int(level))
 
     @set.command(aliases=['dex'])
     async def dexterity(self, ctx, level=None):
+        attr = "dexterity"
         if level is None:
-            await ctx.send(embed='Enter New Attribute Level', delete_after=10)
-
-            def check(m):
-                return ctx.channel == m.channel and ctx.author == m.author
-
-            try:
-                response = await self.bot.wait_for('message', check=check, timeout=10)
-                await self.set_attribute(ctx, "dexterity", response.content)
-            except asyncio.TimeoutError:
-                await ctx.send('Timed Out. Please reissue command.', delete_after=10)
+            result = await self.prompt(ctx=ctx, question=f"Enter {attr} level", output="int")
+            if result is not False:
+                await self.set_attribute(ctx, attr, result)
         else:
-            await self.set_attribute(ctx, "dexterity", level)
+            await self.set_attribute(ctx, attr, int(level))
 
     @set.command(aliases=['con'])
     async def constitution(self, ctx, level=None):
+        attr = "constitution"
         if level is None:
-            await ctx.send(embed='Enter New Attribute Level', delete_after=10)
-
-            def check(m):
-                return ctx.channel == m.channel and ctx.author == m.author
-
-            try:
-                response = await self.bot.wait_for('message', check=check, timeout=10)
-                await self.set_attribute(ctx, "constitution", response.content)
-            except asyncio.TimeoutError:
-                await ctx.send('Timed Out. Please reissue command.', delete_after=10)
+            result = await self.prompt(ctx=ctx, question=f"Enter {attr} level", output="int")
+            if result is not False:
+                await self.set_attribute(ctx, attr, result)
         else:
-            await self.set_attribute(ctx, "constitution", level)
+            await self.set_attribute(ctx, attr, int(level))
 
     @set.command(aliases=['int'])
     async def intelligence(self, ctx, level=None):
+        attr = "intelligence"
         if level is None:
-            await ctx.send(embed='Enter New Attribute Level', delete_after=10)
-
-            def check(m):
-                return ctx.channel == m.channel and ctx.author == m.author
-
-            try:
-                response = await self.bot.wait_for('message', check=check, timeout=10)
-                await self.set_attribute(ctx, "intelligence", response.content)
-            except asyncio.TimeoutError:
-                await ctx.send('Timed Out. Please reissue command.', delete_after=10)
+            result = await self.prompt(ctx=ctx, question=f"Enter {attr} level", output="int")
+            if result is not False:
+                await self.set_attribute(ctx, attr, result)
         else:
-            await self.set_attribute(ctx, "intelligence", level)
+            await self.set_attribute(ctx, attr, int(level))
 
     @set.command(aliases=['wis'])
     async def wisdom(self, ctx, level=None):
+        attr = "wisdom"
         if level is None:
-            await ctx.send(embed='Enter New Attribute Level', delete_after=10)
-
-            def check(m):
-                return ctx.channel == m.channel and ctx.author == m.author
-
-            try:
-                response = await self.bot.wait_for('message', check=check, timeout=10)
-                await self.set_attribute(ctx, "wisdom", response.content)
-            except asyncio.TimeoutError:
-                await ctx.send('Timed Out. Please reissue command.', delete_after=10)
+            result = await self.prompt(ctx=ctx, question=f"Enter {attr} level", output="int")
+            if result is not False:
+                await self.set_attribute(ctx, attr, result)
         else:
-            await self.set_attribute(ctx, "wisdom", level)
+            await self.set_attribute(ctx, attr, int(level))
 
     @set.command(aliases=['cha'])
     async def charisma(self, ctx, level=None):
+        attr = "charisma"
         if level is None:
-            await ctx.send(embed='Enter New Attribute Level', delete_after=10)
-
-            def check(m):
-                return ctx.channel == m.channel and ctx.author == m.author
-
-            try:
-                response = await self.bot.wait_for('message', check=check, timeout=10)
-                await self.set_attribute(ctx, "charisma", response.content)
-            except asyncio.TimeoutError:
-                await ctx.send('Timed Out. Please reissue command.', delete_after=10)
+            result = await self.prompt(ctx=ctx, question=f"Enter {attr} level", output="int")
+            if result is not False:
+                await self.set_attribute(ctx, attr, result)
         else:
-            await self.set_attribute(ctx, "charisma", level)
+            await self.set_attribute(ctx, attr, int(level))
 
     @set.command(aliases=['atts', 'ats'])
     async def attributes(self, ctx, *, attributes=None):
         if attributes is None:
-            await ctx.send(
-                embed=Embed(
-                    title="Please enter a number for each attribute, separated by commas",
-                    description="Enter stats in this order:\nStr, Dex, Con, Wis, Int, Cha"
-                ),
-                delete_after=10
-            )
-
-            def check(m):
-                return ctx.channel == m.channel and ctx.author == m.author
-
-            try:
-                response = await self.bot.wait_for('message', check=check, timeout=10)
-                await self.update_valid_attributes(ctx, response.content.replace(" ", "").split(","))
-            except asyncio.TimeoutError:
-                await ctx.send('Timed Out. Please reissue command.', delete_after=10)
+            result = await self.prompt(ctx, question="Enter attributes separated by commas in this order:\nStr, Dex, "
+                                                     "Con, Wis, Int, Cha")
+            if result is not False:
+                await self.update_valid_attributes(ctx, result.replace(" ", "").split(","))
         else:
             await self.update_valid_attributes(ctx, attributes.replace(" ", "").split(","))
 
     @set.command(aliases=['skills', 'profs'])
     async def proficiencies(self, ctx, *, skills=None):
         if skills is None:
-            await ctx.send(embed=self.skill_embed, delete_after=10)
-
-            def check(m):
-                return ctx.channel == m.channel and ctx.author == m.author
-
-            try:
-                response = await self.bot.wait_for('message', check=check, timeout=10)
-                await self.process_valid_skills(ctx, response.content.split(','))
-            except asyncio.TimeoutError:
-                await ctx.send('Timed Out. Please reissue command.', delete_after=10)
+            result = await self.prompt(ctx=ctx, question="Enter skills separated by commas", description=self.skills)
+            if result is not False:
+                await self.process_valid_skills(ctx, result.split(','))
         else:
             await self.process_valid_skills(ctx, skills.split(","))
 
     @set.command(aliases=['toggle_prof', 'toggle prof'])
     async def prof(self, ctx, skill=None):
         if skill is None:
-            await ctx.send('Please enter a skill from the list below to toggle proficiency.', delete_after=10)
-            await ctx.send(embed=self.skill_embed, delete_after=10)
-
-            def check(m):
-                return ctx.channel == m.channel and ctx.author == m.author
-
-            try:
-                response = await self.bot.wait_for('message', check=check, timeout=10)
-                await self.process_valid_skill(ctx, response.content)
-            except asyncio.TimeoutError:
-                await ctx.send('Timed Out. Please reissue command.', delete_after=10)
+            result = await self.prompt(ctx=ctx, question="Enter skill to toggle proficiency", description=self.skills)
+            if result is not False:
+                await self.process_valid_skill(ctx, result.split(','))
         else:
             await self.process_valid_skill(ctx, skill)
 
     @set.command()
     async def alignment(self, ctx, *, alignment=None):
         if alignment is None:
-            await ctx.send('Please enter an alignment from the list below.', delete_after=10)
-            await ctx.send(embed=self.alignment_embed, delete_after=10)
-
-            def check(m):
-                return ctx.channel == m.channel and ctx.author == m.author
-
-            try:
-                response = await self.bot.wait_for('message', check=check, timeout=10)
-                await self.process_valid_alignment(ctx, response.content)
-            except asyncio.TimeoutError:
-                await ctx.send('Timed Out. Please reissue command.', delete_after=10)
+            result = await self.prompt(ctx=ctx, question="Enter an alignment", description=self.alignments)
+            if result is not False:
+                await self.process_valid_alignment(ctx, result)
         else:
             await self.process_valid_alignment(ctx, alignment)
 
     @set.command()
     async def race(self, ctx, *, race=None):
         if race is None:
-            await ctx.send(embed=self.race_embed, delete_after=10)
-
-            def check(m):
-                return ctx.channel == m.channel and ctx.author == m.author
-
-            try:
-                response = await self.bot.wait_for('message', check=check, timeout=10)
-                await self.process_valid_race(ctx, response.content)
-            except asyncio.TimeoutError:
-                await ctx.send('Timed Out. Please reissue command.', delete_after=10)
+            result = await self.prompt(ctx=ctx, question="Enter a race", description=self.races)
+            if result is not False:
+                await self.process_valid_race(ctx, result)
         else:
             await self.process_valid_race(ctx, race)
 
     @set.command(aliases=['class'])
     async def class_type(self, ctx, *, class_type=None):
         if class_type is None:
-            await ctx.send(embed=self.class_type_embed)
-
-            def check(m):
-                return ctx.channel == m.channel and ctx.author == m.author
-
-            try:
-                response = await self.bot.wait_for('message', check=check, timeout=10)
-                await self.process_valid_class(ctx, response.content)
-            except asyncio.TimeoutError:
-                await ctx.send('Timed Out. Please reissue command.', delete_after=10)
+            result = await self.prompt(ctx=ctx, question="Enter a class", description=self.class_types)
+            if result is not False:
+                await self.process_valid_class(ctx, result)
         else:
-            await self.process_valid_class(ctx, class_list)
+            await self.process_valid_class(ctx, class_type)
 
     @commands.command(aliases=['print'])
     async def output(self, ctx):
         if await(self.character_found(ctx)):
             await self.bot.character_list[ctx.author.id].output(ctx)
 
+    """ Helper function that prompts the user for additional input """
+
+    async def prompt(self, ctx, question: str = None, description: str = None, output="str"):
+        if question is None:
+            if description is not None:
+                await ctx.send(embed=Embed(title="Question", description=description), delete_after=10)
+        else:
+            await ctx.send(embed=Embed(title=question, description=description), delete_after=10)
+
+        def check(m):
+            return ctx.channel == m.channel and ctx.author == m.author
+
+        try:
+            response = await self.bot.wait_for('message', check=check, timeout=10)
+            if output == "str":
+                return response.content
+            elif output == "int":
+                return int(response.content)
+        except asyncio.TimeoutError:
+            await ctx.send('Timed Out. Please reissue command.', delete_after=10)
+        return False
+
     """ Helper function that prevents commands from executing for any users without a character created """
 
     async def character_found(self, ctx):
         if ctx.author.id in self.bot.character_list:
-            return True
+            return self.bot.character_list[ctx.author.id]
         else:
             await ctx.message.delete()
             await ctx.send('Character Not Found. Please use the make_char command.', delete_after=10)
@@ -315,16 +267,26 @@ class DND(commands.Cog):
 
     async def process_valid_skill(self, ctx, skill):
         if skill in skill_list:
-            if skill in self.bot.character_list[ctx.author.id].proficiencies:
-                self.bot.character_list[ctx.author.id].proficiencies.pop(skill)
-                await self.bot.character_list[ctx.author.id].reload_skills()
-                await ctx.send('Successfully updated proficiencies and skills.', delete_after=10)
-            else:
-                self.bot.character_list[ctx.author.id].proficiencies.append(skill)
-                await self.bot.character_list[ctx.author.id].reload_skills()
-                await ctx.send('Successfully updated proficiencies and skills.', delete_after=10)
+            await self.toggle_prof(ctx, skill)
         else:
-            await ctx.send('Skill could not be updated successfully. Ensure proper spelling.', delete_after=10)
+            for i in skill_list:
+                if skill in skill_list[i]["aliases"]:
+                    await self.toggle_prof(ctx, skill_list[i]["name"])
+                    return
+            else:
+                await ctx.send('Skill could not be updated successfully. Ensure proper spelling.', delete_after=10)
+
+    """ Helper function to append / remove skill to / from proficiencies """
+
+    async def toggle_prof(self, ctx, skill):
+        current = self.bot.character_list[ctx.author.id]
+        try:
+            current.proficiencies.remove(skill)
+        except (ValueError, KeyError):
+            current.proficiencies.append(skill)
+        finally:
+            await current.reload_skills()
+            await ctx.send('Successfully updated proficiencies and skills.', delete_after=10)
 
     """ Helper function to check user input and filter out bad strings that were inputted as 'skills' """
 
@@ -349,7 +311,7 @@ class DND(commands.Cog):
     async def update_valid_attributes(self, ctx, att):
         if len(att) == 6:
             self.bot.character_list[ctx.author.id].attributes = Attributes(
-                att[0], att[1], att[2], att[3], att[4], att[5]
+                int(att[0]), int(att[1]), int(att[2]), int(att[3]), int(att[4]), int(att[5])
             )
             await ctx.send('Successfully updated Attributes.', delete_after=10)
         else:
