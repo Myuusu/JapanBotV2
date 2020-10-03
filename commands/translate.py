@@ -1,13 +1,85 @@
+import asyncio
 import re
 import urllib
 from urllib.parse import quote_plus
 
+import discord
 import lxml.html
 from discord import Embed
 from discord.ext import commands
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 
-from commands.utility import find_in_site_text, read_website, trim
+from commands.utility import find_in_site_text, read_website
+from commands.utility import trim
+from config import chrome_driver_path
 from config import x_naver_client_id, x_naver_client_secret
+
+
+class WebTable:
+    def __init__(self, web_table):
+        self.table = {
+            "table": web_table,
+            "rows": len(web_table.find_elements_by_xpath("tr")) - 1,
+            "columns": len(web_table.find_elements_by_xpath("//tr[2]/td"))
+        }
+
+    def __getitem__(self, item):
+        return self.table[item]
+
+    def get_row_count(self):
+        return len(self.table["table"].find_elements_by_tag_name("tr")) - 1
+
+    def get_column_count(self):
+        return len(self.table["table"].find_elements_by_xpath("//tr[2]/td"))
+
+    def get_table_size(self):
+        return {"rows": self.get_row_count(), "columns": self.get_column_count()}
+
+    def row_data(self, row_number):
+        if row_number == 0:
+            raise Exception("Row number starts from 1")
+        r_data = []
+        for webElement in self.table["table"].find_elements_by_xpath(f'//tr[{str(row_number + 1)}]/td'):
+            r_data.append(webElement.text)
+        return r_data
+
+    def column_data(self, column_number):
+        r_data = []
+        for webElement in self.table["table"].find_elements_by_xpath(f'//tr/td[{str(column_number)}]'):
+            r_data.append(webElement.text)
+        return r_data
+
+    def get_all_data(self, max_rows=None):
+        if max_rows:
+            num_rows = len(self.table["table"].find_elements_by_xpath("//tr")) - 1
+            if max_rows < num_rows:
+                num_rows = max_rows
+        else:
+            num_rows = len(self.table["table"].find_elements_by_xpath("//tr")) - 1
+        header = ["Form", "Plain", "Polite"]
+        all_data = [" | ".join(header)]
+        for i in range(2, num_rows):
+            ro = ["**(" + self.table["table"].find_element_by_xpath(f'//tr[{str(i)}]/th').text + ")**"]
+            for j in range(1, len(self.table["table"].find_elements_by_xpath(f'//tr[{str(i)}]/td')) - 1):
+                try:
+                    ro.append(
+                        self.table["table"].find_element_by_xpath(
+                            f'//tr[{str(i)}]/td[{str(j)}]'
+                        ).text
+                    )
+                except NoSuchElementException:
+                    pass
+            all_data.append(" | ".join(ro))
+        return all_data
+
+    def presence_of_data(self, data):
+        return len(self.table["table"].find_elements_by_xpath(f'//td[normalize-space(text())="{data}"]')) > 0
+
+    def get_cell_data(self, row_number, column_number):
+        if row_number == 0:
+            raise Exception("Row number starts from 1")
+        return self.table["table"].find_element_by_xpath(f'//tr[{str(row_number + 1)}]/td[{str(column_number)}]').text
 
 
 class Translate(commands.Cog):
@@ -86,6 +158,32 @@ class Translate(commands.Cog):
             await ctx.send(f'/tts {results["message"]["result"]["translatedText"]}')
         except KeyError:
             await ctx.send("Translation Was Not Able To Be Found")
+
+    @commands.command(name='c', aliases=['con', 'conjugate'])
+    async def c(self, ctx, query: str = "string"):
+        options = webdriver.ChromeOptions()
+        options.add_argument("headless")
+        with webdriver.Chrome(executable_path=chrome_driver_path, options=options) as driver:
+            driver.get(f'https://tangorin.com/words?search={query}')
+            page_link = driver.find_element_by_xpath('//*[@class="results-dl "]/*/a')
+            page_link.click()
+            await asyncio.sleep(5)
+            table_link = driver.find_element_by_xpath('//*/section/div/dl/div/dt/a')
+            table_link.click()
+            des = []
+            table_data = driver.find_element_by_xpath('//*/section/*/table')
+            for row in WebTable(table_data).get_all_data(40):
+                des.append(
+                    row.strip("'[]").replace("\n", "//")
+                )
+            await ctx.send(
+                embed=discord.Embed(
+                    title=f"Conjugation of {query}",
+                    description=await trim("\n".join(des)),
+                    color=0x00ff00
+                )
+            )
+        driver.quit()
 
 
 def setup(bot):

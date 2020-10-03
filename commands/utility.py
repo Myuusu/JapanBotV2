@@ -12,50 +12,69 @@ import discord
 from discord.ext import commands
 
 
-async def find_duplicate_messages(channel):
-    if channel is None:
-        print('Channel Is Not Found In find_duplicate_messages Function')
-        return None
-    found = []
-    duplicates = []
+async def print_error(code=None, function=None):
+    if code is None:
+        print('Error: General Error!')
+    elif code == 1:
+        print('Error: Channel Could Not Be Located!')
+    if function is not None:
+        print(f'Error triggered during execution of: {function}')
 
-    def transform(message):
-        return {message.content, message.id}
 
-    async for content, message_id in channel.history(limit=None).map(transform):
-        if content in found:
-            print(f"Duplicate Found: {content}")
-            duplicates.append(message_id)
+async def find_duplicate_messages(channel: discord.TextChannel = None):
+    if channel is not None:
+        found = []
+        duplicates = []
+
+        def transform(message):
+            return {message.content, message.id}
+
+        async for content, message_id in channel.history(limit=None).map(transform):
+            if content in found:
+                print(f"Duplicate Found: {content}")
+                duplicates.append(message_id)
+            else:
+                found.append(content)
         else:
-            found.append(content)
+            return duplicates
     else:
-        return duplicates
+        await print_error(1, "find_duplicate_messages")
+        return None
 
 
-async def remove_duplicate_messages_in_channel(channel):
-    if channel is None:
-        print('Channel Is Not Found In remove_duplicate_messages_in_channel Function')
-    duplicate_messages = await find_duplicate_messages(channel)
-    if duplicate_messages is not None:
-        for i in duplicate_messages:
-            msg = await channel.fetch_message(id=i)
-            if msg is not None:
-                await msg.delete()
-
-
-async def find_message_in_channel(message, channel):
-    async for i in channel.history(limit=None):
-        if message == i:
-            return True
+async def remove_duplicate_messages_in_channel(channel: discord.TextChannel = None):
+    if channel is not None:
+        duplicate_messages = await find_duplicate_messages(channel)
+        if duplicate_messages is not None:
+            for i in duplicate_messages:
+                msg = await channel.fetch_message(id=i)
+                if msg is not None:
+                    await msg.delete()
     else:
+        await print_error(1, "remove_duplicate_messages_in_channel")
+
+
+async def find_message_in_channel(message, channel: discord.TextChannel = None):
+    if channel is not None:
+        async for i in channel.history(limit=None):
+            if message == i:
+                return True
+        else:
+            return False
+    else:
+        await print_error(1, "find_message_in_channel")
         return False
 
 
-async def find_string_in_channel_content(content, channel):
-    async for i in channel.history(limit=None):
-        if content in i.content:
-            return True
+async def find_string_in_channel_content(content, channel: discord.TextChannel = None):
+    if channel is not None:
+        async for i in channel.history(limit=None):
+            if content in i.content:
+                return True
+        else:
+            return False
     else:
+        await print_error(1, "find_string_in_channel_content")
         return False
 
 
@@ -90,14 +109,7 @@ async def trim(output: str = "", length: int = 2000):
     return output
 
 
-async def read_website(
-        url: str,
-        process_format: str = "text",
-        method: str = "GET",
-        params=None,
-        headers=None,
-        data=None
-):
+async def read_website(url, process_format="text", method="GET", params=None, headers=None, data=None):
     if data is None:
         data = {}
     if headers is None:
@@ -118,7 +130,7 @@ async def read_website(
                 return await session_get(session=session, url=url, process_format=process_format, params=params)
 
 
-async def session_get(session, url: str, process_format: str = "text", params=None):
+async def session_get(session, url, process_format="text", params=None):
     if params is None:
         params = {}
     async with session.get(url=url, params=params) as resp:
@@ -169,12 +181,13 @@ class Utility(commands.Cog):
         self.bot = bot
 
     @commands.command(name='eval', aliases=['evaluate'])
-    async def eval(self, ctx, *, expression: str = None):
+    async def eval(self, ctx, *, expression=None):
         if expression is None:
             msg = await ctx.send("Please Enter Your Expression.")
 
             def check(m):
                 return ctx.channel == m.channel and ctx.author == m.author
+
             try:
                 response = await self.bot.wait_for('message', check=check, timeout=10)
                 expression = response.content
@@ -280,7 +293,7 @@ class Utility(commands.Cog):
                                f"Please check log for Information. <a:peepohack:740653897772826724>")
 
     @commands.command(name='reverse', aliases=['rev', 'backwards'])
-    async def reverse(self, ctx, *, text: str):
+    async def reverse(self, ctx, *, text):
         t_rev = text[::-1].replace("@", "@\u200B").replace("&", "&\u200B")
         await ctx.send(f"🔁 {t_rev}")
 

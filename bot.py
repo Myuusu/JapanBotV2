@@ -6,10 +6,12 @@ from random import randrange
 
 import discord
 from discord.ext import commands, tasks
-from classes import Guild, Trivia
+
+from classes import Guild
 from commands.utility import find_message_in_channel, find_string_in_channel_content
 from config import bot_token, t_b, t_c, t_c_a, t_q_h, t_a_h
 from storage.account_list import account_list
+from storage.character_list import character_list
 from storage.eight_ball_responses import eight_ball_responses
 from storage.guild_list import guild_list
 from storage.level_list import level_list
@@ -17,22 +19,30 @@ from storage.slot_machines import slot_machines
 from storage.station_list import station_list
 from storage.timer_list import timer_list
 from storage.trivia_list import trivia_list
-from storage.character_list import character_list
 
 
 class Bot(commands.Bot):
     def __init__(self):
         super(Bot, self).__init__(case_insensitive=True, command_prefix=self.get_prefix)
-        self.trivia_channel_answers = {}
+        self.trivia_channel_answers = self.get_channel(t_c_a)
+        self.eight_ball_responses = eight_ball_responses
+        self.slot_machines = slot_machines
         self.account_list = account_list
         self.guild_list = guild_list
         self.level_list = level_list
-        self.eight_ball_responses = eight_ball_responses
-        self.slot_machines = slot_machines
         self.station_list = station_list
         self.trivia_list = trivia_list
         self.timer_list = timer_list
         self.character_list = character_list
+
+        self.last_slot_machines = slot_machines
+        self.last_account_list = account_list
+        self.last_guild_list = guild_list
+        self.last_level_list = level_list
+        self.last_station_list = station_list
+        self.last_trivia_list = trivia_list
+        self.last_timer_list = timer_list
+        self.last_character_list = character_list
 
         for filename in os.listdir('./commands'):
             if filename.endswith('.py'):
@@ -40,13 +50,27 @@ class Bot(commands.Bot):
 
         self.errors = []
 
-    @tasks.loop(seconds=30, count=None, reconnect=True)
+    @tasks.loop(seconds=15, count=None, reconnect=True)
     async def update(self):
-        await self.update_guild_list()
-        await self.update_account_list()
-        await self.update_slot_machines()
-        await self.update_trivia_list()
-        await self.update_timer_list()
+        if self.guild_list != self.last_guild_list:
+            await self.update_guild_list()
+
+        if self.account_list != self.last_account_list:
+            await self.update_account_list()
+
+        if self.slot_machines != self.last_slot_machines:
+            await self.update_slot_machines()
+
+        print('Testing if self.trivia_list != self.last_trivia_list')
+        if self.trivia_list != self.last_trivia_list:
+            print('TRUE: self.trivia_list != self.last_trivia_list\nUpdating trivia_list')
+            await self.update_trivia_list()
+            print('SUCCESS: Finished Updating trivia_list')
+        else:
+            print('FALSE: self.trivia_list == self.last_trivia_list')
+
+        if self.timer_list != self.last_timer_list:
+            await self.update_timer_list()
 
     async def remove_timers(self, indices_to_remove):
         if indices_to_remove is not None:
@@ -77,6 +101,7 @@ class Bot(commands.Bot):
             with open('storage/timer_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
                 fp.write(f'from classes import Timer\n\ntimer_list = {{\n    {output_string}\n}}\n')
             fp.close()
+            self.last_timer_list = self.timer_list
 
     async def update_guild_list(self):
         output = []
@@ -87,6 +112,7 @@ class Bot(commands.Bot):
             with open('storage/guild_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
                 fp.write(f'from classes import Guild\n\nguild_list = {{\n    {output_string}\n}}\n')
             fp.close()
+            self.last_guild_list = self.guild_list
 
     async def update_account_list(self):
         output = []
@@ -97,6 +123,7 @@ class Bot(commands.Bot):
             with open('storage/account_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
                 fp.write(f'from classes import Account\n\naccount_list = {{\n    {output_string}\n}}\n')
             fp.close()
+            self.last_account_list = self.account_list
 
     async def update_slot_machines(self):
         output = []
@@ -107,16 +134,23 @@ class Bot(commands.Bot):
             with open('storage/slot_machines.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
                 fp.write(f'from classes import SlotMachine, Emoji\n\nslot_machines = {{\n    {output_string}\n}}\n')
             fp.close()
+            self.last_slot_machines = self.slot_machines
 
     async def update_trivia_list(self):
         output = []
-        for i in self.trivia_list.keys():
-            output.append(self.trivia_list[i].get_json())
+        for i in self.trivia_list:
+            question = self.trivia_list[i]["question"]
+            answer = self.trivia_list[i]["answer"]
+            output.append(
+                f'    "{question}": {{\n        "question": "{question}",\n        "answer": "{answer}"\n    }}'
+            )
         else:
-            output_string = ",\n    ".join(output)
+            output_string = ",\n".join(output)
+            contents_to_write = f'trivia_list = {{\n{output_string}\n}}\n'
             with open('storage/trivia_list.py', mode='w+', encoding="ascii", errors="backslashreplace") as fp:
-                fp.write(f'from classes import Trivia\n\ntrivia_list = {{\n    {output_string}\n}}\n')
+                fp.write(contents_to_write)
             fp.close()
+            self.last_trivia_list = self.trivia_list
 
     async def get_prefix(self, message):
         try:
@@ -144,8 +178,7 @@ class Bot(commands.Bot):
 
     async def on_ready(self):
         print("Ready")
-        self.update.start()
-        self.trivia_channel_answers = self.get_channel(t_c_a)
+        await self.update.start()
         # if self.trivia_channel_answers is not None:
         # await self.purge_channel(self.trivia_channel_answers)
 
@@ -168,22 +201,24 @@ class Bot(commands.Bot):
         else:
             return await self.process_commands(message)
 
-    async def process_trivia_question(self, message, channel=None):
+    async def process_trivia_question(self, message, channel: discord.TextChannel = None):
         if channel is None:
-            channel = message.channel
+            channel = self.trivia_channel_answers
         question = re.sub(r'^.*\.\.\.\*\* ', '', message.content)
         try:
-            current = self.trivia_list[question].answer
-            if current is None:
+            current = self.trivia_list[question]
+            if current["answer"] in ["None", "", " ", None]:
                 await message.channel.send("Question Located But No Solution Found; Please Update.")
             else:
-                await asyncio.sleep(randrange(3))
-                await message.channel.send(current)
-            if not await find_message_in_channel(message=message, channel=channel):
-                await channel.send(f'**{question}**\n```{current}```')
+                await asyncio.sleep(randrange(2))
+                await message.channel.send(current["answer"])
+                if not await find_message_in_channel(message=message, channel=channel):
+                    await channel.send(f'**{question}**\n```{current["answer"]}```')
         except KeyError:
-            self.trivia_list.update({question: Trivia(question=question)})
-            await message.channel.send("Question Not Located. Inserted, But Needs Solution.")
+            await message.channel.send("Question Not Located. Added To List; Please Update.")
+            trivia_question = {question: {"question": question, "answer": "None"}}
+            print(trivia_question)
+            self.trivia_list.update(trivia_question)
 
     async def on_command_error(self, ctx, exception):
         if isinstance(exception, commands.CommandNotFound):

@@ -1,4 +1,5 @@
 import asyncio
+import random
 
 from discord import Embed
 from discord.ext import commands
@@ -96,6 +97,7 @@ class Gamble(commands.Cog):
         else:
             def test(m):
                 return ctx.channel == m.channel and ctx.author == m.author and "confirm" == m.content
+
             await ctx.send(f'Please type "confirm" to reset the {machine_name}!')
             try:
                 response = await self.bot.wait_for('message', check=test, timeout=10)
@@ -120,7 +122,37 @@ class Gamble(commands.Cog):
             else:
                 output.append(f'{i}: {dice_sum} [{",".join(dice_arr_to_string)}]')
         else:
-            await ctx.send('```'+"\n".join(output)+'```')
+            await ctx.send('```' + "\n".join(output) + '```')
+
+    @commands.command(name='card', aliases=['draw card', 'draw_card'])
+    async def card(self, ctx):
+        deck = Deck()
+        await ctx.send(random.choice(deck.contents))
+
+    @commands.command(name='deal', aliases=['deal cards', 'deal_cards'])
+    async def deal(self, ctx):
+        target_deck = 1
+        deck_one = []
+        deck_two = []
+        deck = Deck()
+        random.shuffle(deck.contents)
+        for x in deck.contents:
+            if target_deck == 1:
+                deck_one.append(x)
+                target_deck = 2
+            else:
+                deck_two.append(x)
+                target_deck = 1
+        else:
+
+            deck_one_output = ""
+            deck_one.sort(key=lambda y: (y.rank, y.suit))
+            for i in deck_one:
+                deck_one_output += f"{str(i)}\n"
+            else:
+                await ctx.send(f"Deck 1:\n{deck_one_output}")
+
+            return [deck_one, deck_two]
 
 
 def setup(bot):

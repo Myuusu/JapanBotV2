@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import discord
 from discord.ext import commands
 
-from classes import Trivia, Timer
+from classes import Timer
 
 
 async def create_timer(end_time, author_id, timer_name):
@@ -35,7 +35,8 @@ class Flashcard(commands.Cog):
             return ctx.channel == m.channel and ctx.author == m.author
         try:
             response = await self.bot.wait_for('message', check=check, timeout=10)
-            self.bot.trivia_list.update({question: Trivia(question=question, answer=response.content)})
+            self.bot.trivia_list.update(
+                {f'"{question}"': {"question": f'"{question}"', "answer": f'"{response.content}"'}})
             await msg.edit(content=f'Updated Successfully.```Question: {question}\nAnswer: {response.content}```')
             not_in_channel = True
             async for message in self.bot.trivia_channel_answers.history():
@@ -51,16 +52,7 @@ class Flashcard(commands.Cog):
 
     @commands.command(
         name='set_timer',
-        aliases=[
-            'start_timer',
-            'timer_start',
-            'timer',
-            'starttimer',
-            'timerstart',
-            'settimer',
-            'timer_set',
-            'timerset'
-        ]
+        aliases=['start_timer', 'timer_start', 'timer', 'starttimer', 'timerstart', 'settimer', 'timer_set', 'timerset']
     )
     async def set_timer(self, ctx, time="00:00:05", name="Reminder"):
         [hours, minutes, seconds] = time.split(":")
@@ -70,15 +62,7 @@ class Flashcard(commands.Cog):
         self.bot.timer_list.update({f'"{ctx.author.id}|{name}"': new_timer})
         await ctx.send(f'{name} timer has been set at {now.time()}. It will expire at {x.time()}')
 
-    @commands.command(
-        name='timers',
-        aliases=[
-            'lookup_timer',
-            'timer_lookup',
-            'timer_status',
-            'status_timer'
-        ]
-    )
+    @commands.command(name='timers', aliases=['lookup_timer', 'timer_lookup', 'timer_status', 'status_timer'])
     async def timer(self, ctx):
         output = []
         for i in self.bot.timer_list.keys():
