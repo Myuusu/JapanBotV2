@@ -61,13 +61,8 @@ class Bot(commands.Bot):
         if self.slot_machines != self.last_slot_machines:
             await self.update_slot_machines()
 
-        print('Testing if self.trivia_list != self.last_trivia_list')
         if self.trivia_list != self.last_trivia_list:
-            print('TRUE: self.trivia_list != self.last_trivia_list\nUpdating trivia_list')
             await self.update_trivia_list()
-            print('SUCCESS: Finished Updating trivia_list')
-        else:
-            print('FALSE: self.trivia_list == self.last_trivia_list')
 
         if self.timer_list != self.last_timer_list:
             await self.update_timer_list()
@@ -195,15 +190,13 @@ class Bot(commands.Bot):
                     if string in message.content:
                         return await self.process_commands(message)
                 else:
-                    return await self.process_trivia_question(message=message, channel=self.trivia_channel_answers)
+                    return await self.process_trivia_question(message=message)
             else:
                 return await self.process_commands(message)
         else:
             return await self.process_commands(message)
 
-    async def process_trivia_question(self, message, channel: discord.TextChannel = None):
-        if channel is None:
-            channel = self.trivia_channel_answers
+    async def process_trivia_question(self, message):
         question = re.sub(r'^.*\.\.\.\*\* ', '', message.content)
         try:
             current = self.trivia_list[question]
@@ -212,8 +205,8 @@ class Bot(commands.Bot):
             else:
                 await asyncio.sleep(randrange(2))
                 await message.channel.send(current["answer"])
-                if not await find_message_in_channel(message=message, channel=channel):
-                    await channel.send(f'**{question}**\n```{current["answer"]}```')
+                if not await find_message_in_channel(message=message, channel=self.trivia_channel_answers):
+                    await self.trivia_channel_answers.send(f'**{question}**\n```{current["answer"]}```')
         except KeyError:
             await message.channel.send("Question Not Located. Added To List; Please Update.")
             trivia_question = {question: {"question": question, "answer": "None"}}
