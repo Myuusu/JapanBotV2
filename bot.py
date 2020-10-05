@@ -197,6 +197,8 @@ class Bot(commands.Bot):
             return await self.process_commands(message)
 
     async def process_trivia_question(self, message):
+        if self.trivia_channel_answers is None:
+            self.trivia_channel_answers = self.get_channel(t_c_a)
         question = re.sub(r'^.*\.\.\.\*\* ', '', message.content)
         try:
             current = self.trivia_list[question]
