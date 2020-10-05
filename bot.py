@@ -5,11 +5,11 @@ from datetime import datetime
 from random import randrange
 
 import discord
+from config import bot_token, t_b, t_c, t_c_a, t_q_h, t_a_h
 from discord.ext import commands, tasks
 
 from classes import Guild
 from commands.utility import find_message_in_channel, find_string_in_channel_content
-from config import bot_token, t_b, t_c, t_c_a, t_q_h, t_a_h
 from storage.account_list import account_list
 from storage.character_list import character_list
 from storage.eight_ball_responses import eight_ball_responses
@@ -173,7 +173,10 @@ class Bot(commands.Bot):
 
     async def on_ready(self):
         print("Ready")
-        await self.update.start()
+        try:
+            await self.update.start()
+        except RuntimeError:
+            print('Previous task still running.')
         # if self.trivia_channel_answers is not None:
         # await self.purge_channel(self.trivia_channel_answers)
 
@@ -233,35 +236,3 @@ class Bot(commands.Bot):
 
 bot = Bot()
 bot.run(bot_token, reconnect=True)
-
-"""
-To do list:
-
-Gambling:
-Weighting modifications
-Jackpot announcements on Animal slot for lion
-Server admin right to toggle "Jackpot Winner" role
-
-Conjugation:
-Fix elements, unable to locate currently
-Fix Issue with overload of conjugations
-
-Station:
-Add a type and subtype for each station so that users can filter through genres
-
-Jisho:
-Fix encoding issue when use a space for ex. to go
-Possibly look into changing from jisho to the website conjugation uses
-
-
-Papago sentence translator:
-Add the API we talked bout of https://papago.naver.com/ to translate entire sentences
-Add the audio output of the translated sentences into the VC function from music.py
-
-Stroke order:
-Create a new command called !so for pulling pictures of the stroke orders for kanji
-        https://jisho.org/search/%23kanji%20(input) <- make sure you type the japanese word in kanji
-        https://gyazo.com/fe9f8c8b4ea6661107c04203b5bc0bf1 <-- reference picture
-If possible, have the automated drawing left side of the picture also be output as a gif or something
-        https://gyazo.com/8f61500ae94e96175bc7433b5e7dd619 <-- reference picture
-"""

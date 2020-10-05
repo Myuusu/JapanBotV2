@@ -9,9 +9,8 @@ from typing import Union
 import discord
 import humanize
 import wavelink
-from discord.ext import commands
-
 from config import node_settings
+from discord.ext import commands
 
 
 async def cog_check(ctx):
